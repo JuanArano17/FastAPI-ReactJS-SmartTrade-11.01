@@ -1,3 +1,5 @@
+# FastAPI-ReactJS-SmartTrade
 # PSW-DDS-Proyect-11.01
+
 Proyecto final de las materias PSW y DDS. 
-Equipo 11.01
+Nombre del Equipo nº11.01: Los Pachangas
