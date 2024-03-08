@@ -81,3 +81,123 @@ class RefundProduct(Base):
         self.quantity = quantity
         self.refund_date = refund_date
 
+class ProductSeller(Base):
+    __tablename__ = 'ProductSeller'
+
+    id_product_seller = Column(Integer, primary_key=True,autoincrement=True)
+    id_product = Column(Integer, ForeignKey('Product.id_product'))
+    id_seller = Column(Integer, ForeignKey('Seller.id_seller'))
+    quantity = Column(Integer, nullable=False)
+    price = Column(Float, nullable=False)
+    shipping_costs = Column(Float, nullable=False)
+
+    def __init__(self, id_product, id_seller, quantity, price, shipping_costs):
+        self.id_product = id_product
+        self.id_seller = id_seller
+        self.quantity = quantity
+        self.price = price
+        self.shipping_costs = shipping_costs
+
+class ProductLine(Base):
+    __tablename__ = 'ProductLine'
+
+    id_product_line = Column(Integer, primary_key=True)
+    id_order = Column(Integer, ForeignKey('Order.id_order'))
+    id_product_seller = Column(Integer, ForeignKey('ProductSeller.id_product_seller'))
+    quantity = Column(Integer, nullable=False)
+    subtotal = Column(Float, nullable=False)
+
+    def __init__(self, id_order, id_product_seller, quantity, subtotal):
+        self.id_order = id_order
+        self.id_product_seller = id_product_seller
+        self.quantity = quantity
+        self.subtotal = subtotal
+
+class BuyerAddress(Base):
+    pass
+
+def add_address(session, street, floor, door, adit_info, city, postal_code, country, id_buyer):
+    address=Address(street,floor,door, adit_info, city, postal_code, country)
+    buyer_address=BuyerAddress(address.id_address,id_buyer)
+    session.add(address)
+    session.add(buyer_address)
+    session.commit(address)
+
+def assign_address(session, id_address, id_buyer):
+    buyer_address=BuyerAddress(id_address, id_buyer)
+    session.add(buyer_address)
+    session.commit(buyer_address)
+
+#must have a product line!
+def add_order(session,id_buyer, id_card, id_address, order_date, total):
+    order=Order(id_buyer, id_card, id_address, order_date, total)
+    session.add(order)
+    session.commit(order)
+
+def add_card(session, card_number, card_name, card_security_num, card_exp_date, id_buyer):
+    card=Card( card_number, card_name, card_security_num, card_exp_date)
+    buyer_owns_card=BuyerOwnsCard(card.id_card, id_buyer)
+    session.add(card)
+    session.add(buyer_owns_card)
+    session.commit(card)
+
+def assign_card(session, id_card, id_buyer):
+    buyer_owns_card=BuyerOwnsCard(id_card, id_buyer)
+    session.add(buyer_owns_card)
+    session.commit(buyer_owns_card)
+
+def add_refund_product(session, id_product_line, quantity, refund_date):
+    product_line=session.query(ProductLine).filter(id_product_line=ProductLine.id_product_line).first()
+    quantity_product_line=product_line.quantity
+    order=session.query(Order).filter(Order.id_order==product_line.id_order)
+    date_difference=refund_date-order.order_date
+    
+    if(quantity>quantity_product_line):
+        print('Unable to refund more items than were ordered')
+    elif(date_difference>30):
+        print('Unable to refund a product more than 30 days after it has been ordered')
+    else:
+        refund_product=RefundProduct(id_product_line, quantity, refund_date)
+        session.add(refund_product)
+        session.commit(refund_product)
+
+def add_product_seller(session,id_product, id_seller, quantity, price, shipping_costs):
+    exists_already=session.query(ProductSeller).filter((ProductSeller.id_seller==id_seller)and(ProductSeller.id_product==id_product)).all()
+    
+    if(len(exists_already)>0):
+        print ('The seller already owns an instance of this product')
+    elif(price<0):
+        print ('Price cannot be negative')
+    elif(shipping_costs<0):
+        print('Shipping costs cannot be negative')
+    elif(quantity<=0):
+        print('Quantity cannot be negative or 0')
+    else:
+        product_seller=ProductSeller(id_product, id_seller, quantity, price, shipping_costs)
+        session.add(product_seller)
+        session.commit(product_seller)
+
+def add_product_line(session, id_order, id_product_seller, quantity, subtotal):
+    product_seller=session.query(ProductSeller).filter(ProductSeller.id_product_seller==id_product_seller).first()
+    product_seller_quantity=product_seller.quantity
+    exists_already=session.query(ProductLine).filter((ProductLine.order==id_order)and(ProductLine.id_product_seller==id_product_seller)).all()
+    related_order=session.query(Order).filter(Order.id_order==id_order).first()
+    price=product_seller.price
+    if(quantity>product_seller_quantity):
+        print('Product seller cannot sell more items than those he owns')
+    elif(len(exists_already)>0):
+        print('The product line trying to be introduced is already in the order')
+    elif(subtotal<0):
+        print('Subtotal cannot be smaller than 0')
+    else:
+        product_line=ProductLine( id_order, id_product_seller, quantity, subtotal)
+        session.add(product_line)
+        session.commit(product_line)
+        #related_order.total+=price*quantity
+
+db=""
+engine=create_engine(db)
+Base.metadata.create_all(bind=engine)
+
+Session=sessionmaker(bind=engine)
+session=Session()
