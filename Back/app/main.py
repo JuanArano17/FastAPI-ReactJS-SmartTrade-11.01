@@ -2,6 +2,8 @@ from sqlalchemy import DateTime, Float, create_engine, ForeignKey, String, Integ
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import relationship
+from sqlalchemy_utils import database_exists, create_database
+from local_settings import postgresql as settings
 
 Base=declarative_base()
 
@@ -30,14 +32,14 @@ class Order(Base):
     __tablename__ = 'Order'
 
     id_order = Column('id_order',Integer, primary_key=True, autoincrement=True)
-    id_buyer = Column('id_buyer',Integer, ForeignKey('Buyer.id_buyer'))
+    #id_buyer = Column('id_buyer',Integer, ForeignKey('Buyer.id_buyer'))
     id_card = Column('id_card', Integer, ForeignKey('Card.id_card'))
     id_address = Column('id_address',Integer, ForeignKey('Address.id_address'))
     order_date = Column('order_date', DateTime, nullable=False)
     total = Column('total', Float, nullable=False)
 
     def __init__(self, id_buyer, id_card, id_address, order_date, total):
-        self.id_buyer = id_buyer
+        #self.id_buyer = id_buyer
         self.id_card = id_card
         self.id_address = id_address
         self.order_date = order_date
@@ -63,11 +65,11 @@ class BuyerOwnsCard(Base):
     __tablename__ = 'BuyerOwnsCard'
 
     id_card = Column(Integer, ForeignKey('Card.id_card'), primary_key=True)
-    id_buyer = Column(Integer, ForeignKey('Buyer.id_buyer'), primary_key=True)
+    #id_buyer = Column(Integer, ForeignKey('Buyer.id_buyer'), primary_key=True)
 
     def __init__(self, id_card, id_buyer):
         self.id_card = id_card
-        self.id_buyer = id_buyer
+        #self.id_buyer = id_buyer
 
 class RefundProduct(Base):
     __tablename__ = 'RefundProduct'
@@ -85,15 +87,15 @@ class ProductSeller(Base):
     __tablename__ = 'ProductSeller'
 
     id_product_seller = Column(Integer, primary_key=True,autoincrement=True)
-    id_product = Column(Integer, ForeignKey('Product.id_product'))
-    id_seller = Column(Integer, ForeignKey('Seller.id_seller'))
+    #id_product = Column(Integer, ForeignKey('Product.id_product'))
+    #id_seller = Column(Integer, ForeignKey('Seller.id_seller'))
     quantity = Column(Integer, nullable=False)
     price = Column(Float, nullable=False)
     shipping_costs = Column(Float, nullable=False)
 
     def __init__(self, id_product, id_seller, quantity, price, shipping_costs):
-        self.id_product = id_product
-        self.id_seller = id_seller
+        #self.id_product = id_product
+        #self.id_seller = id_seller
         self.quantity = quantity
         self.price = price
         self.shipping_costs = shipping_costs
@@ -113,22 +115,22 @@ class ProductLine(Base):
         self.quantity = quantity
         self.subtotal = subtotal
 
-class BuyerAddress(Base):
-    pass
+#class BuyerAddress(Base):
+#    pass
 
 def add_address(session, street, floor, door, adit_info, city, postal_code, country, id_buyer):
     address=Address(street,floor,door, adit_info, city, postal_code, country)
-    buyer_address=BuyerAddress(address.id_address,id_buyer)
+#    buyer_address=BuyerAddress(address.id_address,id_buyer)
     session.add(address)
-    session.add(buyer_address)
+#    session.add(buyer_address)
     session.commit(address)
 
-def assign_address(session, id_address, id_buyer):
-    buyer_address=BuyerAddress(id_address, id_buyer)
-    session.add(buyer_address)
-    session.commit(buyer_address)
+#def assign_address(session, id_address, id_buyer):
+#    buyer_address=BuyerAddress(id_address, id_buyer)
+#    session.add(buyer_address)
+#    session.commit(buyer_address)
 
-#must have a product line!
+#must have a product line!!!
 def add_order(session,id_buyer, id_card, id_address, order_date, total):
     order=Order(id_buyer, id_card, id_address, order_date, total)
     session.add(order)
@@ -195,9 +197,25 @@ def add_product_line(session, id_order, id_product_seller, quantity, subtotal):
         session.commit(product_line)
         #related_order.total+=price*quantity
 
-db=""
-engine=create_engine(db)
-Base.metadata.create_all(bind=engine)
+def get_engine(user,passwd,host,port,db):
+    url = f"postgresql://{user}:{passwd}@{host}:{port}/{db}"
+    if not database_exists(url):
+         create_database(url)
+    engine=create_engine(url, pool_size=50, echo=False)
+    return engine
 
-Session=sessionmaker(bind=engine)
-session=Session()
+def get_engine_from_settings():
+    keys=['pguser','pgpasswd', 'pghost','pgport', 'pgdb']
+    if not all(key in keys for key in settings.keys()):
+        raise Exception('Bad Config File')
+    return get_engine(settings['pguser'], settings['pgpasswd'], settings['pghost'], settings['pgport'], settings['pgdb'])
+
+def get_session():
+    engine=get_engine_from_settings()
+    session=sessionmaker(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    return session
+
+session=get_session()
+
+print(session)
