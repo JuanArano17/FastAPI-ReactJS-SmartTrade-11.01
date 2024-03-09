@@ -5,6 +5,9 @@ from sqlalchemy.orm import relationship
 from sqlalchemy_utils import database_exists, create_database
 from local_settings import postgresql as settings
 
+
+#note: make relationships
+
 Base=declarative_base()
 
 class Address(Base):
