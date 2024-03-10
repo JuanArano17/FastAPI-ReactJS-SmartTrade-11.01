@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional
-from Back.app.database import Order
+from Back.app.schemas.order import Order
 
 class Address(BaseModel):
   id_address: Optional[int] = None

@@ -5,9 +5,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy_utils import database_exists, create_database
 from local_settings import postgresql as settings
 
-
-#note: make relationships
-
 Base=declarative_base()
 
 class Address(Base):
@@ -22,6 +19,9 @@ class Address(Base):
     postal_code=Column('postal_code', String, nullable=False)
     country=Column('country', String, nullable=False)
 
+    orders = relationship('Order', back_populates='address')
+    buyer_addresses=relationship('BuyerAddress', back_populates='address')
+
     def __init__(self, street, floor, door, adit_info, city, postal_code, country): 
         self.street=street
         self.floor=floor
@@ -34,12 +34,18 @@ class Address(Base):
 class Order(Base):
     __tablename__ = 'Order'
 
-    id_order = Column('id_order',Integer, primary_key=True, autoincrement=True)
-    #id_buyer = Column('id_buyer',Integer, ForeignKey('Buyer.id_buyer'))
+    id_order = Column('id_order', Integer, primary_key=True, autoincrement=True)
+    #id_buyer = Column('id_buyer', Integer, ForeignKey('Buyer.id_buyer'))
     id_card = Column('id_card', Integer, ForeignKey('Card.id_card'))
     id_address = Column('id_address',Integer, ForeignKey('Address.id_address'))
     order_date = Column('order_date', DateTime, nullable=False)
     total = Column('total', Float, nullable=False)
+
+    card = relationship('Card', back_populates='orders')
+    address = relationship('Address', back_populates='orders')
+    #buyer= relaionship('Buyer', back_populates='orders')
+
+    product_lines = relationship('ProductLine', back_populates='order')
 
     def __init__(self, id_buyer, id_card, id_address, order_date, total):
         #self.id_buyer = id_buyer
@@ -57,6 +63,9 @@ class Card(Base):
     card_security_num = Column(Integer, nullable=False)
     card_exp_date = Column(DateTime, nullable=False)
 
+    orders = relationship('Order', back_populates='card')
+    buyer_owns_cards = relationship('BuyerOwnsCard', back_populates='card')
+
     def __init__(self, card_number, card_name, card_security_num, card_exp_date):
         self.card_number = card_number
         self.card_name = card_name
@@ -70,16 +79,23 @@ class BuyerOwnsCard(Base):
     id_card = Column(Integer, ForeignKey('Card.id_card'), primary_key=True)
     #id_buyer = Column(Integer, ForeignKey('Buyer.id_buyer'), primary_key=True)
 
+    card = relationship('Card', back_populates='buyer_owns_cards')
+    #buyer=relationship('Buyer', back_populates='buyer_owns_cards')
+
     def __init__(self, id_card, id_buyer):
         self.id_card = id_card
         #self.id_buyer = id_buyer
+        
 
 class RefundProduct(Base):
     __tablename__ = 'RefundProduct'
 
-    id_product_line = Column(Integer, ForeignKey('ProductLine.id_product_line'), primary_key=True)
+    id_refund_product=Column(Integer, primary_key=True, autoincrement=True)
+    id_product_line = Column(Integer, ForeignKey('ProductLine.id_product_line'), nullable=False)
     quantity = Column(Integer, nullable=False)
     refund_date = Column(DateTime, nullable=False)
+
+    product_line = relationship('ProductLine', back_populates='refund_products')
 
     def __init__(self, id_product_line, quantity, refund_date):
         self.id_product_line = id_product_line
@@ -95,6 +111,12 @@ class ProductSeller(Base):
     quantity = Column(Integer, nullable=False)
     price = Column(Float, nullable=False)
     shipping_costs = Column(Float, nullable=False)
+
+    #product=relationship('Product', back_populates='product_sellers')
+    #in_wish_list=relationship('InWishList', back_populates='product_sellers')
+    #in_shopping_cart=relationship('InShoppingCart', back_populates='product_sellers')
+
+    product_lines = relationship('ProductLine', back_populates='product_seller')
 
     def __init__(self, id_product, id_seller, quantity, price, shipping_costs):
         #self.id_product = id_product
@@ -112,6 +134,11 @@ class ProductLine(Base):
     quantity = Column(Integer, nullable=False)
     subtotal = Column(Float, nullable=False)
 
+    order = relationship('Order', back_populates='product_lines')
+    product_seller = relationship('ProductSeller', back_populates='product_lines')
+    
+    refund_products = relationship('RefundProduct', back_populates='product_line')
+
     def __init__(self, id_order, id_product_seller, quantity, subtotal):
         self.id_order = id_order
         self.id_product_seller = id_product_seller
@@ -121,35 +148,37 @@ class ProductLine(Base):
 #class BuyerAddress(Base):
 #    pass
 
+#adder methods need some work
+
 def add_address(session, street, floor, door, adit_info, city, postal_code, country, id_buyer):
     address=Address(street,floor,door, adit_info, city, postal_code, country)
 #    buyer_address=BuyerAddress(address.id_address,id_buyer)
     session.add(address)
 #    session.add(buyer_address)
-    session.commit(address)
+    session.commit()
 
 #def assign_address(session, id_address, id_buyer):
 #    buyer_address=BuyerAddress(id_address, id_buyer)
 #    session.add(buyer_address)
-#    session.commit(buyer_address)
+#    session.commit()
 
 #must have a product line!!!
 def add_order(session,id_buyer, id_card, id_address, order_date, total):
     order=Order(id_buyer, id_card, id_address, order_date, total)
     session.add(order)
-    session.commit(order)
+    session.commit()
 
 def add_card(session, card_number, card_name, card_security_num, card_exp_date, id_buyer):
     card=Card( card_number, card_name, card_security_num, card_exp_date)
     buyer_owns_card=BuyerOwnsCard(card.id_card, id_buyer)
     session.add(card)
     session.add(buyer_owns_card)
-    session.commit(card)
+    session.commit()
 
 def assign_card(session, id_card, id_buyer):
     buyer_owns_card=BuyerOwnsCard(id_card, id_buyer)
     session.add(buyer_owns_card)
-    session.commit(buyer_owns_card)
+    session.commit()
 
 def add_refund_product(session, id_product_line, quantity, refund_date):
     product_line=session.query(ProductLine).filter(id_product_line=ProductLine.id_product_line).first()
@@ -158,29 +187,27 @@ def add_refund_product(session, id_product_line, quantity, refund_date):
     date_difference=refund_date-order.order_date
     
     if(quantity>quantity_product_line):
-        print('Unable to refund more items than were ordered')
+        raise Exception('Unable to refund more items than were ordered')
     elif(date_difference>30):
-        print('Unable to refund a product more than 30 days after it has been ordered')
+        raise Exception('Unable to refund a product more than 30 days after it has been ordered')
+    elif(date_difference<0):
+        raise Exception('Invalid refund_date')
     else:
         refund_product=RefundProduct(id_product_line, quantity, refund_date)
         session.add(refund_product)
-        session.commit(refund_product)
+        #subtract quantity from product line and add to product seller
+        session.commit()
+
 
 def add_product_seller(session,id_product, id_seller, quantity, price, shipping_costs):
     exists_already=session.query(ProductSeller).filter((ProductSeller.id_seller==id_seller)and(ProductSeller.id_product==id_product)).all()
     
     if(len(exists_already)>0):
-        print ('The seller already owns an instance of this product')
-    elif(price<0):
-        print ('Price cannot be negative')
-    elif(shipping_costs<0):
-        print('Shipping costs cannot be negative')
-    elif(quantity<=0):
-        print('Quantity cannot be negative or 0')
+        raise Exception('The seller already owns an instance of this product')
     else:
         product_seller=ProductSeller(id_product, id_seller, quantity, price, shipping_costs)
         session.add(product_seller)
-        session.commit(product_seller)
+        session.commit()
 
 def add_product_line(session, id_order, id_product_seller, quantity, subtotal):
     product_seller=session.query(ProductSeller).filter(ProductSeller.id_product_seller==id_product_seller).first()
@@ -189,15 +216,13 @@ def add_product_line(session, id_order, id_product_seller, quantity, subtotal):
     related_order=session.query(Order).filter(Order.id_order==id_order).first()
     price=product_seller.price
     if(quantity>product_seller_quantity):
-        print('Product seller cannot sell more items than those he owns')
+        raise Exception('Product seller cannot sell more items than those he owns')
     elif(len(exists_already)>0):
-        print('The product line trying to be introduced is already in the order')
-    elif(subtotal<0):
-        print('Subtotal cannot be smaller than 0')
+        raise Exception('The product line trying to be introduced is already in the order')
     else:
         product_line=ProductLine( id_order, id_product_seller, quantity, subtotal)
         session.add(product_line)
-        session.commit(product_line)
+        session.commit()
         #related_order.total+=price*quantity
 
 def get_engine(user,passwd,host,port,db):
