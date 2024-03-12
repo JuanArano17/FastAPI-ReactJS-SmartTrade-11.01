@@ -1,19 +1,14 @@
-import logo from './logo.svg';
 import './App.css';
-import EPGetAll from './components/EPGetAll';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import HomePage from './pages/HomePage';
 
 function App() {
   return (
     <div className="App">
       <Router>
         <Switch>
-          <Route path="/home">
-            <EPGetAll/>
-          </Route>
-          <Route exact path="/">
-            <EPGetAll/>
-          </Route>
+          <Route path="/home" component={HomePage} />
+          <Route exact path="/" component={HomePage} />
         </Switch>
       </Router>
     </div>

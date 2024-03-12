@@ -1,0 +1,42 @@
+.homepage {
+    text-align: center;
+}
+
+.homepage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+.search-bar input {
+    padding: 10px;
+    margin: 0 15px;
+}
+
+.login-buttons button {
+    padding: 10px 15px;
+    margin: 0 5px;
+}
+
+.main-content h1 {
+    color: #333;
+}
+
+.main-content .image-container {
+    /* Añade estilos para posicionar tu imagen como en la imagen proporcionada */
+}
+
+.homepage-footer {
+    background-color: #f0f0f0;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.footer-links a {
+    margin: 0 10px;
+    text-decoration: none;
+    color: #333;
+}
+  /* Añade más estilos según sea necesario */
