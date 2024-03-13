@@ -1,6 +1,5 @@
 from sqlalchemy import Float, Integer, Column
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import relationship
 
 Base=declarative_base()
