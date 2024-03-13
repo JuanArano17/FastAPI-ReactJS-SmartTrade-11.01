@@ -12,6 +12,7 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import RecyclingIcon from '@mui/icons-material/Recycling';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 const TopBar = ({ toggleSearchBar }) => {
     const [searchBar, setSearchBar] = useState(toggleSearchBar);
@@ -60,9 +61,11 @@ const TopBar = ({ toggleSearchBar }) => {
                     <Button variant="contained" sx={{ bgcolor:'#444444', borderRadius: 32, marginRight: '20px'}}>
                         Login
                     </Button>
+                    <Link to="/register">
                     <Button variant="contained" sx={{ color:'#444444', bgcolor:'#ffffff', borderRadius: 32 }}>
                         Register
                     </Button>
+                    </Link>
                 </Box>
             </Toolbar>
         </AppBar>

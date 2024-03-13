@@ -42,14 +42,14 @@ const RegisterPage = () => {
 
   return (
     <Box sx={styles.mainContainer}>
-      <TopBar toggleSearchBar="False" />
-      <img
+      <TopBar />
+      <img // sx={styles.rounded_img}
         src={img_mundo}
         alt="Example"
         style={{
           width: "200px",
           height: "auto",
-          marginTop:"20px",
+          marginTop: "40px",
           marginBottom: "20px",
           margin: "0 auto",
           borderRadius: "50%",
