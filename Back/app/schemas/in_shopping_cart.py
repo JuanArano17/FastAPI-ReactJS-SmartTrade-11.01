@@ -10,8 +10,8 @@ class InShoppingCartCreate(InShoppingCartBase):
 
 
 class InShoppingCart(InShoppingCartBase):
-    id_buyer: str
-    id_product: int
+    id_buyer: int
+    id_product_seller: int
 
     class Config:
         orm_mode = True
