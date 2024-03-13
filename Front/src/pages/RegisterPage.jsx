@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import TopBar from "../components/TopBar/TopBar";
 import {
   Box,
   Typography,
@@ -7,135 +6,92 @@ import {
   Button,
   Container,
   Grid,
+  Paper,
 } from "@mui/material";
+import TopBar from "../components/TopBar/TopBar";
 import Footer from "../components/Footer/Footer";
+import styles from "../styles/styles";
+import img_mundo from "../images/img_mundo.png";
 
-const RegistrationForm = () => {
+const formFields = [
+  { id: "firstName", label: "Patricio", name: "Name", autoComplete: "fname", autoFocus: true },
+  { id: "lastName", label: "Letelier", name: "Surname", autoComplete: "lname" },
+  { id: "email", label: "letelier@upv.edu.es", name: "Email", autoComplete: "email" },
+  { id: "password", label: "PSW_curso_2023_2024", name: "Password", autoComplete: "new-password", type: "password" },
+  { id: "age", name: "Date Of Birth", type: "date" },
+];
+
+const RegisterPage = () => {
   const [formData, setFormData] = useState({
-    firstName: "", lastName: "", email: "", password: "",  age: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    dateOfBirth: "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
   const handleSubmit = (e) => {
-    // lógica backend
+    e.preventDefault();
+    // Lógica comunicación con backend
   };
 
   return (
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
+    <Box sx={styles.mainContainer}>
+      <TopBar toggleSearchBar="False" />
+      <img
+        src={img_mundo}
+        alt="Example"
+        style={{
+          width: "200px",
+          height: "auto",
+          marginTop:"20px",
+          marginBottom: "20px",
+          margin: "0 auto",
+          borderRadius: "50%",
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
         }}
-      ><TopBar toggleSearchBar='False'/>
-        <Container component="main" maxWidth="xs">
-       <Typography component="h1" variant="h5" color="#629c44">
-          Register
-        </Typography>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Typography variant="body2" color="232323">
-                First Name
-              </Typography>
-              <TextField
-                autoComplete="fname"
-                name="firstName"
-                required
-                fullWidth
-                id="firstName"
-                label="Patricio"
-                autoFocus
-                value={formData.firstName}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body2" color="232323">
-                Last Name
-              </Typography>
-              <TextField
-                required
-                fullWidth
-                id="lastName"
-                label="Letelier"
-                name="lastName"
-                autoComplete="lname"
-                value={formData.lastName}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body2" color="232323">
-                Email Address
-              </Typography>
-              <TextField
-                required
-                fullWidth
-                id="email"
-                label="letelier@upv.edu.es"
-                name="email"
-                autoComplete="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body2" color="232323">
-                Password
-              </Typography>
-              <TextField
-                required
-                fullWidth
-                name="password"
-                label="PSW_curso_2023_2024"
-                type="password"
-                id="password"
-                autoComplete="new-password"
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body2" color="232323">
-                Age
-              </Typography>
-              <TextField
-                required
-                fullWidth
-                name="age"
-                label="59"
-                type="number"
-                id="age"
-                value={formData.age}
-                onChange={handleChange}
-              />
-            </Grid>
-          </Grid>
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3, mb: 2, bgcolor: "#dfedd6", color: "#232323",
-            boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
-            borderRadius: "10px",
-            bordercolor:"232323"}}
-          >
+      />
+      <Container component="main" maxWidth="xs">
+        <Paper elevation={3} sx={styles.paperContainer}>
+          <Typography component="h1" variant="h5" color="#629c44">
             Register
-          </Button>
-        </Box>
-        </Container>
-        <Footer style = {{ width: "100%" }}/>
-      </Box>
-    
+          </Typography>
+          <Box component="form" onSubmit={handleSubmit} sx={styles.formContainer}>
+            <Grid container spacing={2}>
+              {formFields.map((field) => (
+                <Grid item xs={12} key={field.id}>
+                  <Typography variant="body2" color="232323" sx={{ textAlign: 'left' }}>
+                    {field.name}
+                  </Typography>
+                  <TextField
+                    {...field}
+                    required
+                    fullWidth
+                    value={formData[field.name]}
+                    onChange={handleChange}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={styles.registerButton}
+            >
+              Register
+            </Button>
+          </Box>
+        </Paper>
+      </Container>
+      <Footer />
+    </Box>
   );
 };
 
-export default RegistrationForm;
+export default RegisterPage;
