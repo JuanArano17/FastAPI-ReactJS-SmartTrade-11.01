@@ -24,7 +24,7 @@ const TopBar = ({ toggleSearchBar }) => {
     return (
         <AppBar position="static" color="default" elevation={0}>
             <Toolbar>
-                <Box sx={{ display: 'flex', alignItems: 'center', marginLeft:'40px', marginRight: 'auto' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: '40px', marginRight: 'auto' }}>
                     <IconButton
                         size="large"
                         edge="start"
@@ -58,13 +58,15 @@ const TopBar = ({ toggleSearchBar }) => {
                 )}
 
                 <Box sx={{ marginRight: '40px', marginLeft: 'auto', display: 'flex' }}>
-                    <Button variant="contained" sx={{ bgcolor:'#444444', borderRadius: 32, marginRight: '20px'}}>
-                        Login
-                    </Button>
+                    <Link to="/login">
+                        <Button variant="contained" sx={{ bgcolor: '#444444', borderRadius: 32, marginRight: '20px' }}>
+                            Login
+                        </Button>
+                    </Link>
                     <Link to="/register">
-                    <Button variant="contained" sx={{ color:'#444444', bgcolor:'#ffffff', borderRadius: 32 }}>
-                        Register
-                    </Button>
+                        <Button variant="contained" sx={{ color: '#444444', bgcolor: '#ffffff', borderRadius: 32 }}>
+                            Register
+                        </Button>
                     </Link>
                 </Box>
             </Toolbar>

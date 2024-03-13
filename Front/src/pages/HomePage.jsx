@@ -9,7 +9,7 @@ import TopBar from "../components/TopBar/TopBar";
 const HomePage = () => {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            <TopBar/>
+            <TopBar />
             <Container component="main" sx={{ mt: 4, mb: 4, flex: 1 }}>
                 <Grid container spacing={3} alignItems="center" justifyContent="center">
                     <Grid item xs={12} md={8}>
