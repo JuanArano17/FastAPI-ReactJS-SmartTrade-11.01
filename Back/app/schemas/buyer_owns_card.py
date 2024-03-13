@@ -1,9 +1,9 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+
 
 class BuyerOwnsCard(BaseModel):
-  id_card:int
-  id_buyer:int 
-  
-  class Config:
+    id_card: int
+    id_buyer: int
+
+    class Config:
         orm_mode = True
-  
