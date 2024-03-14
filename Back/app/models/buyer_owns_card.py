@@ -13,9 +13,3 @@ class BuyerOwnsCard(Base):
 
     card = relationship("Card", back_populates="buyer_owns_cards")
     # buyer=relationship('Buyer', back_populates='buyer_owns_cards')
-
-
-def assign_card(session, id_card, id_buyer):
-    buyer_owns_card = BuyerOwnsCard(id_card, id_buyer)
-    session.add(buyer_owns_card)
-    session.commit()

@@ -21,10 +21,3 @@ class Order(Base):
     # buyer= relaionship('Buyer', back_populates='orders')
 
     product_lines = relationship("ProductLine", back_populates="order")
-
-
-# must have a product line!!!
-def add_order(session, id_buyer, id_card, id_address, order_date, total):
-    order = Order(id_buyer, id_card, id_address, order_date, total)
-    session.add(order)
-    session.commit()

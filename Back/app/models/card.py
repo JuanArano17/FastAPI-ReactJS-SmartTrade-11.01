@@ -2,8 +2,6 @@ from sqlalchemy import DateTime, String, Integer, Column
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
-from Back.models.buyer_owns_card import BuyerOwnsCard
-
 Base = declarative_base()
 
 
@@ -18,13 +16,3 @@ class Card(Base):
 
     orders = relationship("Order", back_populates="card")
     buyer_owns_cards = relationship("BuyerOwnsCard", back_populates="card")
-
-
-def add_card(
-    session, card_number, card_name, card_security_num, card_exp_date, id_buyer
-):
-    card = Card(card_number, card_name, card_security_num, card_exp_date)
-    buyer_owns_card = BuyerOwnsCard(card.id_card, id_buyer)
-    session.add(card)
-    session.add(buyer_owns_card)
-    session.commit()

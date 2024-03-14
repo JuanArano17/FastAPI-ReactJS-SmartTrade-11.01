@@ -20,19 +20,3 @@ class Address(Base):
 
     orders = relationship("Order", back_populates="address")
     buyer_addresses = relationship("BuyerAddress", back_populates="address")
-
-
-def add_address(
-    session, street, floor, door, adit_info, city, postal_code, country, id_buyer
-):
-    address = Address(street, floor, door, adit_info, city, postal_code, country)
-    #    buyer_address=BuyerAddress(address.id_address,id_buyer)
-    session.add(address)
-    #    session.add(buyer_address)
-    session.commit()
-
-
-# def assign_address(session, id_address, id_buyer):
-#    buyer_address=BuyerAddress(id_address, id_buyer)
-#    session.add(buyer_address)
-#    session.commit()
