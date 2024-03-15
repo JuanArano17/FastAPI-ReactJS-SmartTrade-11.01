@@ -19,3 +19,6 @@ class Address(Base):
 
     orders = relationship("Order", back_populates="address")
     buyer_addresses = relationship("BuyerAddress", back_populates="address")
+
+    def __repr__(self):
+        return f"Address(id={self.id}, street='{self.street}', floor={self.floor}, door='{self.door}', adit_info='{self.adit_info}', city='{self.city}', postal_code='{self.postal_code}', country='{self.country}')"

@@ -20,3 +20,6 @@ class ProductSeller(Base):
     in_shopping_cart = relationship("InShoppingCart", back_populates="product_seller")
 
     product_lines = relationship("ProductLine", back_populates="product_seller")
+
+    def __repr__(self):
+        return f"ProductSeller(id={self.id}, id_product={self.id_product}, id_seller={self.id_seller}, quantity={self.quantity}, price={self.price}, shipping_costs={self.shipping_costs})"

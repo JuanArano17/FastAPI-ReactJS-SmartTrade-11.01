@@ -14,3 +14,6 @@ class RefundProduct(Base):
     refund_date = Column(DateTime, nullable=False)
 
     product_line = relationship("ProductLine", back_populates="refund_products")
+
+    def __repr__(self):
+        return f"RefundProduct(id={self.id}, id_product_line={self.id_product_line}, quantity={self.quantity}, refund_date={self.refund_date})"

@@ -20,3 +20,6 @@ class Order(Base):
     buyer = relationship("Buyer", back_populates="orders")
 
     product_lines = relationship("ProductLine", back_populates="order")
+
+    def __repr__(self):
+        return f"Order(id={self.id}, id_buyer={self.id_buyer}, id_card={self.id_card}, id_address={self.id_address}, order_date={self.order_date}, total={self.total})"

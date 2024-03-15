@@ -18,3 +18,6 @@ class ProductLine(Base):
     product_seller = relationship("ProductSeller", back_populates="product_lines")
 
     refund_products = relationship("RefundProduct", back_populates="product_line")
+
+    def __repr__(self):
+        return f"ProductLine(id={self.id}, id_order={self.id_order}, id_product_seller={self.id_product_seller}, quantity={self.quantity}, subtotal={self.subtotal})"

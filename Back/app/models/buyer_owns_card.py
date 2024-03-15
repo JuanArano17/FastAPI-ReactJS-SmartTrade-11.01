@@ -13,3 +13,6 @@ class BuyerOwnsCard(Base):
 
     card = relationship("Card", back_populates="buyer_owns_cards")
     buyer = relationship("Buyer", back_populates="buyer_owns_cards")
+
+    def __repr__(self):
+        return f"BuyerOwnsCard(id_card={self.id_card}, id_buyer={self.id_buyer})"
