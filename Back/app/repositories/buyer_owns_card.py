@@ -1,8 +1,11 @@
 from Back.app.models.buyer_owns_card import BuyerOwnsCard
-from sqlalchemy.orm import Session
 
 
-def assign_card(session: Session, id_card, id_buyer):
-    buyer_owns_card = BuyerOwnsCard(id_card, id_buyer)
-    session.add(buyer_owns_card)
-    session.commit()
+class BuyerOwnsCardRepository:
+    def __init__(self, session):
+        self.session = session
+
+    def add(self, id_card, id_buyer):
+        buyer_owns_card = BuyerOwnsCard(id_card, id_buyer)
+        self.session.add(buyer_owns_card)
+        self.session.commit()

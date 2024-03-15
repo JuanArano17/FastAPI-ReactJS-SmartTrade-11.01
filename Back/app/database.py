@@ -10,8 +10,6 @@ from models.card import Base as CardBase
 from models.product_line import Base as ProductLineBase
 from models.refund_product import Base as RefundProductBase
 
-# adder methods need some work
-
 
 def get_engine(user, passwd, host, port, db):
     url = f"postgresql://{user}:{passwd}@{host}:{port}/{db}"
