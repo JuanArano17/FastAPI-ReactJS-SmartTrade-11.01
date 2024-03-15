@@ -1,8 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class InShoppingCartBase(BaseModel):
-    quantity: int
+    quantity: int = Field(ge=0)
 
 
 class InShoppingCartCreate(InShoppingCartBase):

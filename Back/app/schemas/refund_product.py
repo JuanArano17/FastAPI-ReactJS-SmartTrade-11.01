@@ -5,7 +5,7 @@ from datetime import datetime
 
 class RefundProductBase(BaseModel):
     quantity: int = Field(gt=0)
-    refund_date: datetime
+    refund_date: datetime  # must be greater than order
 
 
 class RefundProductCreate(RefundProductBase):

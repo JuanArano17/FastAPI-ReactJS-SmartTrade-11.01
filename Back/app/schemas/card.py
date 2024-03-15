@@ -4,7 +4,7 @@ from datetime import datetime, date
 
 
 class CardBase(BaseModel):
-    card_number: str = Field(min_length=5, max_length=19, pattern=r"^[0-9]+$")
+    card_number: str = Field(min_length=8, max_length=19, pattern=r"^[0-9]+$")
     card_name: str = Field(min_length=1, max_length=60)
     card_exp_date: datetime = Field(gt=date.today)
 

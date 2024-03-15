@@ -1,9 +1,10 @@
-from pydantic import BaseModel
+from typing import Optional
+from pydantic import BaseModel, Field
 
 
 class CategoryBase(BaseModel):
-    name: str
-    description: str
+    name: str = Field(min_length=1, max_length=20)
+    description: str = Field(min_length=1, max_length=70)
 
 
 class CategoryCreate(CategoryBase):
@@ -11,7 +12,7 @@ class CategoryCreate(CategoryBase):
 
 
 class Category(CategoryBase):
-    id: int
+    id: Optional[int]
 
     class Config:
         orm_mode = True
