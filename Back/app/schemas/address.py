@@ -1,10 +1,8 @@
 from pydantic import BaseModel, Field
 from typing import Optional
-from Back.app.schemas.order import Order
 
 
-class Address(BaseModel):
-    id_address: Optional[int] = None
+class AddressBase(BaseModel):
     street: str = Field(min_length=5, max_length=35)
     floor: Optional[int] = Field(ge=0, le=200)
     door: str = Field(min_length=1, max_length=6)
@@ -12,7 +10,15 @@ class Address(BaseModel):
     city: str = Field(min_length=1, max_length=28)
     postal_code: str = Field(min_length=5, max_length=8)
     country: str = Field(min_length=4, max_length=28)
-    orders: list[Order] = []
+
+
+class AddressCreate(AddressBase):
+    pass
+
+
+class Address(AddressBase):
+    id: Optional[int] = None
+    # orders: list[Order] = []
     # buyer_addresses: list[BuyerAddress]=[] optional?
 
     class Config:

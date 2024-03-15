@@ -45,6 +45,3 @@ def get_session():
     ProductSellerBase.metadata.create_all(bind=engine)
     RefundProductBase.metadata.create_all(bind=engine)
     return session
-
-
-session = get_session()

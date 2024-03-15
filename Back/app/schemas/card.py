@@ -1,18 +1,22 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime, date
-from Back.app.schemas.buyer_owns_card import BuyerOwnsCard
-from Back.app.schemas.order import Order
 
 
-class Card(BaseModel):
-    id_card: Optional[int] = None
+class CardBase(BaseModel):
     card_number: str = Field(min_length=5, max_length=19, pattern=r"^[0-9]+$")
     card_name: str = Field(min_length=1, max_length=60)
-    card_security_num: int = Field(min_length=3, max_length=4)
     card_exp_date: datetime = Field(gt=date.today)
-    orders: list[Order] = []
-    buyer_owns_cards: list[BuyerOwnsCard] = []
+
+
+class CardCreate(CardBase):
+    card_security_num: int = Field(min_length=3, max_length=4)
+
+
+class Card(CardBase):
+    id: Optional[int] = None
+    # orders: list[Order] = []
+    # buyer_owns_cards: list[BuyerOwnsCard] = []
 
     class Config:
         orm_mode = True

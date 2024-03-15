@@ -1,7 +1,15 @@
 from pydantic import BaseModel
 
 
-class BuyerOwnsCard(BaseModel):
+class BuyerOwnsCardBase(BaseModel):
+    pass
+
+
+class BuyerOwnsCardCreate(BuyerOwnsCardBase):
+    pass
+
+
+class BuyerOwnsCard(BuyerOwnsCardBase):
     id_card: int
     id_buyer: int
 

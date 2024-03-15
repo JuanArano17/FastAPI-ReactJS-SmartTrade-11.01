@@ -3,11 +3,18 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 
 
-class RefundProduct(BaseModel):
-    id_refund_product: Optional[int] = None
-    id_product_line: int
+class RefundProductBase(BaseModel):
     quantity: int = Field(gt=0)
     refund_date: datetime
+
+
+class RefundProductCreate(RefundProductBase):
+    pass
+
+
+class RefundProduct(RefundProductBase):
+    id: Optional[int] = None
+    id_product_line: int
 
     class Config:
         orm_mode = True
