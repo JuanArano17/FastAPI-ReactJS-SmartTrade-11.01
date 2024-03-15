@@ -8,9 +8,9 @@ Base = declarative_base()
 class ProductLine(Base):
     __tablename__ = "ProductLine"
 
-    id_product_line = Column(Integer, primary_key=True)
-    id_order = Column(Integer, ForeignKey("Order.id_order"))
-    id_product_seller = Column(Integer, ForeignKey("ProductSeller.id_product_seller"))
+    id = Column(Integer, primary_key=True)
+    id_order = Column(Integer, ForeignKey("Order.id"))
+    id_product_seller = Column(Integer, ForeignKey("ProductSeller.id"))
     quantity = Column(Integer, nullable=False)
     subtotal = Column(Float, nullable=False)
 

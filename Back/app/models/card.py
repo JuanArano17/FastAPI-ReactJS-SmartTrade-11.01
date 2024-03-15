@@ -8,7 +8,7 @@ Base = declarative_base()
 class Card(Base):
     __tablename__ = "Card"
 
-    id_card = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True)
     card_number = Column(String, nullable=False)
     card_name = Column(String, nullable=False)
     card_security_num = Column(Integer, nullable=False)

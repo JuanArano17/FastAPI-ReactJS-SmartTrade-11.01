@@ -8,15 +8,15 @@ Base = declarative_base()
 class Order(Base):
     __tablename__ = "Order"
 
-    id_order = Column("id_order", Integer, primary_key=True, autoincrement=True)
-    # id_buyer = Column('id_buyer', Integer, ForeignKey('Buyer.id_buyer'))
-    id_card = Column("id_card", Integer, ForeignKey("Card.id_card"))
-    id_address = Column("id_address", Integer, ForeignKey("Address.id_address"))
-    order_date = Column("order_date", DateTime, nullable=False)
-    total = Column("total", Float, nullable=False)
+    id = Column(Integer, primary_key=True)
+    id_buyer = Column(Integer, ForeignKey("Buyer.id"))
+    id_card = Column(Integer, ForeignKey("Card.id"))
+    id_address = Column(Integer, ForeignKey("Address.id"))
+    order_date = Column(DateTime, nullable=False)
+    total = Column(Float, nullable=False)
 
     card = relationship("Card", back_populates="orders")
     address = relationship("Address", back_populates="orders")
-    # buyer= relaionship('Buyer', back_populates='orders')
+    buyer = relationship("Buyer", back_populates="orders")
 
     product_lines = relationship("ProductLine", back_populates="order")

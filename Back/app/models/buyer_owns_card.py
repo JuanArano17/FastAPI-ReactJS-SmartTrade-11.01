@@ -8,8 +8,8 @@ Base = declarative_base()
 class BuyerOwnsCard(Base):
     __tablename__ = "BuyerOwnsCard"
 
-    id_card = Column(Integer, ForeignKey("Card.id_card"), primary_key=True)
-    # id_buyer = Column(Integer, ForeignKey('Buyer.id_buyer'), primary_key=True)
+    id_card = Column(Integer, ForeignKey("Card.id"), primary_key=True)
+    id_buyer = Column(Integer, ForeignKey("Buyer.id"), primary_key=True)
 
     card = relationship("Card", back_populates="buyer_owns_cards")
-    # buyer=relationship('Buyer', back_populates='buyer_owns_cards')
+    buyer = relationship("Buyer", back_populates="buyer_owns_cards")

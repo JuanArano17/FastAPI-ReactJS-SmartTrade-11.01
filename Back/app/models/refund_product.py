@@ -8,10 +8,8 @@ Base = declarative_base()
 class RefundProduct(Base):
     __tablename__ = "RefundProduct"
 
-    id_refund_product = Column(Integer, primary_key=True, autoincrement=True)
-    id_product_line = Column(
-        Integer, ForeignKey("ProductLine.id_product_line"), nullable=False
-    )
+    id = Column(Integer, primary_key=True)
+    id_product_line = Column(Integer, ForeignKey("ProductLine.id"), nullable=False)
     quantity = Column(Integer, nullable=False)
     refund_date = Column(DateTime, nullable=False)
 
