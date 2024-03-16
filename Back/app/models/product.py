@@ -15,7 +15,7 @@ class Product(Base):
     stock = Column(Integer, nullable=False)
 
     images = relationship("Image", back_populates="product")
-    product_sellers = relationship("ProductSeller", back_populates="product")
+    seller_products = relationship("SellerProduct", back_populates="product")
     category = relationship("Category", back_populates="products")
 
     def __repr__(self):

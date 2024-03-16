@@ -2,17 +2,17 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-class ProductSellerBase(BaseModel):
+class SellerProductBase(BaseModel):
     quantity: int = Field(gt=0)
     price: float = Field(ge=0)
     shipping_costs: float = Field(ge=0)
 
 
-class ProductSellerCreate(ProductSellerBase):
+class SellerProductCreate(SellerProductBase):
     pass
 
 
-class ProductSeller(ProductSellerBase):
+class SellerProduct(SellerProductBase):
     id: Optional[int] = None
     id_product: int
     id_seller: int

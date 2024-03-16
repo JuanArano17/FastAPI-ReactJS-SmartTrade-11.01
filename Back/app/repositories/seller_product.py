@@ -1,16 +1,16 @@
-from Back.app.models.product_seller import ProductSeller
+from Back.app.models.seller_product import SellerProduct
 
 
-class ProductSellerRepository:
+class SellerProductRepository:
     def __init__(self, session):
         self.session = session
 
     def add(self, id_product, id_seller, quantity, price, shipping_costs):
         exists_already = (
-            self.session.query(ProductSeller)
+            self.session.query(SellerProduct)
             .filter(
-                (ProductSeller.id_seller == id_seller)
-                and (ProductSeller.id_product == id_product)
+                (SellerProduct.id_seller == id_seller)
+                and (SellerProduct.id_product == id_product)
             )
             .all()
         )
@@ -18,8 +18,8 @@ class ProductSellerRepository:
         if len(exists_already) > 0:
             raise Exception("The seller already owns an instance of this product")
         else:
-            product_seller = ProductSeller(
+            seller_product = SellerProduct(
                 id_product, id_seller, quantity, price, shipping_costs
             )
-            self.session.add(product_seller)
+            self.session.add(seller_product)
             self.session.commit()
