@@ -11,7 +11,7 @@ class InShoppingCartCreate(InShoppingCartBase):
 
 class InShoppingCart(InShoppingCartBase):
     id_buyer: int
-    id_product_seller: int
+    id_seller_product: int
 
     class Config:
         orm_mode = True

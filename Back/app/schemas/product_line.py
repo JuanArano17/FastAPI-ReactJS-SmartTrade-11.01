@@ -14,7 +14,7 @@ class ProductLineCreate(ProductLineBase):
 class ProductLine(ProductLineBase):
     id: Optional[int] = None
     id_order: int
-    id_product_seller: int
+    id_seller_product: int
 
     # refund_products: list[RefundProduct] = []
 
