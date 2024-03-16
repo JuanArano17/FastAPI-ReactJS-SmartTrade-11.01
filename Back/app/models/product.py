@@ -16,6 +16,7 @@ class Product(Base):
 
     images = relationship("Image", back_populates="product")
     product_sellers = relationship("ProductSeller", back_populates="product")
+    category = relationship("Category", back_populates="products")
 
     def __repr__(self):
         return f"Product(id={self.id}, id_category={self.id_category}, name='{self.name}', description='{self.description}', eco_points={self.eco_points}, spec_sheet='{self.spec_sheet}', stock={self.stock})"
