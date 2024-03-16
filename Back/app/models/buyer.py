@@ -16,7 +16,7 @@ class Buyer(Base):
     billing_address = Column(String(255))
     payment_method = Column(String(255))
 
-    buyer_addresses = relationship("BuyerAddress", back_populates="buyer")
+    addresses = relationship("Address", back_populates="buyer")
     in_shopping_cart = relationship("InShoppingCart", back_populates="buyer")
     in_wish_list = relationship("InWishList", back_populates="buyer")
     buyer_owns_cards = relationship("BuyerOwnsCard", back_populates="buyer")

@@ -30,5 +30,5 @@ class ProductLineRepository:
         else:
             product_line = ProductLine(id_order, id_seller_product, quantity, subtotal)
             self.session.add(product_line)
+            product_line.order.total += product_line.seller_product.price * quantity
             self.session.commit()
-            # related_order.total+=price*quantity

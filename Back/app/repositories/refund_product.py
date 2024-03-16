@@ -30,5 +30,10 @@ class RefundProductRepository:
         else:
             refund_product = RefundProduct(id_product_line, quantity, refund_date)
             self.session.add(refund_product)
-            # subtract quantity from product line and add to product seller
+            refund_product.product_line.quantity = (
+                refund_product.product_line.quantity - quantity
+            )
+            refund_product.product_line.seller_product.quantity = (
+                refund_product.product_line.seller_product.quantity + quantity
+            )
             self.session.commit()
