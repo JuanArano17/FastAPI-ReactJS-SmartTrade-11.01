@@ -1,8 +1,6 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-
-Base = declarative_base()
+from database import Base
 
 
 class BuyerAddress(Base):

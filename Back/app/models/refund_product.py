@@ -1,8 +1,6 @@
 from sqlalchemy import DateTime, ForeignKey, Integer, Column
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-
-Base = declarative_base()
+from database import Base
 
 
 class RefundProduct(Base):

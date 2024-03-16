@@ -1,4 +1,4 @@
-from Back.app.models.address import Address
+from models.address import Address
 
 
 class AddressRepository:
@@ -14,7 +14,7 @@ class AddressRepository:
         city,
         postal_code,
         country,
-        id_buyer,
+        # id_buyer,
     ):
         address = Address(street, floor, door, adit_info, city, postal_code, country)
         #    buyer_address=BuyerAddress(address.id_address,id_buyer)
