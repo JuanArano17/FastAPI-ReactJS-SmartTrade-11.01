@@ -6,6 +6,17 @@ class CategoryRepository:
         self.session = session
 
     def add(self, name, description):
-        category = Category(name, description)
-        self.session.add(category)
-        self.session.commit()
+        try:
+            category = Category(name, description)
+            self.session.add(category)
+            self.session.commit()
+        except Exception as e:
+            self.session.rollback()
+            raise e
+
+    def list(self):
+        try:
+            categories = self.session.query(Category).all()
+            return categories
+        except Exception as e:
+            raise e

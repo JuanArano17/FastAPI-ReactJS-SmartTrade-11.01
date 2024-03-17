@@ -28,12 +28,23 @@ class RefundProductRepository:
         elif date_difference < 0:
             raise Exception("Invalid refund_date")
         else:
-            refund_product = RefundProduct(id_product_line, quantity, refund_date)
-            self.session.add(refund_product)
-            refund_product.product_line.quantity = (
-                refund_product.product_line.quantity - quantity
-            )
-            refund_product.product_line.seller_product.quantity = (
-                refund_product.product_line.seller_product.quantity + quantity
-            )
-            self.session.commit()
+            try:
+                refund_product = RefundProduct(id_product_line, quantity, refund_date)
+                self.session.add(refund_product)
+                refund_product.product_line.quantity = (
+                    refund_product.product_line.quantity - quantity
+                )
+                refund_product.product_line.seller_product.quantity = (
+                    refund_product.product_line.seller_product.quantity + quantity
+                )
+                self.session.commit()
+            except Exception as e:
+                self.session.rollback()
+                raise e
+
+    def list(self):
+        try:
+            refund_products = self.session.query(RefundProduct).all()
+            return refund_products
+        except Exception as e:
+            raise e

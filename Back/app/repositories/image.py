@@ -6,6 +6,17 @@ class ImageRepository:
         self.session = session
 
     def add(self, id_product, url):
-        image = Image(id_product, url)
-        self.session.add(image)
-        self.session.commit()
+        try:
+            image = Image(id_product, url)
+            self.session.add(image)
+            self.session.commit()
+        except Exception as e:
+            self.session.rollback()
+            raise e
+
+    def list(self):
+        try:
+            images = self.session.query(Image).all()
+            return images
+        except Exception as e:
+            raise e

@@ -28,7 +28,20 @@ class ProductLineRepository:
                 "The product line trying to be introduced is already in the order"
             )
         else:
-            product_line = ProductLine(id_order, id_seller_product, quantity, subtotal)
-            self.session.add(product_line)
-            product_line.order.total += product_line.seller_product.price * quantity
-            self.session.commit()
+            try:
+                product_line = ProductLine(
+                    id_order, id_seller_product, quantity, subtotal
+                )
+                self.session.add(product_line)
+                product_line.order.total += product_line.seller_product.price * quantity
+                self.session.commit()
+            except Exception as e:
+                self.session.rollback()
+                raise e
+
+    def list(self):
+        try:
+            product_lines = self.session.query(ProductLine).all()
+            return product_lines
+        except Exception as e:
+            raise e

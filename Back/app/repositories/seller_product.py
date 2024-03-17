@@ -18,8 +18,19 @@ class SellerProductRepository:
         if len(exists_already) > 0:
             raise Exception("The seller already owns an instance of this product")
         else:
-            seller_product = SellerProduct(
-                id_product, id_seller, quantity, price, shipping_costs
-            )
-            self.session.add(seller_product)
-            self.session.commit()
+            try:
+                seller_product = SellerProduct(
+                    id_product, id_seller, quantity, price, shipping_costs
+                )
+                self.session.add(seller_product)
+                self.session.commit()
+            except Exception as e:
+                self.session.rollback()
+                raise e
+
+    def list(self):
+        try:
+            seller_products = self.session.query(SellerProduct).all()
+            return seller_products
+        except Exception as e:
+            raise e

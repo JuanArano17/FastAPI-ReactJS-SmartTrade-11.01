@@ -17,16 +17,28 @@ class AddressRepository:
         default,
         id_buyer,
     ):
-        address = Address(
-            id_buyer,
-            street,
-            floor,
-            door,
-            adit_info,
-            city,
-            postal_code,
-            country,
-            default,
-        )
-        self.session.add(address)
-        self.session.commit()
+        try:
+            address = Address(
+                id_buyer,
+                street,
+                floor,
+                door,
+                adit_info,
+                city,
+                postal_code,
+                country,
+                default,
+            )
+            # if default, set other address to not default, if such address exists
+            self.session.add(address)
+            self.session.commit()
+        except Exception as e:
+            self.session.rollback()
+            raise e
+
+    def list(self):
+        try:
+            addresses = self.session.query(Address).all()
+            return addresses
+        except Exception as e:
+            raise e
