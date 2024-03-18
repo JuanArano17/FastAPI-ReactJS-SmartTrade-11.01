@@ -1,6 +1,6 @@
 from sqlalchemy import DateTime, String, Integer, Column
 from sqlalchemy.orm import relationship
-from database import Base
+from app.database import Base
 
 
 class Card(Base):

@@ -2,7 +2,7 @@ from sqlalchemy import Boolean, ForeignKey, String, Integer, Column
 from sqlalchemy.orm import relationship
 
 # from models.order import Order
-from database import Base
+from app.database import Base
 
 
 class Address(Base):
