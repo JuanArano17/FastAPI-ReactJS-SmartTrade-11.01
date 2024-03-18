@@ -1,3 +1,4 @@
+from sqlalchemy import BinaryExpression, select
 from Back.app.models.buyer_owns_card import BuyerOwnsCard
 from Back.app.models.card import Card
 
@@ -21,5 +22,23 @@ class CardRepository:
         try:
             cards = self.session.query(Card).all()
             return cards
+        except Exception as e:
+            raise e
+
+    def get(self, pk):
+        try:
+            return self.session.get(Card, pk)
+        except Exception as e:
+            raise e
+
+    def filter(
+        self,
+        *expressions: BinaryExpression,
+    ):
+        try:
+            query = select(Card)
+            if expressions:
+                query = query.where(*expressions)
+            return list(self.session.scalars(query))
         except Exception as e:
             raise e

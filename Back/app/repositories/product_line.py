@@ -1,3 +1,4 @@
+from sqlalchemy import BinaryExpression, select
 from Back.app.models.product_line import ProductLine
 from Back.app.models.seller_product import SellerProduct
 
@@ -44,4 +45,51 @@ class ProductLineRepository:
             product_lines = self.session.query(ProductLine).all()
             return product_lines
         except Exception as e:
+            raise e
+
+    def get(self, pk):
+        try:
+            return self.session.get(ProductLine, pk)
+        except Exception as e:
+            raise e
+
+    def filter(
+        self,
+        *expressions: BinaryExpression,
+    ):
+        try:
+            query = select(ProductLine)
+            if expressions:
+                query = query.where(*expressions)
+            return list(self.session.scalars(query))
+        except Exception as e:
+            raise e
+
+    def update(self, product_line_id, new_data):
+        try:
+            product_line = (
+                self.session.query(ProductLine).filter_by(id=product_line_id).first()
+            )
+            if product_line:
+                for key, value in new_data.items():
+                    setattr(product_line, key, value)
+                self.session.commit()
+            else:
+                raise ValueError("Product Line not found.")
+        except Exception as e:
+            self.session.rollback()
+            raise e
+
+    def delete(self, product_line_id):
+        try:
+            product_line = (
+                self.session.query(ProductLine).filter_by(id=product_line_id).first()
+            )
+            if product_line:
+                self.session.delete(product_line)
+                self.session.commit()
+            else:
+                raise ValueError("Product not found.")
+        except Exception as e:
+            self.session.rollback()
             raise e

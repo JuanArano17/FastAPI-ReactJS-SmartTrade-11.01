@@ -1,3 +1,4 @@
+from sqlalchemy import BinaryExpression, select
 from models.address import Address
 
 
@@ -40,5 +41,23 @@ class AddressRepository:
         try:
             addresses = self.session.query(Address).all()
             return addresses
+        except Exception as e:
+            raise e
+
+    def get(self, pk):
+        try:
+            return self.session.get(Address, pk)
+        except Exception as e:
+            raise e
+
+    def filter(
+        self,
+        *expressions: BinaryExpression,
+    ):
+        try:
+            query = select(Address)
+            if expressions:
+                query = query.where(*expressions)
+            return list(self.session.scalars(query))
         except Exception as e:
             raise e

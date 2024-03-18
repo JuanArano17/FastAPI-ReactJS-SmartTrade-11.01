@@ -1,3 +1,4 @@
+from sqlalchemy import BinaryExpression, select
 from Back.app.models.order import Order
 from Back.app.models.product_line import ProductLine
 from Back.app.models.refund_product import RefundProduct
@@ -47,4 +48,55 @@ class RefundProductRepository:
             refund_products = self.session.query(RefundProduct).all()
             return refund_products
         except Exception as e:
+            raise e
+
+    def get(self, pk):
+        try:
+            return self.session.get(RefundProduct, pk)
+        except Exception as e:
+            raise e
+
+    def filter(
+        self,
+        *expressions: BinaryExpression,
+    ):
+        try:
+            query = select(RefundProduct)
+            if expressions:
+                query = query.where(*expressions)
+            return list(self.session.scalars(query))
+        except Exception as e:
+            raise e
+
+    def update(self, refund_product_id, new_data):
+        try:
+            refund_product = (
+                self.session.query(RefundProduct)
+                .filter_by(id=refund_product_id)
+                .first()
+            )
+            if refund_product:
+                for key, value in new_data.items():
+                    setattr(refund_product, key, value)
+                self.session.commit()
+            else:
+                raise ValueError("Refund product not found.")
+        except Exception as e:
+            self.session.rollback()
+            raise e
+
+    def delete(self, refund_product_id):
+        try:
+            refund_product = (
+                self.session.query(RefundProduct)
+                .filter_by(id=refund_product_id)
+                .first()
+            )
+            if refund_product:
+                self.session.delete(refund_product)
+                self.session.commit()
+            else:
+                raise ValueError("Refund product not found.")
+        except Exception as e:
+            self.session.rollback()
             raise e

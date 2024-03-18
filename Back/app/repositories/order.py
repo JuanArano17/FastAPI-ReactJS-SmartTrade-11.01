@@ -1,3 +1,4 @@
+from sqlalchemy import BinaryExpression, select
 from Back.app.models.order import Order
 
 
@@ -23,4 +24,47 @@ class OrderRepository:
             orders = self.session.query(Order).all()
             return orders
         except Exception as e:
+            raise e
+
+    def get(self, pk):
+        try:
+            return self.session.get(Order, pk)
+        except Exception as e:
+            raise e
+
+    def filter(
+        self,
+        *expressions: BinaryExpression,
+    ):
+        try:
+            query = select(Order)
+            if expressions:
+                query = query.where(*expressions)
+            return list(self.session.scalars(query))
+        except Exception as e:
+            raise e
+
+    def update(self, order_id, new_data):
+        try:
+            order = self.session.query(Order).filter_by(id=order_id).first()
+            if order:
+                for key, value in new_data.items():
+                    setattr(order, key, value)
+                self.session.commit()
+            else:
+                raise ValueError("Product Line not found.")
+        except Exception as e:
+            self.session.rollback()
+            raise e
+
+    def delete(self, order_id):
+        try:
+            order = self.session.query(Order).filter_by(id=order_id).first()
+            if order:
+                self.session.delete(order)
+                self.session.commit()
+            else:
+                raise ValueError("Product not found.")
+        except Exception as e:
+            self.session.rollback()
             raise e

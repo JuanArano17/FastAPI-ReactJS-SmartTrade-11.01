@@ -1,3 +1,4 @@
+from sqlalchemy import BinaryExpression, select
 from Back.app.models.category import Category
 
 
@@ -18,5 +19,23 @@ class CategoryRepository:
         try:
             categories = self.session.query(Category).all()
             return categories
+        except Exception as e:
+            raise e
+
+    def get(self, pk):
+        try:
+            return self.session.get(Category, pk)
+        except Exception as e:
+            raise e
+
+    def filter(
+        self,
+        *expressions: BinaryExpression,
+    ):
+        try:
+            query = select(Category)
+            if expressions:
+                query = query.where(*expressions)
+            return list(self.session.scalars(query))
         except Exception as e:
             raise e
