@@ -14,9 +14,9 @@ class SellerProduct(Base):
     shipping_costs = Column(Float, nullable=False)
 
     product = relationship("Product", back_populates="seller_products")
-    in_wish_list = relationship("InWishList", back_populates="seller_product")
-    in_shopping_cart = relationship("InShoppingCart", back_populates="seller_product")
-
+    in_wish_list = relationship("InWishList", back_populates="seller_products")
+    in_shopping_cart = relationship("InShoppingCart", back_populates="seller_products")
+    seller = relationship("Seller", back_populates="seller_products")
     product_lines = relationship("ProductLine", back_populates="seller_product")
 
     def __repr__(self):

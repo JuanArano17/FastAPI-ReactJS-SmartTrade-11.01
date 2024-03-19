@@ -1,5 +1,8 @@
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel, Field
+
+from Back.app.schemas.image import Image
+from Back.app.schemas.seller_product import SellerProduct
 
 
 class ProductBase(BaseModel):
@@ -17,6 +20,8 @@ class ProductCreate(ProductBase):
 class Product(ProductBase):
     id: int
     id_category: int
+    images: List[Image]
+    seller_products: List[SellerProduct] = []
 
     class Config:
         orm_mode = True

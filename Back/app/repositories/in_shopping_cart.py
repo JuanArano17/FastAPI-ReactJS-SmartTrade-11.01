@@ -39,3 +39,32 @@ class InShoppingCartRepository:
             return list(self.session.scalars(query))
         except Exception as e:
             raise e
+
+    def update(self, buyer_id, new_data):
+        try:
+            in_shopping_cart = (
+                self.session.query(InShoppingCart).filter_by(id=buyer_id).first()
+            )
+            if in_shopping_cart:
+                for key, value in new_data.items():
+                    setattr(in_shopping_cart, key, value)
+                self.session.commit()
+            else:
+                raise ValueError("Shopping cart item not found.")
+        except Exception as e:
+            self.session.rollback()
+            raise e
+
+    def delete(self, buyer_id):
+        try:
+            in_shopping_cart = (
+                self.session.query(InShoppingCart).filter_by(id=buyer_id).first()
+            )
+            if in_shopping_cart:
+                self.session.delete(in_shopping_cart)
+                self.session.commit()
+            else:
+                raise ValueError("Shopping cart item not found.")
+        except Exception as e:
+            self.session.rollback()
+            raise e

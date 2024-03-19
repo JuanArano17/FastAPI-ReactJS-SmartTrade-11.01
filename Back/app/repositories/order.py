@@ -52,7 +52,7 @@ class OrderRepository:
                     setattr(order, key, value)
                 self.session.commit()
             else:
-                raise ValueError("Product Line not found.")
+                raise ValueError("Order not found.")
         except Exception as e:
             self.session.rollback()
             raise e
@@ -64,7 +64,7 @@ class OrderRepository:
                 self.session.delete(order)
                 self.session.commit()
             else:
-                raise ValueError("Product not found.")
+                raise ValueError("Order not found.")
         except Exception as e:
             self.session.rollback()
             raise e

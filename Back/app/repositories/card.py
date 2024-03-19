@@ -42,3 +42,28 @@ class CardRepository:
             return list(self.session.scalars(query))
         except Exception as e:
             raise e
+
+    def update(self, card_id, new_data):
+        try:
+            card = self.session.query(Card).filter_by(id=card_id).first()
+            if card:
+                for key, value in new_data.items():
+                    setattr(card, key, value)
+                self.session.commit()
+            else:
+                raise ValueError("Card not found.")
+        except Exception as e:
+            self.session.rollback()
+            raise e
+
+    def delete(self, card_id):
+        try:
+            card = self.session.query(Card).filter_by(id=card_id).first()
+            if card:
+                self.session.delete(card)
+                self.session.commit()
+            else:
+                raise ValueError("Card not found.")
+        except Exception as e:
+            self.session.rollback()
+            raise e

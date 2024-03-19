@@ -1,6 +1,16 @@
+from Back.app.repositories.buyer import BuyerRepository
 from database import get_session
-from repositories.address import AddressRepository
+
 
 session = get_session()
-address_repo = AddressRepository(session())
-address_repo.add("Calle Ruzafa", 2, "42", "", "Valencia", "45932", "spain")
+address_repo = BuyerRepository(session())
+address_repo.add(
+    "aloecm@gmail.com",
+    "Pedrito",
+    "Paco",
+    0,
+    "Pefecwe231",
+    "49764160A",
+    "Billing address 123",
+    "Bizum",
+)

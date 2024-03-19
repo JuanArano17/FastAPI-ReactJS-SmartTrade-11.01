@@ -39,3 +39,28 @@ class CategoryRepository:
             return list(self.session.scalars(query))
         except Exception as e:
             raise e
+
+    def update(self, category_id, new_data):
+        try:
+            category = self.session.query(Category).filter_by(id=category_id).first()
+            if category:
+                for key, value in new_data.items():
+                    setattr(category, key, value)
+                self.session.commit()
+            else:
+                raise ValueError("Category not found.")
+        except Exception as e:
+            self.session.rollback()
+            raise e
+
+    def delete(self, category_id):
+        try:
+            category = self.session.query(Category).filter_by(id=category_id).first()
+            if category:
+                self.session.delete(category)
+                self.session.commit()
+            else:
+                raise ValueError("Category not found.")
+        except Exception as e:
+            self.session.rollback()
+            raise e

@@ -89,7 +89,7 @@ class ProductLineRepository:
                 self.session.delete(product_line)
                 self.session.commit()
             else:
-                raise ValueError("Product not found.")
+                raise ValueError("Product Line not found.")
         except Exception as e:
             self.session.rollback()
             raise e

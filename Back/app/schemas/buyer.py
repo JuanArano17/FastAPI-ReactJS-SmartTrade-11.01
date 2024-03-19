@@ -1,4 +1,10 @@
 from pydantic import BaseModel, Field
+from typing import List
+from Back.app.schemas.address import Address
+from Back.app.schemas.buyer_owns_card import BuyerOwnsCard
+from Back.app.schemas.in_shopping_cart import InShoppingCart
+from Back.app.schemas.in_wish_list import InWishList
+from Back.app.schemas.order import Order
 
 
 class BuyerBase(BaseModel):
@@ -20,6 +26,11 @@ class BuyerCreate(BuyerBase):
 
 class Buyer(BuyerBase):
     id: int
+    addresses: List[Address]
+    in_shopping_cart: List[InShoppingCart] = []
+    in_wish_list: List[InWishList] = []
+    buyer_owns_cards: List[BuyerOwnsCard] = []
+    orders: List[Order] = []
 
     class Config:
         orm_mode = True

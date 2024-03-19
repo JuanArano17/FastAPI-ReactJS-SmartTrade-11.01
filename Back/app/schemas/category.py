@@ -1,5 +1,7 @@
-from typing import Optional
+from typing import List, Optional
 from pydantic import BaseModel, Field
+
+from Back.app.schemas.product import Product
 
 
 class CategoryBase(BaseModel):
@@ -13,6 +15,7 @@ class CategoryCreate(CategoryBase):
 
 class Category(CategoryBase):
     id: Optional[int]
+    products: List[Product] = []
 
     class Config:
         orm_mode = True

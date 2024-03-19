@@ -59,3 +59,28 @@ class BuyerRepository:
             return list(self.session.scalars(query))
         except Exception as e:
             raise e
+
+    def update(self, buyer_id, new_data):
+        try:
+            buyer = self.session.query(Buyer).filter_by(id=buyer_id).first()
+            if buyer:
+                for key, value in new_data.items():
+                    setattr(buyer, key, value)
+                self.session.commit()
+            else:
+                raise ValueError("Buyer not found.")
+        except Exception as e:
+            self.session.rollback()
+            raise e
+
+    def delete(self, buyer_id):
+        try:
+            buyer = self.session.query(Buyer).filter_by(id=buyer_id).first()
+            if buyer:
+                self.session.delete(buyer)
+                self.session.commit()
+            else:
+                raise ValueError("Buyer not found.")
+        except Exception as e:
+            self.session.rollback()
+            raise e

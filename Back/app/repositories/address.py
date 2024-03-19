@@ -61,3 +61,28 @@ class AddressRepository:
             return list(self.session.scalars(query))
         except Exception as e:
             raise e
+
+    def update(self, address_id, new_data):
+        try:
+            address = self.session.query(Address).filter_by(id=address_id).first()
+            if address:
+                for key, value in new_data.items():
+                    setattr(address, key, value)
+                self.session.commit()
+            else:
+                raise ValueError("Address not found.")
+        except Exception as e:
+            self.session.rollback()
+            raise e
+
+    def delete(self, address_id):
+        try:
+            address = self.session.query(Address).filter_by(id=address_id).first()
+            if address:
+                self.session.delete(address)
+                self.session.commit()
+            else:
+                raise ValueError("Address not found.")
+        except Exception as e:
+            self.session.rollback()
+            raise e

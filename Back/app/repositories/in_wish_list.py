@@ -39,3 +39,28 @@ class InWishListRepository:
             return list(self.session.scalars(query))
         except Exception as e:
             raise e
+
+    def update(self, buyer_id, new_data):
+        try:
+            in_wish_list = self.session.query(InWishList).filter_by(id=buyer_id).first()
+            if in_wish_list:
+                for key, value in new_data.items():
+                    setattr(in_wish_list, key, value)
+                self.session.commit()
+            else:
+                raise ValueError("Wish list item not found.")
+        except Exception as e:
+            self.session.rollback()
+            raise e
+
+    def delete(self, buyer_id):
+        try:
+            in_wish_list = self.session.query(InWishList).filter_by(id=buyer_id).first()
+            if in_wish_list:
+                self.session.delete(in_wish_list)
+                self.session.commit()
+            else:
+                raise ValueError("Wish list item not found.")
+        except Exception as e:
+            self.session.rollback()
+            raise e

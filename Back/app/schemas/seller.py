@@ -1,4 +1,7 @@
+from typing import List
 from pydantic import BaseModel, Field
+
+from Back.app.schemas.seller_product import SellerProduct
 
 
 class SellerBase(BaseModel):
@@ -18,6 +21,7 @@ class SellerCreate(SellerBase):
 
 class Seller(SellerBase):
     id: int
+    seller_products: List[SellerProduct] = []
     pass
 
     class Config:

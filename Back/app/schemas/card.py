@@ -1,6 +1,9 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import List, Optional
 from datetime import datetime, date
+
+from Back.app.schemas.buyer_owns_card import BuyerOwnsCard
+from Back.app.schemas.order import Order
 
 
 class CardBase(BaseModel):
@@ -15,8 +18,8 @@ class CardCreate(CardBase):
 
 class Card(CardBase):
     id: Optional[int] = None
-    # orders: list[Order] = []
-    # buyer_owns_cards: list[BuyerOwnsCard] = []
+    orders: List[Order] = []
+    buyer_owns_cards: List[BuyerOwnsCard] = []
 
     class Config:
         orm_mode = True

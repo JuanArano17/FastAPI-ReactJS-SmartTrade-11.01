@@ -39,3 +39,32 @@ class BuyerOwnsCardRepository:
             return list(self.session.scalars(query))
         except Exception as e:
             raise e
+
+    def update(self, buyer_id, new_data):
+        try:
+            buyer_owns_card = (
+                self.session.query(BuyerOwnsCard).filter_by(id=buyer_id).first()
+            )
+            if buyer_owns_card:
+                for key, value in new_data.items():
+                    setattr(buyer_owns_card, key, value)
+                self.session.commit()
+            else:
+                raise ValueError("Buyer card not found.")
+        except Exception as e:
+            self.session.rollback()
+            raise e
+
+    def delete(self, buyer_id):
+        try:
+            buyer_owns_card = (
+                self.session.query(BuyerOwnsCard).filter_by(id=buyer_id).first()
+            )
+            if buyer_owns_card:
+                self.session.delete(buyer_owns_card)
+                self.session.commit()
+            else:
+                raise ValueError("Buyer card not found.")
+        except Exception as e:
+            self.session.rollback()
+            raise e

@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String
 from app.database import Base
+from sqlalchemy.orm import relationship
 
 
 class Seller(Base):
@@ -12,6 +13,8 @@ class Seller(Base):
     password = Column(String(255), nullable=False)
     cif = Column(String(255), nullable=False, unique=True)
     bank_data = Column(String(255), nullable=False)
+
+    seller_products = relationship("SellerProduct", back_populates="seller")
 
     def __repr__(self):
         return f"Seller(id={self.id}, email='{self.email}', name='{self.name}', surname='{self.surname}', password='{self.password}', cif='{self.cif}', bank_data='{self.bank_data}')"

@@ -12,7 +12,7 @@ class InShoppingCart(Base):
     id_buyer = Column(Integer, ForeignKey("Buyer.id"), primary_key=True)
     quantity = Column(Integer)
 
-    seller_product = relationship("SellerProduct", back_populates="in_shopping_cart")
+    seller_products = relationship("SellerProduct", back_populates="in_shopping_cart")
     buyer = relationship("Buyer", back_populates="in_shopping_cart")
 
     def __repr__(self):

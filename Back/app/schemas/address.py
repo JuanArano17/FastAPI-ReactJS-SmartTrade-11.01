@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import List, Optional
+
+from Back.app.schemas.order import Order
 
 
 class AddressBase(BaseModel):
@@ -20,6 +22,13 @@ class Address(AddressBase):
     id: Optional[int] = None
     # orders: list[Order] = []
     # buyer_addresses: list[BuyerAddress]=[] optional?
+
+    class Config:
+        orm_mode = True
+
+
+class AddressWithOrders(Address):
+    orders: List[Order]
 
     class Config:
         orm_mode = True

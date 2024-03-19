@@ -12,7 +12,7 @@ class InWishList(Base):
     id_buyer = Column(Integer, ForeignKey("Buyer.id"), primary_key=True)
 
     buyer = relationship("Buyer", back_populates="in_wish_list")
-    seller_product = relationship("SellerProduct", back_populates="in_wish_list")
+    seller_products = relationship("SellerProduct", back_populates="in_wish_list")
 
     def __repr__(self):
         return f"InWishList(id_seller_product={self.id_seller_product}, id_buyer={self.id_buyer})"

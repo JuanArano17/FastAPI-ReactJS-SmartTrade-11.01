@@ -39,3 +39,28 @@ class ImageRepository:
             return list(self.session.scalars(query))
         except Exception as e:
             raise e
+
+    def update(self, image_id, new_data):
+        try:
+            image = self.session.query(Image).filter_by(id=image_id).first()
+            if image:
+                for key, value in new_data.items():
+                    setattr(image, key, value)
+                self.session.commit()
+            else:
+                raise ValueError("Image not found.")
+        except Exception as e:
+            self.session.rollback()
+            raise e
+
+    def delete(self, image_id):
+        try:
+            image = self.session.query(Image).filter_by(id=image_id).first()
+            if image:
+                self.session.delete(image)
+                self.session.commit()
+            else:
+                raise ValueError("Image not found.")
+        except Exception as e:
+            self.session.rollback()
+            raise e
