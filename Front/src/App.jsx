@@ -1,8 +1,10 @@
 import './App.css';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import HomePage from './pages/HomePage';
-import RegistrationForm from './pages/RegisterPage';
-import RegisterPage from './pages/RegisterPage';
+import RegisterSelectionPage from './pages/RegisterSelectionPage';
+import RegisterSellerPage from './pages/RegisterSellerPage';
+import RegisterBuyerPage from './pages/RegisterBuyerPage';
+
 
 function App() {
   return (
@@ -10,7 +12,9 @@ function App() {
       <Router>
         <Switch>
           <Route path="/home" component={HomePage} />
-          <Route path="/register" component={RegisterPage} />
+          <Route path="/register" component={RegisterSelectionPage} />
+          <Route path="/registerSeller" component={RegisterSellerPage} />
+          <Route path="/registerBuyer" component={RegisterBuyerPage} />
           <Route exact path="/" component={HomePage} />
         </Switch>
       </Router>

@@ -29,5 +29,22 @@ const styles = {
         borderRadius: "50%",
         boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)"
     },
+    imageStyle:{
+        width: "275px", 
+        height: "183px", 
+        border: "2px solid black", 
+        borderRadius: "15px",
+      },
+      greenRoundedButton: {
+        bgcolor: "#cbe8ba",
+        color: "#000000",
+        fontWeight: "bold",
+        marginBottom: "20px",
+        boxShadow: "-5px 5px 3px rgba(0, 0, 0, 0.4)",
+        width: "100%", 
+        borderRadius: "15px" 
+      }
+      
+      
 }
 export default styles;

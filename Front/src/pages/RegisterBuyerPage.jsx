@@ -43,19 +43,7 @@ const RegisterPage = () => {
   return (
     <Box sx={styles.mainContainer}>
       <TopBar />
-      <img // sx={styles.rounded_img}
-        src={img_mundo}
-        alt="Example"
-        style={{
-          width: "200px",
-          height: "auto",
-          marginTop: "40px",
-          marginBottom: "20px",
-          margin: "0 auto",
-          borderRadius: "50%",
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
-        }}
-      />
+      <img src={img_mundo} style ={styles.rounded_img}/>
       <Container component="main" maxWidth="xs">
         <Paper elevation={3} sx={styles.paperContainer}>
           <Typography component="h1" variant="h5" color="#629c44">
