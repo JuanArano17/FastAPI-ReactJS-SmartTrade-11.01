@@ -15,7 +15,7 @@ const SelectionPage = () => {
       <Typography variant="h4" align="center" color="#629c44" marginTop={"20px"} marginBottom={"20px"}>
         ¿Qué harás en SmartTrade?
       </Typography>
-      <Box display="flex" justifyContent="center" alignItems="center" mb={4}>
+      <Box display="flex" justifyContent="center" alignItems="center" mb={32}>
         <Box textAlign="center" mr={4} style={{ width: "275px", marginBottom: "10px" }}>
           <Button
           sx={styles.greenRoundedButton} component={Link} to="/registerBuyer"
