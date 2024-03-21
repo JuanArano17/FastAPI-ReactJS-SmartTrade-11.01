@@ -20,6 +20,9 @@ python-dotenv = "^1.0.1"
 pytest = "^8.0.2"
 pre-commit = "^3.6.2"
 
+[tool.ruff.lint.per-file-ignores]
+"database.py" = ["E402", "F401"]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

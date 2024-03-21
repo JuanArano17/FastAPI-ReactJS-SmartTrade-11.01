@@ -7,9 +7,9 @@ class InShoppingCart(Base):
     __tablename__ = "InShoppingCart"
 
     id_seller_product = Column(
-        Integer, ForeignKey("SellerProduct.id"), primary_key=True
+        Integer, ForeignKey("SellerProduct.id"), primary_key=True, index=True
     )
-    id_buyer = Column(Integer, ForeignKey("Buyer.id"), primary_key=True)
+    id_buyer = Column(Integer, ForeignKey("Buyer.id"), primary_key=True, index=True)
     quantity = Column(Integer)
 
     seller_products = relationship("SellerProduct", back_populates="in_shopping_cart")

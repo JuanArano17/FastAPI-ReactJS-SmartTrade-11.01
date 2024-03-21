@@ -6,7 +6,7 @@ from app.database import Base
 class RefundProduct(Base):
     __tablename__ = "RefundProduct"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
     id_product_line = Column(Integer, ForeignKey("ProductLine.id"), nullable=False)
     quantity = Column(Integer, nullable=False)
     refund_date = Column(DateTime, nullable=False)

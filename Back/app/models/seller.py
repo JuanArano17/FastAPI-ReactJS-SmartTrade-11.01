@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 class Seller(Base):
     __tablename__ = "Seller"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
     email = Column(String(255), nullable=False, unique=True)
     name = Column(String(255), nullable=False)
     surname = Column(String(255), nullable=False)
@@ -14,7 +14,9 @@ class Seller(Base):
     cif = Column(String(255), nullable=False, unique=True)
     bank_data = Column(String(255), nullable=False)
 
-    seller_products = relationship("SellerProduct", back_populates="seller")
+    seller_products = relationship(
+        "SellerProduct", back_populates="seller", cascade="all, delete-orphan"
+    )
 
     def __repr__(self):
         return f"Seller(id={self.id}, email='{self.email}', name='{self.name}', surname='{self.surname}', password='{self.password}', cif='{self.cif}', bank_data='{self.bank_data}')"

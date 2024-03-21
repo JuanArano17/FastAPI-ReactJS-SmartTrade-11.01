@@ -6,7 +6,7 @@ from app.database import Base
 class Product(Base):
     __tablename__ = "Product"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
     id_category = Column(Integer, ForeignKey("Category.id"), nullable=False)
     name = Column(String(255), nullable=False)
     description = Column(String(255))
@@ -14,8 +14,12 @@ class Product(Base):
     spec_sheet = Column(String(255), nullable=False)
     stock = Column(Integer, nullable=False)
 
-    images = relationship("Image", back_populates="product")
-    seller_products = relationship("SellerProduct", back_populates="product")
+    images = relationship(
+        "Image", back_populates="product", cascade="all, delete-orphan"
+    )
+    seller_products = relationship(
+        "SellerProduct", back_populates="product", cascade="all, delete-orphan"
+    )
     category = relationship("Category", back_populates="products")
 
     def __repr__(self):
