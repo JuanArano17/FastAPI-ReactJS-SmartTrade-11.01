@@ -1,10 +1,10 @@
-from Back.app.repositories.buyer import BuyerRepository
+from Back.app.service.BuyerService import BuyerService
 from database import get_session
 
 
 session = get_session()
-address_repo = BuyerRepository(session())
-address_repo.add(
+buyer_serv = BuyerService(session())
+buyer_serv.add_buyer(
     "aloecm@gmail.com",
     "Pedrito",
     "Paco",
