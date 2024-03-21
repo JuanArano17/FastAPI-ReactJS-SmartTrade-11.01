@@ -1,34 +1,41 @@
-from sqlalchemy import create_engine
+import os
+from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import database_exists, create_database
-from .local_settings import postgresql as settings
 from sqlalchemy.ext.declarative import declarative_base
+from dotenv import load_dotenv
 
 Base = declarative_base()
 
+from app.models.buyer import Buyer
+from app.models.address import Address
+from app.models.category import Category
+from app.models.product import Product
+from app.models.image import Image
+from app.models.card import Card
+from app.models.seller import Seller
+from app.models.order import Order
+from app.models.product_line import ProductLine
+from app.models.seller_product import SellerProduct
+from app.models.in_shopping_cart import InShoppingCart
+from app.models.in_wish_list import InWishList
+from app.models.refund_product import RefundProduct
 
-def get_engine(user, passwd, host, port, db):
-    url = f"postgresql://{user}:{passwd}@{host}:{port}/{db}"
+load_dotenv()
+
+
+def get_engine() -> Engine:
+    url = os.getenv(
+        "DB_URL",
+        "postgresql+psycopg://postgres:password@localhost:5432/database",
+    )
     if not database_exists(url):
         create_database(url)
-    engine = create_engine(url, pool_size=50, echo=False)
+    engine = create_engine(url, pool_size=50, echo=True)
     return engine
 
 
-def get_engine_from_settings():
-    keys = ["pguser", "pgpasswd", "pghost", "pgport", "pgdb"]
-    if not all(key in keys for key in settings.keys()):
-        raise Exception("Bad Config File")
-    return get_engine(
-        settings["pguser"],
-        settings["pgpasswd"],
-        settings["pghost"],
-        settings["pgport"],
-        settings["pgdb"],
-    )
-
-
 def get_session():
-    engine = get_engine_from_settings()
+    engine = get_engine()
     session = sessionmaker(bind=engine)
     return session
