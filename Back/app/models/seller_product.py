@@ -6,7 +6,7 @@ from app.database import Base
 class SellerProduct(Base):
     __tablename__ = "SellerProduct"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
     id_product = Column(Integer, ForeignKey("Product.id"))
     id_seller = Column(Integer, ForeignKey("Seller.id"))
     quantity = Column(Integer, nullable=False)

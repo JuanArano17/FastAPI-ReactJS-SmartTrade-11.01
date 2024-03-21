@@ -6,11 +6,11 @@ from app.database import Base
 class Card(Base):
     __tablename__ = "Card"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
     card_number = Column(String, nullable=False)
     card_name = Column(String, nullable=False)
     card_security_num = Column(Integer, nullable=False)
     card_exp_date = Column(DateTime, nullable=False)
 
     orders = relationship("Order", back_populates="card")
-    buyer_owns_cards = relationship("BuyerOwnsCard", back_populates="card")
+    buyer = relationship("Buyer", back_populates="cards")

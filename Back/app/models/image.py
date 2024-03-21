@@ -6,7 +6,7 @@ from app.database import Base
 class Image(Base):
     __tablename__ = "Image"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
     id_product = Column(Integer, ForeignKey("Product.id"), nullable=False)
     url = Column(String)
 
