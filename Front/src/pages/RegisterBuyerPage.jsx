@@ -8,12 +8,12 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 const formFields = [
-  { id: "firstName", placeholder: "Patricio", name: "Name *", autoComplete: "fname", autoFocus: true },
-  { id: "lastName", placeholder: "Letelier", name: "Surname *", autoComplete: "lname" },
-  { id: "email", placeholder: "letelier@upv.edu.es", name: "Email *", autoComplete: "email" },
-  { id: "dni", name: "DNI *", placeholder: "12345678A" },
-  { id: "password", placeholder: "PSW_curso_2023_2024", name: "Password *", autoComplete: "new-password", type: "password" },
-  { id: "age", name: "Date Of Birth *", type: "date"}
+  { id: "firstName", placeholder: "Patricio*", name: "Name", autoComplete: "fname", autoFocus: true },
+  { id: "lastName", placeholder: "Letelier*", name: "Surname", autoComplete: "lname" },
+  { id: "email", placeholder: "letelier@upv.edu.es*", name: "Email", autoComplete: "email" },
+  { id: "dni", name: "DNI", placeholder: "12345678A*" },
+  { id: "password", placeholder: "PSW_curso_2023_2024*", name: "Password", autoComplete: "new-password", type: "password" },
+  { id: "age", name: "Date Of Birth", type: "date"}
 ];
 
 const RegisterPage = () => {
@@ -184,12 +184,12 @@ const RegisterPage = () => {
                   <Grid container spacing={3}>
                     <Grid item xs={12}>
                       <Typography variant="body2" color="232323" sx={{ textAlign: 'left' }}>
-                        Card Number*
+                        Card Number
                       </Typography>
                       <TextField
                         id="CardNumber"
-                        name="CardNumber *"
-                        placeholder="1234-1234-1234-1234"
+                        name="CardNumber"
+                        placeholder="1234-1234-1234-1234*"
                         required
                         fullWidth
                         value={formData.CardNumber}
@@ -200,12 +200,12 @@ const RegisterPage = () => {
                     </Grid>
                     <Grid item xs={6}>
                       <Typography variant="body2" color="232323" sx={{ textAlign: 'left' }}>
-                        Date of expiry *
+                        Date of expiry
                       </Typography>
                       <TextField
                         id="ExpiryDate"
                         name="ExpiryDate"
-                        placeholder="09/26"
+                        placeholder="09/26*"
                         required
                         fullWidth
                         value={formData.ExpiryDate}
@@ -216,12 +216,12 @@ const RegisterPage = () => {
                     </Grid>
                     <Grid item xs={6}>
                       <Typography variant="body2" color="232323" sx={{ textAlign: 'left' }}>
-                        CVV*
+                        CVV
                       </Typography>
                       <TextField
                         id="CVV"
-                        name="CVV *"
-                        placeholder="123"
+                        name="CVV"
+                        placeholder="123*"
                         required
                         fullWidth
                         value={formData.CVV}
