@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from models.buyer_owns_card import Buyer
+from models.buyer import Buyer
 from repository import Repository
 
 

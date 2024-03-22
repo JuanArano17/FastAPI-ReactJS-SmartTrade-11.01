@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 
-class BaseRepository:
+class Repository:
     def __init__(self, session: Session, model):
         self.session = session
         self.model = model

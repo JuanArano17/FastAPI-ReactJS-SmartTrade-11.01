@@ -1,4 +1,4 @@
-from Back.app.models.category import Category
+from app.models.category import Category
 from repository import Repository
 from sqlalchemy.orm import Session
 

@@ -1,4 +1,4 @@
-from Back.app.service.BuyerService import BuyerService
+from app.service.BuyerService import BuyerService
 from database import get_session
 
 
