@@ -41,7 +41,7 @@ const RegisterPage = () => {
   };
 
   return (
-    <Box sx={styles.mainContainer}>
+    <Box sx={styles.mainBox}>
       <TopBar />
       <img src={img_mundo} style ={styles.rounded_img}/>
       <Container component="main" maxWidth="xs">

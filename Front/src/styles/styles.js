@@ -1,8 +1,8 @@
 const styles = {
-    mainContainer: {
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: '100vh',
+    mainBox:{
+        display: 'flex', 
+        flexDirection: 'column', 
+        minHeight: '100vh' 
     },
     paperContainer: {
         mt: 3,
@@ -52,6 +52,6 @@ const styles = {
         borderWidth: '1px', 
         borderStyle: 'solid',
         borderRadius: "5px",
-    }
+    },
 }
 export default styles;

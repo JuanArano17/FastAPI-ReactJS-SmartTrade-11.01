@@ -5,10 +5,11 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Footer from "../components/Footer/Footer";
 import TopBar from "../components/TopBar/TopBar";
+import styles from "../styles/styles";
 
 const HomePage = () => {
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <Box sx={styles.mainBox}>
             <TopBar />
             <Container component="main" sx={{ mt: 4, mb: 4, flex: 1 }}>
                 <Grid container spacing={3} alignItems="center" justifyContent="center">
