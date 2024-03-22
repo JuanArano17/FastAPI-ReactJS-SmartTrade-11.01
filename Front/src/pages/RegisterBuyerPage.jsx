@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { Box, Typography, TextField, Button, Container, Grid, Paper, } from "@mui/material";
+import { Box, Typography, TextField, Button, Container, Grid, Paper,IconButton, InputAdornment, } from "@mui/material";
 import TopBar from "../components/TopBar/TopBar";
 import Footer from "../components/Footer/Footer";
 import styles from "../styles/styles";
 import img_mundo from "../images/img_mundo.png";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 const formFields = [
   { id: "firstName", placeholder: "Patricio", name: "Name *", autoComplete: "fname", autoFocus: true },
@@ -30,6 +32,7 @@ const RegisterPage = () => {
   const [isValidPassword, setIsValidPassword] = useState(false);
   const [isAllFieldsFilled, setIsAllFieldsFilled] = useState(false);
   const [dniError, setDniError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const validatePassword = (value) => {
     // Use regex to validate password requirements
@@ -98,6 +101,10 @@ const RegisterPage = () => {
     // Logic for communicating with backend
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
   return (
     <Box sx={styles.mainBox}>
       <TopBar />
@@ -115,17 +122,45 @@ const RegisterPage = () => {
                     <Typography variant="body2" color="232323" sx={{ textAlign: 'left' }}>
                       {field.name}
                     </Typography>
-                    <TextField
-                      {...field}
-                      required
-                      fullWidth
-                      value={formData[field.name]}
-                      onChange={handleChange}
-                      sx={styles.textfields}
-                      inputProps={field.name === 'DNI' ? { maxLength: 9 } : {}}
-                      error={field.name === 'DNI' && dniError !== ""}
-                      helperText={field.name === 'DNI' && dniError}
-                    />
+                    {field.type === 'password' ? (
+                      <TextField
+                        {...field}
+                        required
+                        fullWidth
+                        value={formData[field.name]}
+                        onChange={handleChange}
+                        sx={styles.textfields}
+                        inputProps={field.name === 'DNI' ? { maxLength: 9 } : {}}
+                        error={field.name === 'DNI' && dniError !== ""}
+                        helperText={field.name === 'DNI' && dniError}
+                        type={showPassword ? 'text' : 'password'} // Mostrar contraseña si showPassword es true
+                        InputProps={{ // Agregar icono de ojo para mostrar/ocultar contraseña
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton
+                                onClick={togglePasswordVisibility}
+                                edge="end"
+                                aria-label="toggle password visibility"
+                              >
+                                {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                    ) : (
+                      <TextField
+                        {...field}
+                        required
+                        fullWidth
+                        value={formData[field.name]}
+                        onChange={handleChange}
+                        sx={styles.textfields}
+                        inputProps={field.name === 'DNI' ? { maxLength: 9 } : {}}
+                        error={field.name === 'DNI' && dniError !== ""}
+                        helperText={field.name === 'DNI' && dniError}
+                      />
+                    )}
                   </Grid>
                 ))}
                 <Button
@@ -134,7 +169,7 @@ const RegisterPage = () => {
                   variant="contained"
                   sx={styles.registerButton}
                   mt={4}
-                //(en proceso)disabled={!isAllFieldsFilled || !isValidPassword}
+                  //tengo que arreglarlo disabled={!isAllFieldsFilled || !isValidPassword}
                 >
                   Register BUYER
                 </Button>
