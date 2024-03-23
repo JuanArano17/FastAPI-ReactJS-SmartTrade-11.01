@@ -1,6 +1,8 @@
 from sqlalchemy import DateTime, Float, ForeignKey, Integer, Column
-from sqlalchemy.orm import relationship
-from app.database import Base
+from sqlalchemy.orm import relationship, declarative_base
+#from app.database import Base
+from app.base import Base
+
 
 
 class Order(Base):

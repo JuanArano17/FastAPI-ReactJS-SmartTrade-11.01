@@ -2,11 +2,10 @@ import os
 from sqlalchemy import Engine, create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import database_exists, create_database
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from dotenv import load_dotenv
 
-Base = declarative_base()
-
+#Base = declarative_base()
 from app.models.buyer import Buyer
 from app.models.address import Address
 from app.models.category import Category

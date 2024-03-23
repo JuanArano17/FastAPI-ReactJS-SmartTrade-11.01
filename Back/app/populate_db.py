@@ -1,5 +1,5 @@
 from app.service.BuyerService import BuyerService
-from database import get_session
+from app.database import get_session
 
 
 session = get_session()

@@ -1,6 +1,7 @@
 from sqlalchemy import DateTime, ForeignKey, String, Integer, Column
 from sqlalchemy.orm import relationship
-from app.database import Base
+#from app.database import Base
+from app.base import Base
 
 
 class Card(Base):
