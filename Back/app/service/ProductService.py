@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from Back.app.models.product import Product
 from Back.app.service.ImageService import ImageService
-from repository import Repository
+from app.repository import Repository
 
 
 class ProductService:

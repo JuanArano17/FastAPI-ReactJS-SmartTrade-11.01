@@ -41,4 +41,4 @@ def get_engine() -> Engine:
 def get_session():
     engine = get_engine()
     session = sessionmaker(bind=engine)
-    return session
+    return session()

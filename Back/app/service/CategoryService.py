@@ -1,5 +1,5 @@
 from app.models.category import Category
-from repository import Repository
+from app.repository import Repository
 from sqlalchemy.orm import Session
 
 

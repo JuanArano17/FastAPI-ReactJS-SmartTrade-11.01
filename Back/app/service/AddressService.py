@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from models.address import Address
-from repository import Repository
+from app.models.address import Address
+from app.repository import Repository
 
 
 class AddressService:

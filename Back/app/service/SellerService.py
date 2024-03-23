@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from Back.app.models.seller import Seller
-from repository import Repository
+from app.repository import Repository
 
 
 class SellerService:

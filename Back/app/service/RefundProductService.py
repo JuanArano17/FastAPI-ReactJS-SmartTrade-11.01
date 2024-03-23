@@ -3,7 +3,7 @@ from Back.app.models.product_line import ProductLine
 from Back.app.models.refund_product import RefundProduct
 from Back.app.service.OrderService import OrderService
 from Back.app.service.ProductLineService import ProductLineService
-from repository import Repository
+from app.repository import Repository
 
 
 class RefundProductService:

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from models.buyer import Buyer
-from repository import Repository
+from app.models.buyer import Buyer
+from app.repository import Repository
 
 
 class BuyerService:

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from Back.app.models.image import Image
-from repository import Repository
+from app.repository import Repository
 
 
 class ImageService:
