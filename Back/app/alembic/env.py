@@ -1,5 +1,6 @@
 from logging.config import fileConfig
-from app.database import Base, get_db_url as get_url
+from app.base import Base
+from app.database import get_db_url as get_url
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 

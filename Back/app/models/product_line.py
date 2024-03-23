@@ -1,8 +1,6 @@
 from sqlalchemy import Float, ForeignKey, Integer, Column
 from sqlalchemy.orm import relationship
-#from app.database import Base
 from app.base import Base
-
 
 
 class ProductLine(Base):
