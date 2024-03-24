@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
-from Back.app.models.product_line import ProductLine
-from Back.app.models.refund_product import RefundProduct
-from Back.app.service.OrderService import OrderService
-from Back.app.service.ProductLineService import ProductLineService
+from app.models.product_line import ProductLine
+from app.models.refund_product import RefundProduct
+from Back.app.service.order import OrderService
+from Back.app.service.product_line import ProductLineService
 from app.repository import Repository
 
 

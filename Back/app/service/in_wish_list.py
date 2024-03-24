@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from Back.app.models.in_wish_list import InWishList
+from app.models.in_wish_list import InWishList
 from app.repository import Repository
 
 
