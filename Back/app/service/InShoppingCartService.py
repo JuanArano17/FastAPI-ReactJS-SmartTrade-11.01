@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from Back.app.models.in_shopping_cart import InShoppingCart
+from app.models.in_shopping_cart import InShoppingCart
 from app.repository import Repository
 
 

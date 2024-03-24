@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from Back.app.models.image import Image
+from app.models.image import Image
 from app.repository import Repository
 
 

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from Back.app.models.card import Card
+from app.models.card import Card
 from app.repository import Repository
 
 

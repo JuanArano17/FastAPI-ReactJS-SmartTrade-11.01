@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from Back.app.models.seller_product import SellerProduct
+from app.models.seller_product import SellerProduct
 from app.repository import Repository
 
 
