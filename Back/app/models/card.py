@@ -1,4 +1,4 @@
-from sqlalchemy import DateTime, ForeignKey, String, Integer, Column
+from sqlalchemy import Date, ForeignKey, String, Integer, Column
 from sqlalchemy.orm import relationship
 from app.base import Base
 
@@ -11,7 +11,7 @@ class Card(Base):
     card_number = Column(String, nullable=False)
     card_name = Column(String, nullable=False)
     card_security_num = Column(Integer, nullable=False)
-    card_exp_date = Column(DateTime, nullable=False)
+    card_exp_date = Column(Date, nullable=False)
 
     orders = relationship("Order", back_populates="card")
     buyer = relationship("Buyer", back_populates="cards")

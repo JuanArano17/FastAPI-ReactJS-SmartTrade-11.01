@@ -8,7 +8,7 @@ class Image(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     id_product = Column(Integer, ForeignKey("Product.id"), nullable=False)
-    url = Column(String)
+    url = Column(String, nullable=False)
 
     product = relationship("Product", back_populates="images")
 
