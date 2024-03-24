@@ -1,8 +1,8 @@
-from pydantic import BaseModel
+from pydantic import AnyUrl, BaseModel, ConfigDict
 
 
 class ImageBase(BaseModel):
-    url: str
+    url: AnyUrl
 
 
 class ImageCreate(ImageBase):
@@ -10,8 +10,7 @@ class ImageCreate(ImageBase):
 
 
 class Image(ImageBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     id_product: int
-
-    class Config:
-        orm_mode = True

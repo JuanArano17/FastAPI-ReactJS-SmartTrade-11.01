@@ -1,17 +1,17 @@
-from pydantic import BaseModel, Field
-from typing import List, Optional
-
-from Back.app.schemas.order import Order
+from pydantic import BaseModel, ConfigDict, Field, PositiveInt
+from typing import Optional
+from pydantic_extra_types.country import CountryAlpha3
 
 
 class AddressBase(BaseModel):
     street: str = Field(min_length=5, max_length=35)
-    floor: Optional[int] = Field(ge=0, le=200)
+    floor: Optional[PositiveInt] = Field(le=200)
     door: str = Field(min_length=1, max_length=6)
     adit_info: Optional[str] = Field(max_length=70)
     city: str = Field(min_length=1, max_length=28)
     postal_code: str = Field(min_length=5, max_length=8)
-    country: str = Field(min_length=4, max_length=28)
+    country: CountryAlpha3
+    default: bool
 
 
 class AddressCreate(AddressBase):
@@ -19,16 +19,7 @@ class AddressCreate(AddressBase):
 
 
 class Address(AddressBase):
-    id: Optional[int] = None
-    # orders: list[Order] = []
-    # buyer_addresses: list[BuyerAddress]=[] optional?
+    model_config = ConfigDict(from_attributes=True)
 
-    class Config:
-        orm_mode = True
-
-
-class AddressWithOrders(Address):
-    orders: List[Order]
-
-    class Config:
-        orm_mode = True
+    id: int
+    id_buyer: int

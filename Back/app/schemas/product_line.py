@@ -1,12 +1,11 @@
-from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, NonNegativeFloat, PositiveInt
 
-from Back.app.schemas.refund_product import RefundProduct
+from app.schemas.refund_product import RefundProduct
 
 
 class ProductLineBase(BaseModel):
-    quantity: int = Field(gt=0)
-    subtotal: float = Field(ge=0)
+    quantity: PositiveInt
+    subtotal: NonNegativeFloat
 
 
 class ProductLineCreate(ProductLineBase):
@@ -14,10 +13,9 @@ class ProductLineCreate(ProductLineBase):
 
 
 class ProductLine(ProductLineBase):
-    id: Optional[int] = None
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
     id_order: int
     id_seller_product: int
     refund_products: list[RefundProduct] = []
-
-    class Config:
-        orm_mode = True
