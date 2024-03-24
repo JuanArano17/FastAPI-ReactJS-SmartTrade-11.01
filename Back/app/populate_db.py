@@ -1,39 +1,22 @@
+from app.service.SellerService import SellerService
 from app.service.BuyerService import BuyerService
+from app.service.CardService import CardService
 from app.database import get_session
+from datetime import datetime
 #from app.models.buyer import Buyer
 #from app.repository import Repository
 
 
 session = get_session()
 
-#buyer=Buyer(email="jobfgim@gmail.com",
-#     name="Fran",
-#     surname="Pedro",
-#     eco_points=0,
-#     password="Pojo231",
-#     dni="48764960A",
-#     billing_address="Billing address 932",
-#     payment_method="Paypal")
-#session.add(buyer)
-#session.commit()
+card_serv = CardService(session)
+card_serv.add_card(
+    id_buyer=1,
+    card_number="1234123412341234",
+    card_name="Jack Peterson",
+    card_security_num=123,
+    card_exp_date=datetime(2025,1,1).date(),
+)
 
-#repo=Repository(session, Buyer)          
-#repo.add(email="jobfgim@gmail.com",
-#      name="Fran",
-#      surname="Pedro",
-#      eco_points=0,
-#      password="Pojo231",
-#      dni="48764960A",
-#      billing_address="Billing address 932",    
-#      payment_method="Paypal")
 
-buyer_serv = BuyerService(session)
-buyer_serv.add_buyer(
-    email="afwcm@gmail.com",
-    name="James",
-    surname="Francis",
-    eco_points=0,
-    password="Pefecwe231",
-    dni="49765460A",
-    billing_address="Billing address 1913",
-    payment_method="Bizum")
+        
