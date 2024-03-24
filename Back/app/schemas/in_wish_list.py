@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class InWishListBase(BaseModel):
@@ -6,8 +6,7 @@ class InWishListBase(BaseModel):
 
 
 class InWishList(InWishListBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id_buyer: int
     id_seller_product: int
-
-    class Config:
-        orm_mode = True

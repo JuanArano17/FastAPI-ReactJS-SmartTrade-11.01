@@ -1,13 +1,20 @@
-from datetime import datetime, date
-from pydantic import BaseModel, Field
-from typing import List, Optional
+from datetime import datetime
+from pydantic import BaseModel, ConfigDict, Field, NonNegativeFloat, validator
+from typing import List
 
-from Back.app.schemas.product_line import ProductLine
+from app.schemas.product_line import ProductLine
 
 
 class OrderBase(BaseModel):
-    order_date: datetime = Field(gt=date(2020, 1, 1))
-    total: float = Field(ge=0)
+    order_date: datetime = Field(default_factory=datetime.now)
+    total: NonNegativeFloat
+
+    @validator("order_date")
+    @classmethod
+    def validate_date(cls, v):
+        if v > datetime.now():
+            raise ValueError("The order date must be in the past")
+        return v
 
 
 class OrderCreate(OrderBase):
@@ -15,11 +22,10 @@ class OrderCreate(OrderBase):
 
 
 class Order(OrderBase):
-    id: Optional[int] = None
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
     id_buyer: int
     id_card: int
     id_address: int
     product_lines: List[ProductLine]
-
-    class Config:
-        orm_mode = True

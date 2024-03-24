@@ -1,8 +1,8 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, PositiveInt
 
 
 class InShoppingCartBase(BaseModel):
-    quantity: int = Field(ge=0)
+    quantity: PositiveInt
 
 
 class InShoppingCartCreate(InShoppingCartBase):
@@ -10,8 +10,7 @@ class InShoppingCartCreate(InShoppingCartBase):
 
 
 class InShoppingCart(InShoppingCartBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id_buyer: int
     id_seller_product: int
-
-    class Config:
-        orm_mode = True

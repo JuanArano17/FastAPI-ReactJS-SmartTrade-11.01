@@ -1,11 +1,11 @@
-from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, PositiveInt
 from datetime import datetime
 
 
 class RefundProductBase(BaseModel):
-    quantity: int = Field(gt=0)
-    refund_date: datetime  # must be greater than order
+    quantity: PositiveInt
+    # must be greater than order datetime
+    refund_date: datetime = Field(default_factory=datetime.now)
 
 
 class RefundProductCreate(RefundProductBase):
@@ -13,8 +13,7 @@ class RefundProductCreate(RefundProductBase):
 
 
 class RefundProduct(RefundProductBase):
-    id: Optional[int] = None
-    id_product_line: int
+    model_config = ConfigDict(from_attributes=True)
 
-    class Config:
-        orm_mode = True
+    id: int
+    id_product_line: int
