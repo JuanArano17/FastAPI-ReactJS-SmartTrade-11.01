@@ -51,7 +51,7 @@ class SellerService:
         try:
             seller_instance = self.seller_repo.get(seller_id)
             if seller_instance:
-                self.seller_repo.update(seller_id, new_data)
+                self.seller_repo.update(seller_instance, new_data)
                 return seller_instance
             else:
                 raise ValueError("Seller not found.")

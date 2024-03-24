@@ -109,7 +109,7 @@ class RefundProductService:
                     elif refund_date and date_difference.days < 0:
                         raise ValueError("Invalid refund date")
 
-                self.refund_product_repo.update(refund_product_id, new_data)
+                self.refund_product_repo.update(refund_product_instance, new_data)
                 return refund_product_instance
             else:
                 raise ValueError("Refund product not found.")
@@ -122,7 +122,7 @@ class RefundProductService:
         try:
             refund_product_instance = self.refund_product_repo.get(refund_product_id)
             if refund_product_instance:
-                self.refund_product_repo.delete(refund_product_id)
+                self.refund_product_repo.delete(refund_product_instance)
             else:
                 raise ValueError("Refund product not found.")
         except Exception as e:

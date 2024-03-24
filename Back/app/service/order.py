@@ -19,6 +19,7 @@ class OrderService:
                 total=0,
             )
 
+            #extra logic further up the program: add eco-points from product lines of the order to the buyer
         except Exception as e:
             raise e
         finally:

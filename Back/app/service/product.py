@@ -10,7 +10,7 @@ class ProductService:
         self.product_repo = Repository(session, Product)
 
     def add_product(
-        self, id_category, name, description, eco_points, spec_sheet, stock, url_image
+        self, id_category, name, description, eco_points, spec_sheet, stock #, url_image
     ):
         try:
             product = self.product_repo.add(
@@ -22,9 +22,9 @@ class ProductService:
                 stock=stock,
             )
 
-            image_serv = ImageService(self.session)
+            #image_serv = ImageService(self.session)
             # must add at least one initial image
-            image_serv.add_image(product.id, url_image)
+            #image_serv.add_image(product.id, url_image)
             return product
         except Exception as e:
             raise e
@@ -59,7 +59,7 @@ class ProductService:
         try:
             product_instance = self.product_repo.get(product_id)
             if product_instance:
-                self.product_repo.update(product_id, new_data)
+                self.product_repo.update(product_instance, new_data)
                 return product_instance
             else:
                 raise ValueError("Product not found.")
@@ -72,7 +72,7 @@ class ProductService:
         try:
             product_instance = self.product_repo.get(product_id)
             if product_instance:
-                self.product_repo.delete(product_id)
+                self.product_repo.delete(product_instance)
             else:
                 raise ValueError("Product not found.")
         except Exception as e:

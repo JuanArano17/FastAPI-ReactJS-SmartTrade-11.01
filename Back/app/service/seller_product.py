@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.seller_product import SellerProduct
 from app.repository import Repository
+from service.product import ProductService
 
 
 class SellerProductService:
@@ -16,8 +17,8 @@ class SellerProductService:
             exists_already = self.filter_seller_products(
                 SellerProduct.id_seller == id_seller,
                 SellerProduct.id_product == id_product,
-            ).all()
-            if exists_already:
+            )
+            if len(exists_already)>0:
                 raise Exception("The seller already owns an instance of this product")
 
             # Add the seller product
@@ -28,6 +29,10 @@ class SellerProductService:
                 price=price,
                 shipping_costs=shipping_costs,
             )
+            product_serv=ProductService(self.session)
+            old_stock=product_serv.get_product(id_product).stock#__getattribute__("stock")
+            product_stock = old_stock + quantity
+            product_serv.update_product(id_product, {"stock":product_stock})
             return seller_product
         except Exception as e:
             raise e
@@ -65,22 +70,18 @@ class SellerProductService:
             new_id_seller = new_data.get("id_seller")
 
             if new_id_product and new_id_seller:
-                exists_already = (
-                    self.session.query(SellerProduct)
-                    .filter(
-                        SellerProduct.id_seller == new_id_seller,
-                        SellerProduct.id_product == new_id_product,
-                    )
-                    .all()
+                # Check if the seller already owns an instance of this product
+                exists_already = self.filter_seller_products(
+                    SellerProduct.id_seller == new_id_seller,
+                    SellerProduct.id_product == new_id_product,
+                    SellerProduct.id != seller_product_id  # Exclude the current seller product being updated
                 )
                 if exists_already:
-                    raise Exception(
-                        "The seller already owns an instance of this product"
-                    )
+                    raise Exception("The seller already owns an instance of this product")
 
             seller_product_instance = self.seller_product_repo.get(seller_product_id)
             if seller_product_instance:
-                self.seller_product_repo.update(seller_product_id, new_data)
+                self.seller_product_repo.update(seller_product_instance, new_data)
                 return seller_product_instance
             else:
                 raise ValueError("Seller product not found.")
@@ -93,7 +94,7 @@ class SellerProductService:
         try:
             seller_product_instance = self.seller_product_repo.get(seller_product_id)
             if seller_product_instance:
-                self.seller_product_repo.delete(seller_product_id)
+                self.seller_product_repo.delete(seller_product_instance)
             else:
                 raise ValueError("Seller product not found.")
         except Exception as e:
