@@ -14,7 +14,5 @@ from app.models.in_shopping_cart import InShoppingCart
 from app.models.in_wish_list import InWishList
 from app.models.refund_product import RefundProduct
 
-#check why it does not work
-
 engine = get_engine()
 Base.metadata.create_all(bind=engine)

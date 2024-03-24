@@ -8,7 +8,7 @@ class Card(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     id_buyer = Column(Integer, ForeignKey("Buyer.id"), nullable=False)
-    card_number = Column(String, nullable=False)
+    card_number = Column(String, nullable=False, unique=True)
     card_name = Column(String, nullable=False)
     card_security_num = Column(Integer, nullable=False)
     card_exp_date = Column(DateTime, nullable=False)
