@@ -18,17 +18,18 @@ class AddressService:
         postal_code,
         country,
         default,
-        buyer_id,
+        id_buyer,
     ):
         try:
             if default:
                 # Check if there's already a default address for the buyer
                 existing_default = self.address_repo.filter(
-                    Address.default, Address.buyer_id == buyer_id
+                    Address.default, Address.id_buyer == id_buyer
                 )
-                if existing_default:
+
+                if len(existing_default)>0:
                     # If default address exists, update it to not be default
-                    self.update_address(existing_default.id, {"default": False})
+                    self.update_address(existing_default[0].id, {"default": False})
 
             address = self.address_repo.add(
                 street=street,
@@ -39,7 +40,7 @@ class AddressService:
                 postal_code=postal_code,
                 country=country,
                 default=default,
-                buyer_id=buyer_id,
+                id_buyer=id_buyer,
             )
 
             return address
@@ -79,13 +80,13 @@ class AddressService:
             if "default" in new_data and new_data["default"]:
                 # Check if there's already a default address for the buyer
                 existing_default = self.address_repo.filter(
-                    Address.default, Address.buyer_id == address.buyer_id
+                    Address.default, Address.id_buyer == address.id_buyer
                 )
                 if existing_default:
                     # If default address exists, update it to not be default
-                    self.address_repo.update(existing_default.id, {"default": False})
+                    self.address_repo.update(existing_default[0], {"default": False})
 
-            self.address_repo.update(address_id, new_data)
+            self.address_repo.update(address, new_data)
             return address
         except Exception as e:
             raise e

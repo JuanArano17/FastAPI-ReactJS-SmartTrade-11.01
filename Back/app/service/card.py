@@ -55,18 +55,23 @@ class CardService:
 
     def update_card(self, card_id, new_data):
         try:
+            card_instance = self.card_repo.get(card_id)
             id_buyer = new_data.get('id_buyer')
-            new_card_number = new_data.get('card_number')
+            card_number = new_data.get('card_number')
+            if(card_number==None):
+                card_number=card_instance.card_number
+            if(id_buyer==None):
+                id_buyer=card_instance.id_buyer
             existing_card = self.card_repo.filter(
                 Card.id != card_id,  # Exclude the current card being updated
                 Card.id_buyer == id_buyer,
-                Card.card_number == new_card_number
+                Card.card_number == card_number
             )
 
-            if existing_card:
+            if len(existing_card)>0:
                 raise ValueError("Card with the same buyer id and card number already exists.")
 
-            card_instance = self.card_repo.get(card_id)
+            
             if card_instance:
                 self.card_repo.update(card_instance, new_data)
                 return card_instance

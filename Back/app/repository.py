@@ -31,10 +31,10 @@ class Repository:
 
     def filter(self, *expressions):
         try:
-            query = select(self.model)
+            query = self.session.query(self.model)
             if expressions:
-                query = query.where(*expressions)
-            return list(self.session.execute(query))
+                query = query.filter(*expressions)
+            return query.all()
         except Exception as e:
             raise e
 
