@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict, NonNegativeFloat, PositiveInt
 
-from app.models.product_line import ProductLine
+from app.schemas.product_line import ProductLine
 from app.schemas.in_shopping_cart import InShoppingCart
 from app.schemas.in_wish_list import InWishList
 
