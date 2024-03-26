@@ -8,13 +8,14 @@ from app.service.seller_product import SellerProductService
 from service.image import ImageService
 from service.product import ProductService
 from service.address import AddressService
+from service.in_shopping_cart import InShoppingCartService
 #from app.models.buyer import Buyer
 #from app.repository import Repository
 
 
 session = get_session()
 
-card_serv = CardService(session)
-card_serv.update_card(1, {"card_number":"1234123412341234"})
+seller_product_serv = SellerProductService(session)
+seller_product_serv.update_seller_product(1, {"quantity":30})
 
          

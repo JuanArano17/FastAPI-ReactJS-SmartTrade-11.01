@@ -30,7 +30,7 @@ class SellerProductService:
                 shipping_costs=shipping_costs,
             )
             product_serv=ProductService(self.session)
-            old_stock=product_serv.get_product(id_product).stock#__getattribute__("stock")
+            old_stock=product_serv.get_product(id_product).stock
             product_stock = old_stock + quantity
             product_serv.update_product(id_product, {"stock":product_stock})
             return seller_product
@@ -63,26 +63,39 @@ class SellerProductService:
         finally:
             self.session.close()
 
+    #this method assumes that we never change id_product or id_seller, which we probably won't have to
     def update_seller_product(self, seller_product_id, new_data):
         try:
-            # Check if the seller already owns an instance of this product
-            new_id_product = new_data.get("id_product")
-            new_id_seller = new_data.get("id_seller")
-
-            if new_id_product and new_id_seller:
-                # Check if the seller already owns an instance of this product
-                exists_already = self.filter_seller_products(
-                    SellerProduct.id_seller == new_id_seller,
-                    SellerProduct.id_product == new_id_product,
-                    SellerProduct.id != seller_product_id  # Exclude the current seller product being updated
-                )
-                if exists_already:
-                    raise Exception("The seller already owns an instance of this product")
-
             seller_product_instance = self.seller_product_repo.get(seller_product_id)
+            # Check if the seller already owns an instance of this product
+            id_product = new_data.get("id_product")
+            id_seller = new_data.get("id_seller")
+            quantity = new_data.get("quantity")
+            old_quantity=seller_product_instance.quantity
+            if(id_seller==None):
+                id_seller=seller_product_instance.id_seller
+            
+            if(id_product==None):
+                id_product=seller_product_instance.id_product
+
+            # Check if the seller already owns an instance of this product
+            exists_already = self.seller_product_repo.filter(
+                SellerProduct.id != seller_product_id, # Exclude the current seller product being updated
+                SellerProduct.id_seller == id_seller,
+                SellerProduct.id_product == id_product,
+            )
+
+            if len(exists_already)>0:
+                raise Exception("The seller already owns an instance of this product")
+            
             if seller_product_instance:
                 self.seller_product_repo.update(seller_product_instance, new_data)
-                return seller_product_instance
+                #return seller_product_instance
+            if(quantity):
+                product_serv=ProductService(self.session)
+                old_stock=product_serv.get_product(id_product).stock
+                product_stock = old_stock - old_quantity + quantity
+                product_serv.update_product(id_product, {"stock":product_stock})
             else:
                 raise ValueError("Seller product not found.")
         except Exception as e:
