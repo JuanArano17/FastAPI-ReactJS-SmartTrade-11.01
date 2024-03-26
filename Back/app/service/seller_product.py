@@ -91,13 +91,14 @@ class SellerProductService:
             if seller_product_instance:
                 self.seller_product_repo.update(seller_product_instance, new_data)
                 #return seller_product_instance
+            else:
+                raise ValueError("Seller product not found.")
             if(quantity):
                 product_serv=ProductService(self.session)
                 old_stock=product_serv.get_product(id_product).stock
                 product_stock = old_stock - old_quantity + quantity
                 product_serv.update_product(id_product, {"stock":product_stock})
-            else:
-                raise ValueError("Seller product not found.")
+            
         except Exception as e:
             raise e
         finally:
