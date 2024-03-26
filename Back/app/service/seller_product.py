@@ -72,27 +72,20 @@ class SellerProductService:
             id_seller = new_data.get("id_seller")
             quantity = new_data.get("quantity")
             old_quantity=seller_product_instance.quantity
-            if(id_seller==None):
-                id_seller=seller_product_instance.id_seller
+           
+            if(id_seller):
+                raise Exception("Can't change the seller of a seller product")
             
-            if(id_product==None):
-                id_product=seller_product_instance.id_product
-
-            # Check if the seller already owns an instance of this product
-            exists_already = self.seller_product_repo.filter(
-                SellerProduct.id != seller_product_id, # Exclude the current seller product being updated
-                SellerProduct.id_seller == id_seller,
-                SellerProduct.id_product == id_product,
-            )
-
-            if len(exists_already)>0:
-                raise Exception("The seller already owns an instance of this product")
+            if(id_product):
+                raise Exception("Can't change the product of a seller product")
             
+            id_product=seller_product_instance.id_product
             if seller_product_instance:
                 self.seller_product_repo.update(seller_product_instance, new_data)
                 #return seller_product_instance
             else:
                 raise ValueError("Seller product not found.")
+            
             if(quantity):
                 product_serv=ProductService(self.session)
                 old_stock=product_serv.get_product(id_product).stock
@@ -107,6 +100,10 @@ class SellerProductService:
     def delete_seller_product(self, seller_product_id):
         try:
             seller_product_instance = self.seller_product_repo.get(seller_product_id)
+            product_serv=ProductService(self.session)
+            old_stock=product_serv.get_product(seller_product_instance.id_product).stock
+            product_stock = old_stock - seller_product_instance.quantity
+            product_serv.update_product(seller_product_instance.id_product, {"stock":product_stock})
             if seller_product_instance:
                 self.seller_product_repo.delete(seller_product_instance)
             else:

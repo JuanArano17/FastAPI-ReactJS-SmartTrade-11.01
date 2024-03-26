@@ -16,6 +16,6 @@ from service.in_shopping_cart import InShoppingCartService
 session = get_session()
 
 seller_product_serv = SellerProductService(session)
-seller_product_serv.update_seller_product(1, {"quantity":0})
+seller_product_serv.delete_seller_product(1)
 
          
