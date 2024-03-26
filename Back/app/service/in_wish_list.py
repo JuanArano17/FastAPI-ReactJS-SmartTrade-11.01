@@ -8,9 +8,9 @@ class InWishListService:
         self.session = session
         self.wishlist_repo = Repository(session, InWishList)
 
-    def add_to_wishlist(self, id_product, id_buyer):
+    def add_to_wishlist(self, id_seller_product, id_buyer):
         try:
-            return self.wishlist_repo.add(id_product=id_product, id_buyer=id_buyer)
+            return self.wishlist_repo.add(id_seller_product=id_seller_product, id_buyer=id_buyer)
         except Exception as e:
             raise e
         finally:
@@ -40,9 +40,11 @@ class InWishListService:
         finally:
             self.session.close()
 
-    def update_wishlist_item(self, wishlist_item_id, new_data):
+    #probably won't need to use this
+    def update_wishlist_item(self, id_seller_product, id_buyer, new_data):
         try:
-            wishlist_item_instance = self.wishlist_repo.get(wishlist_item_id)
+            composite_key=(id_seller_product, id_buyer)
+            wishlist_item_instance = self.wishlist_repo.get(composite_key)
             if wishlist_item_instance:
                 self.wishlist_repo.update(wishlist_item_instance, new_data)
                 return wishlist_item_instance
@@ -53,9 +55,10 @@ class InWishListService:
         finally:
             self.session.close()
 
-    def delete_wishlist_item(self, wishlist_item_id):
+    def delete_wishlist_item(self, id_seller_product, id_buyer):
         try:
-            wishlist_item_instance = self.wishlist_repo.get(wishlist_item_id)
+            composite_key=(id_seller_product, id_buyer)
+            wishlist_item_instance = self.wishlist_repo.get(composite_key)
             if wishlist_item_instance:
                 self.wishlist_repo.delete(wishlist_item_instance)
             else:

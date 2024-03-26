@@ -10,7 +10,7 @@ class InShoppingCart(Base):
         Integer, ForeignKey("SellerProduct.id"), primary_key=True, index=True
     )
     id_buyer = Column(Integer, ForeignKey("Buyer.id"), primary_key=True, index=True)
-    quantity = Column(Integer)
+    quantity = Column(Integer, nullable=False)
 
     seller_products = relationship("SellerProduct", back_populates="in_shopping_cart")
     buyer = relationship("Buyer", back_populates="in_shopping_cart")

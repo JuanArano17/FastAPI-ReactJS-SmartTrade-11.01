@@ -9,13 +9,12 @@ from service.image import ImageService
 from service.product import ProductService
 from service.address import AddressService
 from service.in_shopping_cart import InShoppingCartService
+from service.in_wish_list import InWishListService
 #from app.models.buyer import Buyer
 #from app.repository import Repository
 
 
 session = get_session()
 
-seller_product_serv = SellerProductService(session)
-seller_product_serv.delete_seller_product(1)
-
-         
+seller_product_serv = InShoppingCartService(session)
+seller_product_serv.delete_cart_item(3,3)

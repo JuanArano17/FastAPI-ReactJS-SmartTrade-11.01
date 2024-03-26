@@ -72,7 +72,7 @@ class SellerProductService:
             id_seller = new_data.get("id_seller")
             quantity = new_data.get("quantity")
             old_quantity=seller_product_instance.quantity
-           
+            
             if(id_seller):
                 raise Exception("Can't change the seller of a seller product")
             
