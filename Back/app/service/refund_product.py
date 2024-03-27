@@ -4,6 +4,7 @@ from app.models.refund_product import RefundProduct
 from Back.app.service.order import OrderService
 from Back.app.service.product_line import ProductLineService
 from app.repository import Repository
+from service.seller_product import SellerProductService
 
 
 class RefundProductService:
@@ -34,13 +35,23 @@ class RefundProductService:
             elif date_difference.days < 0:
                 raise ValueError("Invalid refund_date")
 
+
+            other_refunded=0
+            refund_products=self.filter_refund_products(RefundProduct.id_product_line==id_product_line)
+            for refund_product in refund_products:
+                other_refunded+=refund_product.quantity
+
+
             # Validate quantity
-            if quantity > product_line.quantity:
+            if (quantity + other_refunded)> product_line.quantity:
                 raise ValueError("Unable to refund more items than were ordered")
 
             # Update quantities in related entities
-            product_line.quantity -= quantity
-            product_line.seller_product.quantity += quantity
+            seller_product_serv=SellerProductService(self.session)
+            seller_product_quantity=seller_product_serv.get_seller_product(product_line.id_seller_product).quantity
+            new_quantity=seller_product_quantity+quantity
+            seller_product_serv.update_seller_product(product_line.id_seller_product, {"quantity":new_quantity})
+        
 
             # Add refund product
             refund_product = self.refund_product_repo.add(
@@ -79,50 +90,19 @@ class RefundProductService:
         finally:
             self.session.close()
 
-    def update_refund_product(self, refund_product_id, new_data):
-        try:
-            refund_product_instance = self.refund_product_repo.get(refund_product_id)
-            if refund_product_instance:
-                product_line_id = new_data.get("id_product_line")
-                quantity = new_data.get("quantity")
-                refund_date = new_data.get("refund_date")
-
-                if product_line_id or quantity or refund_date:
-                    product_line = self.session.query(ProductLine).get(product_line_id)
-                    if not product_line:
-                        raise ValueError("Product line not found")
-
-                    order = product_line.order
-                    if not order:
-                        raise ValueError("Order not found")
-
-                    date_difference = refund_date - order.order_date
-
-                    if quantity and quantity > product_line.quantity:
-                        raise ValueError(
-                            "Unable to refund more items than were ordered"
-                        )
-                    elif refund_date and date_difference.days > 30:
-                        raise ValueError(
-                            "Unable to refund a product more than 30 days after it has been ordered"
-                        )
-                    elif refund_date and date_difference.days < 0:
-                        raise ValueError("Invalid refund date")
-
-                self.refund_product_repo.update(refund_product_instance, new_data)
-                return refund_product_instance
-            else:
-                raise ValueError("Refund product not found.")
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+    #no update method because we don't update a refund's details after it's made
 
     def delete_refund_product(self, refund_product_id):
         try:
             refund_product_instance = self.refund_product_repo.get(refund_product_id)
             if refund_product_instance:
+                seller_product_serv=SellerProductService(self.session)
+                product_line_serv=ProductLineService(self.session)
+                product_line=product_line_serv.get_product_line(refund_product_instance.id_product_line)
+                seller_product_quantity=seller_product_serv.get_seller_product(product_line.id_seller_product).quantity
+                new_quantity=seller_product_quantity-refund_product_instance.quantity
                 self.refund_product_repo.delete(refund_product_instance)
+                seller_product_serv.update_seller_product(product_line.id_seller_product, {"quantity":new_quantity})
             else:
                 raise ValueError("Refund product not found.")
         except Exception as e:
