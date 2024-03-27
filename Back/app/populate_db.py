@@ -17,4 +17,4 @@ from service.product_line import ProductLineService
 session = get_session()
 
 seller_product_serv = ProductLineService(session)
-seller_product_serv.update_product_line(7,{"quantity":2})
+seller_product_serv.add_product_line(id_order=9, id_seller_product=3, quantity=3)

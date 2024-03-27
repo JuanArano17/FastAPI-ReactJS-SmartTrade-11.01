@@ -77,73 +77,9 @@ class ProductLineService:
         finally:
             self.session.close()
 
-    def update_product_line(self, product_line_id, new_data):
-        try:
-            product_line_instance = self.product_line_repo.get(product_line_id)
-            # Check if the product line being updated is not already part of the order
-            if "id_order" in new_data:
-                new_order_id = new_data["id_order"]
-                exists_already = self.filter_product_lines(
-                    (ProductLine.id_order == new_order_id)
-                    & (
-                        ProductLine.id_seller_product
-                        == product_line_instance.id_seller_product
-                    )
-                    & (
-                        ProductLine.id != product_line_id
-                    )  # Exclude the current product line
-                )
-
-                if len(exists_already) > 0:
-                    raise Exception(
-                        "The product line trying to be introduced is already in the order"
-                    )
-
-            if product_line_instance:
-                if "quantity" in new_data:
-                    new_quantity = new_data["quantity"]
-                    seller_product_serv = SellerProductService(self.session)
-                    seller_product = seller_product_serv.get_seller_product(
-                        product_line_instance.id_seller_product
-                    )
-                    seller_product_quantity = seller_product.quantity
-                    existing_quantity = product_line_instance.quantity
-                    available_quantity = seller_product_quantity + existing_quantity
-                    new_seller_product_quantity = seller_product_quantity - new_quantity + existing_quantity
-                    subtotal=seller_product.price * new_quantity
-                    if new_quantity > available_quantity:
-                        raise Exception(
-                            "Product seller cannot sell more items than those he owns"
-                        )
-                    else:
-                        self.product_line_repo.update (
-                            product_line_instance, {"quantity":new_seller_product_quantity,"subtotal":subtotal}
-                        )
-
-                        order_serv = OrderService(self.session)
-                        order = order_serv.get_order(product_line_instance.id_order)
-                        order_serv.update_order(
-                            product_line_instance.id_order,
-                            {
-                                "total": order.total
-                                + seller_product.price * new_quantity
-                                - seller_product.price * existing_quantity
-                            },
-                        )
+    #no update method required, once a product line is added to an order it's quantity or anything else should not be changed
     
-                        seller_product_serv.update_seller_product(product_line_instance.id_seller_product,{"quantity":new_seller_product_quantity})
-                        
-                        
-
-                #self.product_line_repo.update(product_line_instance, new_data)
-                return product_line_instance
-            else:
-                raise ValueError("Product Line not found.")
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
-
+    #SHOULD ONLY USE THE METHOD BELOW FOR TESTING
     def delete_product_line(self, product_line_id):
         try:
             product_line_instance = self.product_line_repo.get(product_line_id)
