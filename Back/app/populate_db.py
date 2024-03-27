@@ -10,11 +10,11 @@ from service.product import ProductService
 from service.address import AddressService
 from service.in_shopping_cart import InShoppingCartService
 from service.in_wish_list import InWishListService
-#from app.models.buyer import Buyer
-#from app.repository import Repository
+from service.order import OrderService
+from service.product_line import ProductLineService
 
 
 session = get_session()
 
-seller_product_serv = InShoppingCartService(session)
-seller_product_serv.delete_cart_item(3,3)
+seller_product_serv = ProductLineService(session)
+seller_product_serv.update_product_line(7,{"quantity":2})

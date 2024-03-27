@@ -14,12 +14,12 @@ class ProductLineService:
     def add_product_line(self, id_order, id_seller_product, quantity):
         try:
             seller_product_serv = SellerProductService(self.session)
-            seller_product = seller_product_serv.filter_seller_products(
-                SellerProduct.id_seller_product == id_seller_product
-            ).first()
+            seller_product = seller_product_serv.get_seller_product(id_seller_product)
+            if(seller_product==None):
+                raise Exception("Could't find the seller product")
             seller_product_quantity = seller_product.quantity
             exists_already = self.filter_product_lines(
-                ProductLine.order == id_order,
+                ProductLine.id_order == id_order,
                 ProductLine.id_seller_product == id_seller_product,
             )
 
@@ -37,7 +37,8 @@ class ProductLineService:
             order_serv.update_order(
                 id_order, {"total": order.total + seller_product.price * quantity}
             )
-            seller_product.quantity -= quantity
+            new_seller_product_quantity = seller_product_quantity - quantity
+            seller_product_serv.update_seller_product(id_seller_product,{"quantity":new_seller_product_quantity})
             subtotal = seller_product.price * quantity
 
             self.product_line_repo.add(
@@ -83,7 +84,7 @@ class ProductLineService:
             if "id_order" in new_data:
                 new_order_id = new_data["id_order"]
                 exists_already = self.filter_product_lines(
-                    (ProductLine.order == new_order_id)
+                    (ProductLine.id_order == new_order_id)
                     & (
                         ProductLine.id_seller_product
                         == product_line_instance.id_seller_product
@@ -102,18 +103,23 @@ class ProductLineService:
                 if "quantity" in new_data:
                     new_quantity = new_data["quantity"]
                     seller_product_serv = SellerProductService(self.session)
-                    seller_product = seller_product_serv.filter_seller_products(
-                        SellerProduct.id_seller_product
-                        == product_line_instance.id_seller_product
-                    ).first()
+                    seller_product = seller_product_serv.get_seller_product(
+                        product_line_instance.id_seller_product
+                    )
                     seller_product_quantity = seller_product.quantity
                     existing_quantity = product_line_instance.quantity
                     available_quantity = seller_product_quantity + existing_quantity
+                    new_seller_product_quantity = seller_product_quantity - new_quantity + existing_quantity
+                    subtotal=seller_product.price * new_quantity
                     if new_quantity > available_quantity:
                         raise Exception(
                             "Product seller cannot sell more items than those he owns"
                         )
                     else:
+                        self.product_line_repo.update (
+                            product_line_instance, {"quantity":new_seller_product_quantity,"subtotal":subtotal}
+                        )
+
                         order_serv = OrderService(self.session)
                         order = order_serv.get_order(product_line_instance.id_order)
                         order_serv.update_order(
@@ -124,13 +130,12 @@ class ProductLineService:
                                 - seller_product.price * existing_quantity
                             },
                         )
-                        seller_product.quantity += existing_quantity
-                        seller_product.quantity -= new_quantity
-                        product_line_instance.subtotal = (
-                            seller_product.price * new_quantity
-                        )
+    
+                        seller_product_serv.update_seller_product(product_line_instance.id_seller_product,{"quantity":new_seller_product_quantity})
+                        
+                        
 
-                self.product_line_repo.update(product_line_instance, new_data)
+                #self.product_line_repo.update(product_line_instance, new_data)
                 return product_line_instance
             else:
                 raise ValueError("Product Line not found.")
