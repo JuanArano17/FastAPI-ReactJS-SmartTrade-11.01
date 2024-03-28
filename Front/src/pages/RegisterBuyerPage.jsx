@@ -113,7 +113,7 @@ const RegisterPage = () => {
         <Paper elevation={3} sx={styles.paperContainer}>
           <Grid container spacing={3}>
             <Grid item xs={12} sm={6}>
-              <Typography component="h1" variant="h5" color="#629c44" mb={2}>
+              <Typography component="h1" variant="h5" sx={styles.headerText}>
                 Register
               </Typography>
               <Box component="form" onSubmit={handleSubmit} sx={styles.formContainer}>
@@ -177,7 +177,7 @@ const RegisterPage = () => {
             </Grid>
             <Grid item xs={12} sm={6}>
               <Paper elevation={3} sx={{ ...styles.paperContainer, backgroundColor: "#f2f2f7" }}>
-                <Typography component="h2" variant="h6" color="#629c44" mb={2}>
+                <Typography component="h2" variant="h6" sx={styles.headerText}>
                   Enter your card information (OPTIONAL)
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} sx={styles.formContainer}>

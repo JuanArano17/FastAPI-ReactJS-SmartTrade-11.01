@@ -53,5 +53,14 @@ const styles = {
         borderStyle: 'solid',
         borderRadius: "5px",
     },
+    mainContainer:{
+        mt: 4, 
+        mb: 4, 
+        flex: 1
+    },
+    headerText:{
+        color:"#629c44" ,
+        fontWeight:"bold",
+    }
 }
 export default styles;
