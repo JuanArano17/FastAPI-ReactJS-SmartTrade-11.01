@@ -83,7 +83,7 @@ class OrderService:
         order = self.get_by_id(order_id)
         return self.order_repo.update(order, new_data)
 
-    def delete_order(self, order_id):
+    def delete_by_id(self, order_id):
         self.get_by_id(order_id)
         self.order_repo.delete_by_id(order_id)
 
