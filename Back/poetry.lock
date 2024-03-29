@@ -506,6 +506,17 @@ files = [
 ]
 
 [[package]]
+name = "pycountry"
+version = "23.12.11"
+description = "ISO country, subdivision, language, currency and script definitions and their translations"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pycountry-23.12.11-py3-none-any.whl", hash = "sha256:2ff91cff4f40ff61086e773d61e72005fe95de4a57bfc765509db05695dc50ab"},
+    {file = "pycountry-23.12.11.tar.gz", hash = "sha256:00569d82eaefbc6a490a311bfa84a9c571cff9ddbf8b0a4f4e7b4f868b4ad925"},
+]
+
+[[package]]
 name = "pydantic"
 version = "2.6.3"
 description = "Data validation using Python type hints"
@@ -948,4 +959,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "815d4f727a08e233da8a862a81dbe4dae14122cc54a39f963d8c7ddd0e2e51a1"
+content-hash = "5d5b72948a4eeba73f3d810812d2385047459e13d0235bcf41a27d5063c0b108"
