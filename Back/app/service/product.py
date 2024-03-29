@@ -28,14 +28,6 @@ class ProductService:
     def get_all(self) -> list[Product]:
         return self.product_repo.get_all()
 
-    # def filter_products(self, *expressions):
-    #     try:
-    #         return self.product_repo.filter(*expressions)
-    #     except Exception as e:
-    #         raise e
-    #     finally:
-    #         self.session.close()
-
     def update(self, product_id, new_data: ProductUpdate) -> Product:
         product = self.get_by_id(product_id)
         return self.product_repo.update(product, new_data)

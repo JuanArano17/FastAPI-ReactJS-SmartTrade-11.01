@@ -26,14 +26,6 @@ class SellerService:
     def get_all(self) -> list[Seller]:
         return self.seller_repo.get_all()
 
-    # def filter_sellers(self, *expressions):
-    #     try:
-    #         return self.seller_repo.filter(*expressions)
-    #     except Exception as e:
-    #         raise e
-    #     finally:
-    #         self.session.close()
-
     def update(self, seller_id, new_data: SellerUpdate) -> Seller:
         seller = self.get_by_id(seller_id)
 

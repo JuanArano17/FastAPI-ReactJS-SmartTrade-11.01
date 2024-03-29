@@ -62,8 +62,9 @@ class RefundProductService:
             **refund_product.model_dump(), id_product_line=id_product_line
         )
         refund_product = self.refund_product_repo.add(refund_product)
-        product_line.refund_products.append(refund_product)
         product_line.quantity -= refund_product.quantity  # type: ignore
+
+        # TODO: test it withouth the commit
         self.session.commit()
         return refund_product
 
@@ -95,14 +96,6 @@ class RefundProductService:
             RefundProduct.id_product_line == product_line.id,
         )
 
-    # def filter_refund_products(self, *expressions):
-    #     try:
-    #         return self.refund_product_repo.filter(*expressions)
-    #     except Exception as e:
-    #         raise e
-    #     finally:
-    #         self.session.close()
-
     # no update method because we don't update a refund's details after it's made
 
     # buyers/{id_buyer}/orders/{id_order}/product_lines/{id_product_line}/refund_products/{refund_product_id}
@@ -133,7 +126,6 @@ class RefundProductService:
 
         product_line.quantity += refund_product.quantity  # type: ignore
         self.refund_product_repo.delete_by_id(refund_product_id)
-        self.session.commit()
 
     def delete_by_product_line(self, id_buyer, id_order, id_product_line):
         refund_products = self.get_all_by_product_line(

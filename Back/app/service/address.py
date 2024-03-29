@@ -15,7 +15,7 @@ class AddressRepository(CRUDRepository):
     def get_by_id_buyer(self, id_buyer) -> list[Address]:
         return (
             self._db.query(self._model).filter(self._model.id_buyer == id_buyer).all()
-        )  # type: ignore
+        )
 
 
 class AddressService:
@@ -32,15 +32,13 @@ class AddressService:
             self.address_repo.update(default_address[0], AddressUpdate(default=False))
 
     def add(self, id_buyer, address: AddressCreate) -> Address:
-        buyer = self.buyer_service.get_by_id(id_buyer)
+        self.buyer_service.get_by_id(id_buyer)
 
         if address.default:
             self._update_old_default_address(id_buyer)
 
         address_obj = Address(**address.model_dump(), id_buyer=id_buyer)
         address_obj = self.address_repo.add(address_obj)
-        buyer.addresses.append(address_obj)
-        self.session.commit()
         return address_obj
 
     def get_all(self) -> list[Address]:
@@ -54,14 +52,6 @@ class AddressService:
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Address with id {id} not found.",
         )
-
-    # def filter_addresses(self, *expressions):
-    #     try:
-    #         return self.address_repo.filter(*expressions)
-    #     except Exception as e:
-    #         raise e
-    #     finally:
-    #         self.session.close()
 
     def update(self, address_id, new_data: AddressUpdate) -> Address:
         address = self.get_by_id(address_id)

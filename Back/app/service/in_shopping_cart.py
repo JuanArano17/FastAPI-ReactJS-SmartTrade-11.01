@@ -85,14 +85,6 @@ class InShoppingCartService:
     def get_all(self) -> list[InShoppingCart]:
         return self.cart_repo.get_all()
 
-    # def filter_cart_items(self, *expressions):
-    #     try:
-    #         return self.cart_repo.filter(*expressions)
-    #     except Exception as e:
-    #         raise e
-    #     finally:
-    #         self.session.close()
-
     def update(
         self, id_buyer, id_seller_product, new_data: InShoppingCartUpdate
     ) -> InShoppingCart:

@@ -58,11 +58,11 @@ class ProductLineService:
 
         product_line = ProductLine(**product_line.model_dump(), id_order=id_order)
         product_line = self.product_line_repo.add(product_line)
-        order.product_lines.append(product_line)
         order.total += product_line.subtotal  # type: ignore
 
         seller_product.quantity -= product_line.quantity  # type: ignore
 
+        # TODO: test it withouth the commit
         self.session.commit()
         return product_line
 
@@ -80,14 +80,6 @@ class ProductLineService:
 
     def get_all_by_order_id(self, order_id) -> list[ProductLine]:
         return self.product_line_repo.get_where(ProductLine.id_order == order_id)
-
-    # def filter_product_lines(self, *expressions):
-    #     try:
-    #         return self.product_line_repo.filter(*expressions)
-    #     except Exception as e:
-    #         raise e
-    #     finally:
-    #         self.session.close()
 
     # no update method required, once a product line is added to an order it's quantity or anything else should not be changed
 

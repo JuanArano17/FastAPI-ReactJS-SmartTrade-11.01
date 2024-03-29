@@ -70,14 +70,6 @@ class OrderService:
 
         return order
 
-    # def filter_orders(self, *expressions):
-    #     try:
-    #         return self.order_repo.filter(*expressions)
-    #     except Exception as e:
-    #         raise e
-    #     finally:
-    #         self.session.close()
-
     # Does it make sense to update an order?
     def update(self, order_id, new_data: OrderUpdate) -> Order:
         order = self.get_by_id(order_id)
