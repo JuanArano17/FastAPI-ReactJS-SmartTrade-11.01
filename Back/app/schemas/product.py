@@ -14,7 +14,7 @@ class ProductBase(BaseModel):
 
 
 class ProductCreate(ProductBase):
-    id_category: Optional[int] = None
+    pass
 
 
 class ProductUpdate(ProductBase):

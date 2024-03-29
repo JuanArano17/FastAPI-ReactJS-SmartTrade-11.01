@@ -1,9 +1,9 @@
 from typing import Optional
-from pydantic import AnyUrl, BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict
 
 
 class ImageBase(BaseModel):
-    url: AnyUrl
+    url: str
 
 
 class ImageCreate(ImageBase):
@@ -11,7 +11,7 @@ class ImageCreate(ImageBase):
 
 
 class ImageUpdate(ImageBase):
-    url: Optional[AnyUrl] = None
+    url: Optional[str] = None
 
 
 class Image(ImageBase):
