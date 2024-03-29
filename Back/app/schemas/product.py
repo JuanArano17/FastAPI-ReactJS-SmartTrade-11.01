@@ -14,7 +14,15 @@ class ProductBase(BaseModel):
 
 
 class ProductCreate(ProductBase):
-    pass
+    id_category: Optional[int] = None
+
+
+class ProductUpdate(ProductBase):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=40)
+    description: Optional[str] = None
+    eco_points: Optional[NonNegativeFloat] = None
+    spec_sheet: str = Field(default=None, min_length=1, max_length=240)
+    stock: Optional[NonNegativeInt] = None
 
 
 class Product(ProductBase):

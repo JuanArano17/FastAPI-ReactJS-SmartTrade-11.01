@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.schemas.product import Product
@@ -11,6 +11,11 @@ class CategoryBase(BaseModel):
 
 class CategoryCreate(CategoryBase):
     pass
+
+
+class CategoryUpdate(CategoryBase):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=20)
+    description: Optional[str] = Field(default=None, min_length=1, max_length=70)
 
 
 class Category(CategoryBase):

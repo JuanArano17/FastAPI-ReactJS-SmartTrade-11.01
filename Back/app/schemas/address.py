@@ -18,6 +18,17 @@ class AddressCreate(AddressBase):
     pass
 
 
+class AddressUpdate(AddressBase):
+    street: Optional[str] = Field(default=None, min_length=5, max_length=35)
+    floor: Optional[PositiveInt] = Field(default=None, le=200)
+    door: Optional[str] = Field(default=None, min_length=1, max_length=6)
+    adit_info: Optional[str] = Field(default=None, max_length=70)
+    city: Optional[str] = Field(default=None, min_length=1, max_length=28)
+    postal_code: Optional[str] = Field(default=None, min_length=5, max_length=8)
+    country: Optional[CountryAlpha3] = None
+    default: Optional[bool] = None
+
+
 class Address(AddressBase):
     model_config = ConfigDict(from_attributes=True)
 

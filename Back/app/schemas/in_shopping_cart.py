@@ -6,6 +6,10 @@ class InShoppingCartBase(BaseModel):
 
 
 class InShoppingCartCreate(InShoppingCartBase):
+    id_seller_product: int
+
+
+class InShoppingCartUpdate(InShoppingCartBase):
     pass
 
 

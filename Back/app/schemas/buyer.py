@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict, Field, EmailStr, NonNegativeFloat
-from typing import List
+from typing import List, Optional
 from app.schemas.card import Card
 from app.schemas.address import Address
 from app.schemas.in_shopping_cart import InShoppingCart
@@ -20,7 +20,20 @@ class BuyerBase(BaseModel):
 
 class BuyerCreate(BuyerBase):
     password: str
-    pass
+
+
+class BuyerUpdate(BuyerBase):
+    email: Optional[EmailStr] = None
+    name: Optional[str] = Field(default=None, min_length=1, max_length=20)
+    surname: Optional[str] = Field(default=None, min_length=1, max_length=40)
+    eco_points: Optional[NonNegativeFloat] = None
+    # TODO: change it later for a more formal validation
+    dni: Optional[str] = Field(
+        default=None, min_length=9, max_length=9, pattern=r"^\d{8}[a-zA-Z]$"
+    )
+    billing_address: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    payment_method: Optional[str] = Field(default=None, min_length=1, max_length=20)
+    password: Optional[str] = None
 
 
 class Buyer(BuyerBase):

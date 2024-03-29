@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, ConfigDict, NonNegativeFloat, PositiveInt
 
 from app.schemas.product_line import ProductLine
@@ -12,7 +13,13 @@ class SellerProductBase(BaseModel):
 
 
 class SellerProductCreate(SellerProductBase):
-    pass
+    id_product: int
+
+
+class SellerProductUpdate(SellerProductBase):
+    quantity: Optional[PositiveInt] = None
+    price: Optional[NonNegativeFloat] = None
+    shipping_costs: Optional[NonNegativeFloat] = None
 
 
 class SellerProduct(SellerProductBase):

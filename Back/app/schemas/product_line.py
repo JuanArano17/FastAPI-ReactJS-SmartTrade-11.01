@@ -9,7 +9,7 @@ class ProductLineBase(BaseModel):
 
 
 class ProductLineCreate(ProductLineBase):
-    pass
+    id_seller_product: int
 
 
 class ProductLine(ProductLineBase):
