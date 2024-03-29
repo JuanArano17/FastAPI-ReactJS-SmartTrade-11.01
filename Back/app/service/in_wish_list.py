@@ -18,6 +18,7 @@ class InWishListRepository(CRUDRepository):
             self._model.id_buyer == id_buyer,
             self._model.id_seller_product == id_seller_product,
         ).delete()
+        self._db.commit()
 
     def get_by_id(self, *, id_buyer, id_seller_product) -> InWishList:
         return (
