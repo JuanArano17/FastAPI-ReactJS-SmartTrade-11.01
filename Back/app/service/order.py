@@ -1,75 +1,91 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException, status
+
+from app.service.card import CardService
+from app.service.address import AddressService
+from app.service.buyer import BuyerService
+from app.schemas.order import OrderCreate, OrderUpdate
 from app.models.order import Order
-from app.repository import Repository
+from app.crud_repository import CRUDRepository
 
 
 class OrderService:
-    def __init__(self, session: Session):
+    def __init__(
+        self,
+        session: Session,
+        buyer_service: BuyerService,
+        card_service: CardService,
+        address_service: AddressService,
+    ):
         self.session = session
-        self.order_repo = Repository(session, Order)
+        self.order_repo = CRUDRepository(session=session, model=Order)
+        self.buyer_service = buyer_service
+        self.card_service = card_service
+        self.address_service = address_service
 
-    def add_order(self, id_buyer, id_card, id_address, order_date):
-        try:
-            # should have at least one product line
-            return self.order_repo.add(
-                id_buyer=id_buyer,
-                id_card=id_card,
-                id_address=id_address,
-                order_date=order_date,
-                total=0,
+    # TODO: it might require additional logic
+    # * add eco-points from product lines of the order to the buyer
+    # * should the order have already its products on creation?
+    def add(self, id_buyer: int, order: OrderCreate) -> Order:
+        self.buyer_service.get_by_id(id_buyer)
+        card = self.card_service.get_by_id(order.id_card)
+
+        if card.id_buyer != id_buyer:  # type: ignore
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"The card with id {order.id_card} does not belong to the buyer with id {id_buyer}.",
             )
 
-            #extra logic further up the program: add eco-points from product lines of the order to the buyer
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+        address = self.address_service.get_by_id(order.id_address)
 
-    def list_orders(self):
-        try:
-            return self.order_repo.list()
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+        if address.id_buyer != id_buyer:  # type: ignore
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"The address with id {order.id_address} does not belong to the buyer with id {id_buyer}.",
+            )
 
-    def get_order(self, order_id):
-        try:
-            return self.order_repo.get(order_id)
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+        return self.order_repo.add(Order(**order.model_dump(), id_buyer=id_buyer))
 
-    def filter_orders(self, *expressions):
-        try:
-            return self.order_repo.filter(*expressions)
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+    def get_by_id(self, order_id) -> Order:
+        if order := self.order_repo.get_by_id(order_id):
+            return order
 
-    def update_order(self, order_id, new_data):
-        try:
-            order_instance = self.order_repo.get(order_id)
-            if order_instance:
-                self.order_repo.update(order_instance, new_data)
-                return order_instance
-            else:
-                raise ValueError("Order not found.")
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Order with id {order_id} not found.",
+        )
+
+    def get_all(self) -> list[Order]:
+        return self.order_repo.get_all()
+
+    def get_buyer_order(self, id_buyer, id_order) -> Order:
+        self.buyer_service.get_by_id(id_buyer)
+        order = self.get_by_id(id_order)
+
+        if order.id_buyer != id_buyer:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"The order with id {id_order} does not belong to the buyer with id {id_buyer}.",
+            )
+
+        return order
+
+    # def filter_orders(self, *expressions):
+    #     try:
+    #         return self.order_repo.filter(*expressions)
+    #     except Exception as e:
+    #         raise e
+    #     finally:
+    #         self.session.close()
+
+    # Does it make sense to update an order?
+    def update(self, order_id, new_data: OrderUpdate) -> Order:
+        order = self.get_by_id(order_id)
+        return self.order_repo.update(order, new_data)
 
     def delete_order(self, order_id):
-        try:
-            order_instance = self.order_repo.get(order_id)
-            if order_instance:
-                self.order_repo.delete(order_instance)
-            else:
-                raise ValueError("Order not found.")
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+        self.get_by_id(order_id)
+        self.order_repo.delete_by_id(order_id)
+
+    def delete_all(self):
+        self.order_repo.delete_all()

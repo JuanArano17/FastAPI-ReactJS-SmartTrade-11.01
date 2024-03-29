@@ -1,85 +1,114 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException, status
+
+from app.service.buyer import BuyerService
+from app.schemas.in_shopping_cart import InShoppingCartCreate, InShoppingCartUpdate
 from app.models.in_shopping_cart import InShoppingCart
-from app.repository import Repository
-from service.seller_product import SellerProductService
+from app.crud_repository import CRUDRepository
+from app.service.seller_product import SellerProductService
+
+
+class InShoppingCartRepository(CRUDRepository):
+    def __init__(self, session: Session):
+        super().__init__(session=session, model=InShoppingCart)
+        self._model = InShoppingCart
+
+    def delete_by_id(self, *, id_buyer, id_seller_product):
+        self._db.query(self._model).filter(
+            self._model.id_buyer == id_buyer,
+            self._model.id_seller_product == id_seller_product,
+        ).delete()
+
+    def get_by_id(self, *, id_buyer, id_seller_product) -> InShoppingCart:
+        return (
+            self._db.query(self._model)
+            .filter(
+                self._model.id_buyer == id_buyer,
+                self._model.id_seller_product == id_seller_product,
+            )
+            .first()
+        )
 
 
 class InShoppingCartService:
-    def __init__(self, session: Session):
+    def __init__(
+        self,
+        session: Session,
+        buyer_service: BuyerService,
+        seller_product_service: SellerProductService,
+    ):
         self.session = session
-        self.cart_repo = Repository(session, InShoppingCart)
+        self.cart_repo = InShoppingCartRepository(session=session)
+        self.buyer_service = buyer_service
+        self.seller_product_service = seller_product_service
 
-    def add_to_cart(self, id_seller_product, id_buyer, quantity):
-        try:
-            seller_product_serv=SellerProductService(self.session)
-            seller_product=seller_product_serv.get_seller_product(id_seller_product)
-            seller_product_quantity=seller_product.quantity
-            #when making an order using the shopping cart (logic layer), make sure to check that the quantity in the shopping cart is still available, or update shopping carts after each order maybe
-            if(quantity>seller_product_quantity):
-                raise Exception("Not enough seller products")
-            return self.cart_repo.add(
-                id_seller_product=id_seller_product,
-                id_buyer=id_buyer,
-                quantity=quantity,
+    def add(
+        self, id_buyer, shopping_cart_product: InShoppingCartCreate
+    ) -> InShoppingCart:
+        buyer = self.buyer_service.get_by_id(id_buyer)
+        seller_product = self.seller_product_service.get_by_id(
+            shopping_cart_product.id_seller_product
+        )
+
+        if self.get_by_id(id_buyer, shopping_cart_product.id_seller_product):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Product already in shopping cart",
             )
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
 
-    def list_cart_items(self):
-        try:
-            return self.cart_repo.list()
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+        if seller_product.quantity < shopping_cart_product.quantity:  # type: ignore
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Not enough seller products",
+            )
 
-    def get_cart_item(self, cart_item_id):
-        try:
-            return self.cart_repo.get(cart_item_id)
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+        cart_product = InShoppingCart(
+            **shopping_cart_product.model_dump(), id_buyer=id_buyer
+        )
+        buyer.in_shopping_cart.append(cart_product)
+        self.cart_repo.add(cart_product)
+        self.session.commit()
+        return cart_product
 
-    def filter_cart_items(self, *expressions):
-        try:
-            return self.cart_repo.filter(*expressions)
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+    def get_by_id(self, id_buyer, id_seller_product) -> InShoppingCart:
+        if cart_item := self.cart_repo.get_by_id(
+            id_buyer=id_buyer, id_seller_product=id_seller_product
+        ):
+            return cart_item
 
-    def update_cart_item(self, id_seller_product, id_buyer, new_data):
-        try:
-            quantity = new_data.get("quantity")
-            seller_product_serv=SellerProductService(self.session)
-            seller_product=seller_product_serv.get_seller_product(id_seller_product)
-            seller_product_quantity=seller_product.quantity
-            if(quantity):
-                if(quantity>seller_product_quantity):
-                    raise Exception("Not enough seller products")
-            composite_key = (id_seller_product, id_buyer)
-            cart_item_instance = self.cart_repo.get(composite_key)
-            if not cart_item_instance:
-                raise ValueError("Cart item not found.")
-            self.cart_repo.update(cart_item_instance, new_data)
-            return cart_item_instance
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Cart item with id_seller_product={id_seller_product} and id_buyer={id_buyer} not found.",
+        )
 
-    def delete_cart_item(self, id_buyer, id_seller_product):
-        try:
-            composite_key = (id_seller_product, id_buyer)
-            cart_item_instance = self.cart_repo.get(composite_key)
-            if cart_item_instance:
-                self.cart_repo.delete(cart_item_instance)
-            else:
-                raise ValueError("Cart item not found.")
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+    def get_all(self) -> list[InShoppingCart]:
+        return self.cart_repo.get_all()
+
+    # def filter_cart_items(self, *expressions):
+    #     try:
+    #         return self.cart_repo.filter(*expressions)
+    #     except Exception as e:
+    #         raise e
+    #     finally:
+    #         self.session.close()
+
+    def update(
+        self, id_buyer, id_seller_product, new_data: InShoppingCartUpdate
+    ) -> InShoppingCart:
+        cart_item = self.get_by_id(id_buyer, id_seller_product)
+        seller_product = self.seller_product_service.get_by_id(id_seller_product)
+        if new_data.quantity > seller_product.quantity:  # type: ignore
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Not enough seller products",
+            )
+        return self.cart_repo.update(cart_item, new_data)
+
+    def delete_by_id(self, id_buyer, id_seller_product):
+        self.get_by_id(id_buyer, id_seller_product)
+        self.cart_repo.delete_by_id(
+            id_buyer=id_buyer, id_seller_product=id_seller_product
+        )
+
+    def delete_all(self):
+        self.cart_repo.delete_all()

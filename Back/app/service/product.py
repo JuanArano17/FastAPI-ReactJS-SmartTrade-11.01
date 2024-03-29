@@ -1,81 +1,47 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException, status
+
+from app.schemas.product import ProductCreate, ProductUpdate
 from app.models.product import Product
-from Back.app.service.image import ImageService
-from app.repository import Repository
+from app.crud_repository import CRUDRepository
 
 
 class ProductService:
     def __init__(self, session: Session):
         self.session = session
-        self.product_repo = Repository(session, Product)
+        self.product_repo = CRUDRepository(session=session, model=Product)
 
-    def add_product(
-        self, id_category, name, description, eco_points, spec_sheet, stock #, url_image
-    ):
-        try:
-            product = self.product_repo.add(
-                id_category=id_category,
-                name=name,
-                description=description,
-                eco_points=eco_points,
-                spec_sheet=spec_sheet,
-                stock=stock,
-            )
+    def add(self, id_category: int, product: ProductCreate) -> Product:
+        return self.product_repo.add(
+            Product(**product.model_dump(), id_category=id_category)
+        )
 
-            #image_serv = ImageService(self.session)
-            # must add at least one initial image
-            #image_serv.add_image(product.id, url_image)
+    def get_by_id(self, product_id) -> Product:
+        if product := self.product_repo.get_by_id(product_id):
             return product
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
 
-    def list_products(self):
-        try:
-            return self.product_repo.list()
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with id {product_id} not found.",
+        )
 
-    def get_product(self, pk):
-        try:
-            return self.product_repo.get(pk)
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+    def get_all(self) -> list[Product]:
+        return self.product_repo.get_all()
 
-    def filter_products(self, *expressions):
-        try:
-            return self.product_repo.filter(*expressions)
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+    # def filter_products(self, *expressions):
+    #     try:
+    #         return self.product_repo.filter(*expressions)
+    #     except Exception as e:
+    #         raise e
+    #     finally:
+    #         self.session.close()
 
-    def update_product(self, product_id, new_data):
-        try:
-            product_instance = self.product_repo.get(product_id)
-            if product_instance:
-                self.product_repo.update(product_instance, new_data)
-                return product_instance
-            else:
-                raise ValueError("Product not found.")
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+    def update(self, product_id, new_data: ProductUpdate) -> Product:
+        product = self.get_by_id(product_id)
+        return self.product_repo.update(product, new_data)
 
-    def delete_product(self, product_id):
-        try:
-            product_instance = self.product_repo.get(product_id)
-            if product_instance:
-                self.product_repo.delete(product_instance)
-            else:
-                raise ValueError("Product not found.")
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+    def delete_by_id(self, product_id):
+        self.product_repo.delete_by_id(product_id)
+
+    def delete_all(self):
+        self.product_repo.delete_all()

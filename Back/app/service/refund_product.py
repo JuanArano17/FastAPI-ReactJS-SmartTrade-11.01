@@ -1,111 +1,143 @@
+from datetime import timedelta
 from sqlalchemy.orm import Session
-from app.models.product_line import ProductLine
+from fastapi import HTTPException, status
+
+from app.service.buyer import BuyerService
+from app.schemas.refund_product import RefundProductCreate
 from app.models.refund_product import RefundProduct
-from Back.app.service.order import OrderService
-from Back.app.service.product_line import ProductLineService
-from app.repository import Repository
+from app.service.order import OrderService
+from app.service.product_line import ProductLineService
+from app.crud_repository import CRUDRepository
 from service.seller_product import SellerProductService
 
 
 class RefundProductService:
-    def __init__(self, session: Session):
+    def __init__(
+        self,
+        session: Session,
+        buyer_service: BuyerService,
+        order_service: OrderService,
+        seller_product_service: SellerProductService,
+        product_line_service: ProductLineService,
+    ):
         self.session = session
-        self.refund_product_repo = Repository(session, RefundProduct)
+        self.refund_product_repo = CRUDRepository(session=session, model=RefundProduct)
+        self.buyer_service = buyer_service
+        self.order_service = order_service
+        self.seller_product_service = seller_product_service
+        self.product_line_service = product_line_service
 
-    def add_refund_product(self, id_product_line, quantity, refund_date):
-        try:
-            # Retrieve product line and related order for validation
-            product_line_serv = ProductLineService(self.session)
-            product_line = product_line_serv.get_product_line(id_product_line)
+    # buyers/{id_buyer}/orders/{id_order}/product_lines/{id_product_line}/refund_products
+    def add(
+        self, id_buyer, id_order, id_product_line, refund_product: RefundProductCreate
+    ) -> RefundProduct:
+        order = self.order_service.get_buyer_order(id_buyer, id_order)
+        product_line = self.product_line_service.get_by_id(id_product_line)
 
-            if not product_line:
-                raise ValueError("Product line not found")
-
-            order_line_serv = OrderService(self.session)
-            order = order_line_serv.get_order(product_line.id_order)
-            if not order:
-                raise ValueError("Order not found")
-
-            # Calculate date difference for validation
-            date_difference = refund_date - order.order_date
-            if date_difference.days > 30:
-                raise ValueError(
-                    "Unable to refund a product more than 30 days after it has been ordered"
-                )
-            elif date_difference.days < 0:
-                raise ValueError("Invalid refund_date")
-
-
-            other_refunded=0
-            refund_products=self.filter_refund_products(RefundProduct.id_product_line==id_product_line)
-            for refund_product in refund_products:
-                other_refunded+=refund_product.quantity
-
-
-            # Validate quantity
-            if (quantity + other_refunded)> product_line.quantity:
-                raise ValueError("Unable to refund more items than were ordered")
-
-            # Update quantities in related entities
-            seller_product_serv=SellerProductService(self.session)
-            seller_product_quantity=seller_product_serv.get_seller_product(product_line.id_seller_product).quantity
-            new_quantity=seller_product_quantity+quantity
-            seller_product_serv.update_seller_product(product_line.id_seller_product, {"quantity":new_quantity})
-        
-
-            # Add refund product
-            refund_product = self.refund_product_repo.add(
-                id_product_line=id_product_line,
-                quantity=quantity,
-                refund_date=refund_date,
+        if product_line.id_order != id_order:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"The product line with id {id_product_line} does not belong to the order with id {id_order}.",
             )
 
+        if refund_product.refund_date < order.order_date:  # type: ignore
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Refund date must be greater than order date",
+            )
+
+        if refund_product.refund_date > order.order_date + timedelta(days=30):  # type: ignore
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Refund date must be within 30 days of order date",
+            )
+
+        if refund_product.quantity > product_line.quantity:  # type: ignore
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Refund quantity cannot be greater than product line quantity",
+            )
+
+        refund_product = RefundProduct(
+            **refund_product.model_dump(), id_product_line=id_product_line
+        )
+        refund_product = self.refund_product_repo.add(refund_product)
+        product_line.refund_products.append(refund_product)
+        product_line.quantity -= refund_product.quantity  # type: ignore
+        self.session.commit()
+        return refund_product
+
+    def get_by_id(self, refund_product_id) -> RefundProduct:
+        if refund_product := self.refund_product_repo.get_by_id(refund_product_id):
             return refund_product
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
 
-    def list_refund_products(self):
-        try:
-            return self.refund_product_repo.list()
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Refund product with id {refund_product_id} not found.",
+        )
 
-    def get_refund_product(self, pk):
-        try:
-            return self.refund_product_repo.get(pk)
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+    def get_all(self) -> list[RefundProduct]:
+        return self.refund_product_repo.get_all()
 
-    def filter_refund_products(self, *expressions):
-        try:
-            return self.refund_product_repo.filter(*expressions)
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+    def get_all_by_buyer_order(self, id_buyer, id_order) -> list[RefundProduct]:
+        self.buyer_service.get_by_id(id_buyer)
+        order = self.order_service.get_buyer_order(id_buyer, id_order)
+        return self.refund_product_repo.get_where(order.id == RefundProduct.id_order)
 
-    #no update method because we don't update a refund's details after it's made
+    def get_all_by_product_line(
+        self, id_buyer, id_order, id_product_line
+    ) -> list[RefundProduct]:
+        self.buyer_service.get_by_id(id_buyer)
+        order = self.order_service.get_buyer_order(id_buyer, id_order)
+        product_line = self.product_line_service.get_by_id(id_product_line)
+        return self.refund_product_repo.get_where(
+            RefundProduct.id_order == order.id,
+            RefundProduct.id_product_line == product_line.id,
+        )
 
-    def delete_refund_product(self, refund_product_id):
-        try:
-            refund_product_instance = self.refund_product_repo.get(refund_product_id)
-            if refund_product_instance:
-                seller_product_serv=SellerProductService(self.session)
-                product_line_serv=ProductLineService(self.session)
-                product_line=product_line_serv.get_product_line(refund_product_instance.id_product_line)
-                seller_product_quantity=seller_product_serv.get_seller_product(product_line.id_seller_product).quantity
-                new_quantity=seller_product_quantity-refund_product_instance.quantity
-                self.refund_product_repo.delete(refund_product_instance)
-                seller_product_serv.update_seller_product(product_line.id_seller_product, {"quantity":new_quantity})
-            else:
-                raise ValueError("Refund product not found.")
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+    # def filter_refund_products(self, *expressions):
+    #     try:
+    #         return self.refund_product_repo.filter(*expressions)
+    #     except Exception as e:
+    #         raise e
+    #     finally:
+    #         self.session.close()
+
+    # no update method because we don't update a refund's details after it's made
+
+    # buyers/{id_buyer}/orders/{id_order}/product_lines/{id_product_line}/refund_products/{refund_product_id}
+    def delete_by_id(self, id_buyer, id_order, id_product_line, refund_product_id):
+        self.buyer_service.get_by_id(id_buyer)
+        order = self.order_service.get_buyer_order(id_buyer, id_order)
+        product_line = self.product_line_service.get_by_id(id_product_line)
+
+        if product_line.id_order != id_order:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"The product line with id {id_product_line} does not belong to the order with id {id_order}.",
+            )
+
+        refund_product = self.get_by_id(refund_product_id)
+
+        if refund_product.id_order != order.id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"The refund product with id {refund_product_id} does not belong to the order with id {id_order}.",
+            )
+
+        if refund_product.id_product_line != product_line.id:  # type: ignore
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"The refund product with id {refund_product_id} does not belong to the product line with id {id_product_line}.",
+            )
+
+        product_line.quantity += refund_product.quantity  # type: ignore
+        self.refund_product_repo.delete_by_id(refund_product_id)
+        self.session.commit()
+
+    def delete_by_product_line(self, id_buyer, id_order, id_product_line):
+        refund_products = self.get_all_by_product_line(
+            id_buyer, id_order, id_product_line
+        )
+        for refund_product in refund_products:
+            self.refund_product_repo.delete_by_id(refund_product.id)

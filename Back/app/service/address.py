@@ -1,106 +1,79 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException, status
+
+from app.schemas.address import AddressCreate, AddressUpdate
 from app.models.address import Address
-from app.repository import Repository
+from app.crud_repository import CRUDRepository
+from app.service.buyer import BuyerService
+
+
+class AddressRepository(CRUDRepository):
+    def __init__(self, session: Session):
+        super().__init__(session=session, model=Address)
+        self._model = Address
+
+    def get_by_id_buyer(self, id_buyer) -> list[Address]:
+        return (
+            self._db.query(self._model).filter(self._model.id_buyer == id_buyer).all()
+        )  # type: ignore
 
 
 class AddressService:
-    def __init__(self, session: Session):
+    def __init__(self, session: Session, buyer_service: BuyerService):
         self.session = session
-        self.address_repo = Repository(session, Address)
+        self.buyer_service = buyer_service
+        self.address_repo = AddressRepository(session=session)
 
-    def add_address(
-        self,
-        street,
-        floor,
-        door,
-        adit_info,
-        city,
-        postal_code,
-        country,
-        default,
-        id_buyer,
-    ):
-        try:
-            if default:
-                # Check if there's already a default address for the buyer
-                existing_default = self.address_repo.filter(
-                    Address.default, Address.id_buyer == id_buyer
-                )
+    def _update_old_default_address(self, id_buyer):
+        default_address = self.address_repo.get_where(
+            Address.default == True, Address.id_buyer == id_buyer
+        )
+        if default_address:
+            self.address_repo.update(default_address[0], AddressUpdate(default=False))
 
-                if len(existing_default)>0:
-                    # If default address exists, update it to not be default
-                    self.update_address(existing_default[0].id, {"default": False})
+    def add(self, id_buyer, address: AddressCreate) -> Address:
+        buyer = self.buyer_service.get_by_id(id_buyer)
 
-            address = self.address_repo.add(
-                street=street,
-                floor=floor,
-                door=door,
-                adit_info=adit_info,
-                city=city,
-                postal_code=postal_code,
-                country=country,
-                default=default,
-                id_buyer=id_buyer,
-            )
+        if address.default:
+            self._update_old_default_address(id_buyer)
 
+        address_obj = Address(**address.model_dump(), id_buyer=id_buyer)
+        address_obj = self.address_repo.add(address_obj)
+        buyer.addresses.append(address_obj)
+        self.session.commit()
+        return address_obj
+
+    def get_all(self) -> list[Address]:
+        return self.address_repo.get_all()
+
+    def get_by_id(self, id) -> Address:
+        if address := self.address_repo.get_by_id(id):
             return address
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
 
-    def list_addresses(self):
-        try:
-            return self.address_repo.list()
-        except Exception as e:
-            raise e
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Address with id {id} not found.",
+        )
 
-    def get_address(self, pk):
-        try:
-            return self.address_repo.get(pk)
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+    # def filter_addresses(self, *expressions):
+    #     try:
+    #         return self.address_repo.filter(*expressions)
+    #     except Exception as e:
+    #         raise e
+    #     finally:
+    #         self.session.close()
 
-    def filter_addresses(self, *expressions):
-        try:
-            return self.address_repo.filter(*expressions)
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+    def update(self, address_id, new_data: AddressUpdate) -> Address:
+        address = self.get_by_id(address_id)
 
-    def update_address(self, address_id, new_data):
-        try:
-            address = self.address_repo.get(address_id)
-            if address is None:
-                raise ValueError("Address not found.")
+        if new_data.default:
+            self._update_old_default_address(address.id_buyer)
 
-            if "default" in new_data and new_data["default"]:
-                # Check if there's already a default address for the buyer
-                existing_default = self.address_repo.filter(
-                    Address.default, Address.id_buyer == address.id_buyer
-                )
-                if existing_default:
-                    # If default address exists, update it to not be default
-                    self.address_repo.update(existing_default[0], {"default": False})
+        return self.address_repo.update(address, new_data)
 
-            self.address_repo.update(address, new_data)
-            return address
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+    def delete_by_id(self, address_id):
+        self.get_by_id(address_id)
+        self.address_repo.delete_by_id(address_id)
 
-    def delete_address(self, address_id):
-        try:
-            address_instance = self.address_repo.get(address_id)
-            if address_instance:
-                self.address_repo.delete(address_instance)
-            else:
-                raise ValueError("Address not found.")
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+    def delete_all(self):
+        self.address_repo.delete_all()

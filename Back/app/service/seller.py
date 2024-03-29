@@ -1,73 +1,63 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException, status
+
+from app.schemas.seller import SellerCreate, SellerUpdate
 from app.models.seller import Seller
-from app.repository import Repository
+from app.crud_repository import CRUDRepository
 
 
 class SellerService:
     def __init__(self, session: Session):
         self.session = session
-        self.seller_repo = Repository(session, Seller)
+        self.seller_repo = CRUDRepository(session=session, model=Seller)
 
-    def add_seller(self, email, name, surname, password, cif, bank_data):
-        try:
-            return self.seller_repo.add(
-                email=email,
-                name=name,
-                surname=surname,
-                password=password,
-                cif=cif,
-                bank_data=bank_data,
+    def add(self, seller: SellerCreate) -> Seller:
+        return self.seller_repo.add(Seller(**seller.model_dump()))
+
+    def get_by_id(self, seller_id) -> Seller:
+        if seller := self.seller_repo.get_by_id(seller_id):
+            return seller
+
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Seller with id {seller_id} not found.",
+        )
+
+    def get_all(self) -> list[Seller]:
+        return self.seller_repo.get_all()
+
+    # def filter_sellers(self, *expressions):
+    #     try:
+    #         return self.seller_repo.filter(*expressions)
+    #     except Exception as e:
+    #         raise e
+    #     finally:
+    #         self.session.close()
+
+    def update(self, seller_id, new_data: SellerUpdate) -> Seller:
+        seller = self.get_by_id(seller_id)
+
+        if new_data.email and self.seller_repo.get_where(
+            Seller.id != seller_id, Seller.email == new_data.email
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Seller with email {new_data.email} already exists.",
             )
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
 
-    def list_sellers(self):
-        try:
-            return self.seller_repo.list()
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+        if new_data.cif and self.seller_repo.get_where(
+            Seller.id != seller_id, Seller.cif == new_data.cif
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Seller with CIF {new_data.cif} already exists.",
+            )
 
-    def get_seller(self, pk):
-        try:
-            return self.seller_repo.get(pk)
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+        return self.seller_repo.update(seller, new_data)
 
-    def filter_sellers(self, *expressions):
-        try:
-            return self.seller_repo.filter(*expressions)
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+    def delete_by_id(self, seller_id):
+        self.get_by_id(seller_id)
+        self.seller_repo.delete_by_id(seller_id)
 
-    def update_seller(self, seller_id, new_data):
-        try:
-            seller_instance = self.seller_repo.get(seller_id)
-            if seller_instance:
-                self.seller_repo.update(seller_instance, new_data)
-                return seller_instance
-            else:
-                raise ValueError("Seller not found.")
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
-
-    def delete_seller(self, seller_id):
-        try:
-            seller_instance = self.seller_repo.get(seller_id)
-            if seller_instance:
-                self.seller_repo.delete(seller_instance)
-            else:
-                raise ValueError("Seller not found.")
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+    def delete_all(self):
+        self.seller_repo.delete_all()

@@ -1,103 +1,71 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException, status
+
+from app.schemas.card import CardCreate, CardUpdate
+from app.service.buyer import BuyerService
 from app.models.card import Card
-from app.repository import Repository
+from app.crud_repository import CRUDRepository
 
 
 class CardService:
-    def __init__(self, session: Session):
+    def __init__(self, session: Session, buyer_service: BuyerService):
         self.session = session
-        self.card_repo = Repository(session, Card)
+        self.card_repo = CRUDRepository(session=session, model=Card)
+        self.buyer_service = buyer_service
 
-    def add_card(
-        self,
-        card_number,
-        card_name,
-        card_security_num,
-        card_exp_date,
-        id_buyer,
-    ):
-        
-        try:
-            # Check if a card with the same buyer id and card number already exists
-            existing_card = self.filter_cards(
-                Card.id_buyer == id_buyer,
-                Card.card_number == card_number
+    def add(self, id_buyer, card: CardCreate) -> Card:
+        buyer = self.buyer_service.get_by_id(id_buyer)
+
+        if self.card_repo.get_where(
+            Card.card_number == card.card_number, Card.id_buyer == id_buyer
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Card with number {card.card_number} already exists for buyer with id {id_buyer}.",
             )
 
-            if existing_card:
-                raise ValueError("Card with the same buyer id and card number already exists.")
-            
-            card = self.card_repo.add(
-                card_number=card_number,
-                card_name=card_name,
-                card_security_num=card_security_num,
-                card_exp_date=card_exp_date,
-                id_buyer=id_buyer,
-            )
+        card_obj = Card(**card.model_dump(), id_buyer=id_buyer)
+        self.card_repo.add(card_obj)
+        buyer.cards.append(card_obj)
+        self.session.commit()
+        return card_obj
 
+    def get_by_id(self, id) -> Card:
+        if card := self.card_repo.get_by_id(id):
             return card
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
 
-    def get_card(self, pk):
-        try:
-            return self.card_repo.get(pk)
-        except Exception as e:
-            raise e
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Card with id {id} not found.",
+        )
 
-    def filter_cards(self, *expressions):
-        try:
-            return self.card_repo.filter(*expressions)
-        except Exception as e:
-            raise e
+    # def filter_cards(self, *expressions):
+    #     try:
+    #         return self.card_repo.filter(*expressions)
+    #     except Exception as e:
+    #         raise e
 
-    def update_card(self, card_id, new_data):
-        try:
-            card_instance = self.card_repo.get(card_id)
-            id_buyer = new_data.get('id_buyer')
-            card_number = new_data.get('card_number')
-            if(card_number==None):
-                card_number=card_instance.card_number
-            if(id_buyer==None):
-                id_buyer=card_instance.id_buyer
-            existing_card = self.card_repo.filter(
-                Card.id != card_id,  # Exclude the current card being updated
-                Card.id_buyer == id_buyer,
-                Card.card_number == card_number
+    def get_all(self) -> list[Card]:
+        return self.card_repo.get_all()
+
+    def update(self, card_id, new_data: CardUpdate) -> Card:
+        card = self.get_by_id(card_id)
+
+        if self.card_repo.get_where(
+            Card.card_number == new_data.card_number,
+            Card.id_buyer == card.id_buyer,
+            Card.id != card_id,
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Card with number {new_data.card_number} already exists for buyer with id {card.id_buyer}.",
             )
 
-            if len(existing_card)>0:
-                raise ValueError("Card with the same buyer id and card number already exists.")
+        return self.card_repo.update(card, new_data)
 
-            
-            if card_instance:
-                self.card_repo.update(card_instance, new_data)
-                return card_instance
-            else:
-                raise ValueError("Card not found.")
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+    def delete_by_id(self, card_id):
+        self.get_by_id(card_id)
+        self.card_repo.delete_by_id(card_id)
 
-    def list_cards(self):
-        try:
-            return self.card_repo.list()
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
-
-    def delete_card(self, card_id):
-        try:
-            card_instance = self.card_repo.get(card_id)
-            if card_instance:
-                self.card_repo.delete(card_instance)
-            else:
-                raise ValueError("Card not found.")
-        except Exception as e:
-            raise e
-        finally:
-            self.session.close()
+    def delete_all(self):
+        self.card_repo.delete_all()
