@@ -41,6 +41,9 @@ class CRUDRepository:
 
     def delete_by_id(self, id):
         self._db.query(self._model).filter(self._model.id == id).delete()  # type: ignore
+        self._db.commit()
+        
 
     def delete_all(self):
         self._db.query(self._model).delete()
+        self._db.commit()
