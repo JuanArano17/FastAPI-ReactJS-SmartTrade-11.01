@@ -1,9 +1,7 @@
 import './App.css';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import HomePage from './pages/HomePage';
-import RegisterSelectionPage from './pages/RegisterSelectionPage';
-import RegisterSellerPage from './pages/RegisterSellerPage';
-import RegisterBuyerPage from './pages/RegisterBuyerPage';
+import RegisterPage from './pages/RegisterPage';
 
 
 function App() {
@@ -12,9 +10,7 @@ function App() {
       <Router>
         <Switch>
           <Route path="/home" component={HomePage} />
-          <Route path="/register" component={RegisterSelectionPage} />
-          <Route path="/registerSeller" component={RegisterSellerPage} />
-          <Route path="/registerBuyer" component={RegisterBuyerPage} />
+          <Route path="/register" component={RegisterPage} />
           <Route exact path="/" component={HomePage} />
         </Switch>
       </Router>
