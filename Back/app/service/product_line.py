@@ -56,9 +56,7 @@ class ProductLineService:
                 detail="Product subtotal does not match seller's price and quantity",
             )
 
-        product_line = ProductLine(
-            **product_line.model_dump(), id_order=id_order, id_buyer=id_buyer
-        )
+        product_line = ProductLine(**product_line.model_dump(), id_order=id_order)
         product_line = self.product_line_repo.add(product_line)
         order.product_lines.append(product_line)
         order.total += product_line.subtotal  # type: ignore
