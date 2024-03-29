@@ -47,3 +47,4 @@ class CRUDRepository:
     def delete_all(self):
         self._db.query(self._model).delete()
         self._db.commit()
+        self._db.commit()

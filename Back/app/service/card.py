@@ -14,7 +14,7 @@ class CardService:
         self.buyer_service = buyer_service
 
     def add(self, id_buyer, card: CardCreate) -> Card:
-        buyer = self.buyer_service.get_by_id(id_buyer)
+        self.buyer_service.get_by_id(id_buyer)
 
         if self.card_repo.get_where(
             Card.card_number == card.card_number, Card.id_buyer == id_buyer
@@ -26,8 +26,6 @@ class CardService:
 
         card_obj = Card(**card.model_dump(), id_buyer=id_buyer)
         self.card_repo.add(card_obj)
-        buyer.cards.append(card_obj)
-        self.session.commit()
         return card_obj
 
     def get_by_id(self, id) -> Card:
@@ -38,12 +36,6 @@ class CardService:
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Card with id {id} not found.",
         )
-
-    # def filter_cards(self, *expressions):
-    #     try:
-    #         return self.card_repo.filter(*expressions)
-    #     except Exception as e:
-    #         raise e
 
     def get_all(self) -> list[Card]:
         return self.card_repo.get_all()

@@ -18,6 +18,7 @@ class InWishListRepository(CRUDRepository):
             self._model.id_buyer == id_buyer,
             self._model.id_seller_product == id_seller_product,
         ).delete()
+        self._db.commit()
 
     def get_by_id(self, *, id_buyer, id_seller_product) -> InWishList:
         return (
@@ -43,13 +44,11 @@ class InWishListService:
         self.buyer_service = buyer_service
 
     def add(self, id_buyer, wish_list_item: InWishListCreate) -> InWishList:
-        buyer = self.buyer_service.get_by_id(id_buyer)
+        self.buyer_service.get_by_id(id_buyer)
         self.seller_product_service.get_by_id(wish_list_item.id_seller_product)
 
         wl_item = InWishList(**wish_list_item.model_dump(), id_buyer=id_buyer)
         self.wishlist_repo.add(wl_item)
-        buyer.in_wish_list.append(wl_item)
-        self.session.commit()
         return wl_item
 
     def get_by_id(self, id_seller_product, id_buyer) -> InWishList:
@@ -68,29 +67,6 @@ class InWishListService:
 
     def get_all_by_buyer(self, id_buyer) -> list[InWishList]:
         return self.wishlist_repo.get_where(InWishList.id_buyer == id_buyer)
-
-    # def filter_wishlist_items(self, *expressions):
-    #     try:
-    #         return self.wishlist_repo.filter(*expressions)
-    #     except Exception as e:
-    #         raise e
-    #     finally:
-    #         self.session.close()
-
-    # # probably won't need to use this
-    # def update_wishlist_item(self, id_seller_product, id_buyer, new_data):
-    #     try:
-    #         composite_key = (id_seller_product, id_buyer)
-    #         wishlist_item_instance = self.wishlist_repo.get(composite_key)
-    #         if wishlist_item_instance:
-    #             self.wishlist_repo.update(wishlist_item_instance, new_data)
-    #             return wishlist_item_instance
-    #         else:
-    #             raise ValueError("Wishlist item not found.")
-    #     except Exception as e:
-    #         raise e
-    #     finally:
-    #         self.session.close()
 
     def delete_by_id(self, id_seller_product, id_buyer):
         self.wishlist_repo.delete_by_id(

@@ -18,6 +18,7 @@ class InShoppingCartRepository(CRUDRepository):
             self._model.id_buyer == id_buyer,
             self._model.id_seller_product == id_seller_product,
         ).delete()
+        self._db.commit()
 
     def get_by_id(self, *, id_buyer, id_seller_product) -> InShoppingCart:
         return (
@@ -83,14 +84,6 @@ class InShoppingCartService:
 
     def get_all(self) -> list[InShoppingCart]:
         return self.cart_repo.get_all()
-
-    # def filter_cart_items(self, *expressions):
-    #     try:
-    #         return self.cart_repo.filter(*expressions)
-    #     except Exception as e:
-    #         raise e
-    #     finally:
-    #         self.session.close()
 
     def update(
         self, id_buyer, id_seller_product, new_data: InShoppingCartUpdate

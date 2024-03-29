@@ -21,7 +21,7 @@ class SellerProductService:
         self.product_service = product_service
 
     def add(self, id_seller, seller_product: SellerProductCreate) -> SellerProduct:
-        seller = self.seller_service.get_by_id(id_seller)
+        self.seller_service.get_by_id(id_seller)
         product = self.product_service.get_by_id(seller_product.id_product)
 
         if self.seller_product_repo.get_where(
@@ -38,9 +38,7 @@ class SellerProductService:
         seller_product_obj = SellerProduct(
             **seller_product.model_dump(), id_seller=id_seller
         )
-        seller.seller_products.append(seller_product_obj)
         seller_product_obj = self.seller_product_repo.add(seller_product_obj)
-        self.session.commit()
         return seller_product_obj
 
     def get_by_id(self, seller_product_id) -> SellerProduct:
@@ -55,21 +53,12 @@ class SellerProductService:
     def get_all(self) -> list[SellerProduct]:
         return self.seller_product_repo.get_all()
 
-    # def filter_seller_products(self, *expressions):
-    #     try:
-    #         return self.seller_product_repo.filter(*expressions)
-    #     except Exception as e:
-    #         raise e
-    #     finally:
-    #         self.session.close()
-
     def update(self, seller_product_id, new_data: SellerProductUpdate) -> SellerProduct:
         seller_product = self.get_by_id(seller_product_id)
 
         if new_data.quantity:
             product = self.product_service.get_by_id(seller_product.id_product)
             product.stock += new_data.quantity - seller_product.quantity  # type: ignore
-            self.session.commit()
 
         return self.seller_product_repo.update(seller_product, new_data)
 
@@ -77,7 +66,6 @@ class SellerProductService:
         seller_product = self.get_by_id(seller_product_id)
         product = self.product_service.get_by_id(seller_product.id_product)
         product.stock -= seller_product.quantity  # type: ignore
-        self.session.commit()
         self.seller_product_repo.delete_by_id(seller_product_id)
 
     def delete_all(self):
@@ -85,5 +73,4 @@ class SellerProductService:
         for seller_product in seller_products:
             product = self.product_service.get_by_id(seller_product.id_product)
             product.stock -= seller_product.quantity  # type: ignore
-            self.session.commit()
         self.seller_product_repo.delete_all()
