@@ -26,6 +26,9 @@ pre-commit = "^3.6.2"
 [tool.ruff.lint.per-file-ignores]
 "database.py" = ["E402", "F401"]
 
+[tool.ruff.lint]
+ignore = ["E712"]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
