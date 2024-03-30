@@ -7,7 +7,9 @@ class Address(Base):
     __tablename__ = "Address"
 
     id = Column(Integer, primary_key=True, index=True)
-    id_buyer = Column(Integer, ForeignKey("Buyer.id"), nullable=False)
+    id_buyer = Column(
+        Integer, ForeignKey("Buyer.id", ondelete="CASCADE"), nullable=False
+    )
     street = Column(String, nullable=False)
     floor = Column(Integer)
     door = Column(String, nullable=False)

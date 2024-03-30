@@ -7,8 +7,10 @@ class Image(Base):
     __tablename__ = "Image"
 
     id = Column(Integer, primary_key=True, index=True)
-    id_product = Column(Integer, ForeignKey("Product.id"), nullable=False)
-    #should url be unique?
+    id_product = Column(
+        Integer, ForeignKey("Product.id", ondelete="CASCADE"), nullable=False
+    )
+    # should url be unique?
     url = Column(String, nullable=False)
 
     product = relationship("Product", back_populates="images")

@@ -7,7 +7,9 @@ class Product(Base):
     __tablename__ = "Product"
 
     id = Column(Integer, primary_key=True, index=True)
-    id_category = Column(Integer, ForeignKey("Category.id"), nullable=False)
+    id_category = Column(
+        Integer, ForeignKey("Category.id", ondelete="CASCADE"), nullable=False
+    )
     name = Column(String(255), nullable=False)
     description = Column(String(255))
     eco_points = Column(Float, nullable=False)
@@ -18,7 +20,10 @@ class Product(Base):
         "Image", back_populates="product", cascade="all, delete-orphan"
     )
     seller_products = relationship(
-        "SellerProduct", back_populates="product", cascade="all, delete-orphan"
+        "SellerProduct",
+        back_populates="product",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
     category = relationship("Category", back_populates="products")
 

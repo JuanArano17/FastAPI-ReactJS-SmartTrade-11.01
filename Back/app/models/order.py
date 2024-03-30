@@ -1,4 +1,4 @@
-from sqlalchemy import Date, DateTime, Float, ForeignKey, Integer, Column
+from sqlalchemy import Date, Float, ForeignKey, Integer, Column
 from sqlalchemy.orm import relationship
 from app.base import Base
 
@@ -7,7 +7,7 @@ class Order(Base):
     __tablename__ = "Order"
 
     id = Column(Integer, primary_key=True, index=True)
-    id_buyer = Column(Integer, ForeignKey("Buyer.id"))
+    id_buyer = Column(Integer, ForeignKey("Buyer.id", ondelete="CASCADE"))
     id_card = Column(Integer, ForeignKey("Card.id"))
     id_address = Column(Integer, ForeignKey("Address.id"))
     order_date = Column(Date, nullable=False)

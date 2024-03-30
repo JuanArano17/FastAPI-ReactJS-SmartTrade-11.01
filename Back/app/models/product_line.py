@@ -7,7 +7,7 @@ class ProductLine(Base):
     __tablename__ = "ProductLine"
 
     id = Column(Integer, primary_key=True, index=True)
-    id_order = Column(Integer, ForeignKey("Order.id"))
+    id_order = Column(Integer, ForeignKey("Order.id", ondelete="CASCADE"))
     id_seller_product = Column(Integer, ForeignKey("SellerProduct.id"))
     quantity = Column(Integer, nullable=False)
     subtotal = Column(Float, nullable=False)

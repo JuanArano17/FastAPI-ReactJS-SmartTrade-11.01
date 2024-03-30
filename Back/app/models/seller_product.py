@@ -7,8 +7,8 @@ class SellerProduct(Base):
     __tablename__ = "SellerProduct"
 
     id = Column(Integer, primary_key=True, index=True)
-    id_product = Column(Integer, ForeignKey("Product.id"))
-    id_seller = Column(Integer, ForeignKey("Seller.id"))
+    id_product = Column(Integer, ForeignKey("Product.id", ondelete="CASCADE"))
+    id_seller = Column(Integer, ForeignKey("Seller.id", ondelete="CASCADE"))
     quantity = Column(Integer, nullable=False)
     price = Column(Float, nullable=False)
     shipping_costs = Column(Float, nullable=False)

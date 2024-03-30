@@ -1,4 +1,4 @@
-from sqlalchemy import Date, DateTime, ForeignKey, Integer, Column
+from sqlalchemy import Date, ForeignKey, Integer, Column
 from sqlalchemy.orm import relationship
 from app.base import Base
 
@@ -7,7 +7,9 @@ class RefundProduct(Base):
     __tablename__ = "RefundProduct"
 
     id = Column(Integer, primary_key=True, index=True)
-    id_product_line = Column(Integer, ForeignKey("ProductLine.id"), nullable=False)
+    id_product_line = Column(
+        Integer, ForeignKey("ProductLine.id", ondelete="CASCADE"), nullable=False
+    )
     quantity = Column(Integer, nullable=False)
     refund_date = Column(Date, nullable=False)
 

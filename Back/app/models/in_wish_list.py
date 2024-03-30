@@ -7,9 +7,17 @@ class InWishList(Base):
     __tablename__ = "InWishList"
 
     id_seller_product = Column(
-        Integer, ForeignKey("SellerProduct.id"), primary_key=True, index=True
+        Integer,
+        ForeignKey("SellerProduct.id", ondelete="CASCADE"),
+        primary_key=True,
+        index=True,
     )
-    id_buyer = Column(Integer, ForeignKey("Buyer.id"), primary_key=True, index=True)
+    id_buyer = Column(
+        Integer,
+        ForeignKey("Buyer.id", ondelete="CASCADE"),
+        primary_key=True,
+        index=True,
+    )
 
     buyer = relationship("Buyer", back_populates="in_wish_list")
     seller_products = relationship("SellerProduct", back_populates="in_wish_list")
