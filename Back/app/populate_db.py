@@ -24,11 +24,12 @@ from service.product_line import ProductLineService
 from service.refund_product import RefundProductService
 from schemas.refund_product import RefundProductCreate
 from schemas.order import OrderCreate
+from service.user import UserService
 
 session = get_session()
-
-buyer_service=BuyerService(session)
-seller_service=SellerService(session)
+user_service=UserService(session=session)
+buyer_service=BuyerService(session, user_service=user_service)
+seller_service=SellerService(session, user_service=user_service)
 category_service=CategoryService(session)
 product_service=ProductService(session)
 image_service=ImageService(session, product_service)
@@ -40,5 +41,9 @@ in_shopping_cart_service=InShoppingCartService(session,buyer_service,seller_prod
 in_wish_list_service=InWishListService(session=session,buyer_service=buyer_service,seller_product_service=seller_product_serv)
 product_line_service=ProductLineService(session,buyer_service=buyer_service, order_service=order_service,seller_product_service=seller_product_serv)
 
-product=ProductCreate(eco_points=0,name="Headphones",spec_sheet="Hello")
-product_service.add(3,product=product)
+
+seller_product=seller_product_serv.get_by_id(3)
+quantity=2
+product_line=ProductLineCreate(quantity=quantity, subtotal=seller_product.price*quantity, id_seller_product=3)
+product_line_service.add(3,1,product_line)
+

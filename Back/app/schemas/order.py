@@ -9,7 +9,7 @@ class OrderBase(BaseModel):
     order_date: datetime = Field(default_factory=datetime.now)
     id_card: int
     id_address: int
-    total: NonNegativeFloat
+    total: NonNegativeFloat =Field(default=0)
 
     @validator("order_date")
     @classmethod
