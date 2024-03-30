@@ -51,7 +51,7 @@ class InShoppingCartService:
             shopping_cart_product.id_seller_product
         )
 
-        if self.get_by_id(id_buyer, shopping_cart_product.id_seller_product):
+        if self.cart_repo.get_where(InShoppingCart.id_buyer==id_buyer, InShoppingCart.id_seller_product==shopping_cart_product.id_seller_product):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Product already in shopping cart",
@@ -66,9 +66,7 @@ class InShoppingCartService:
         cart_product = InShoppingCart(
             **shopping_cart_product.model_dump(), id_buyer=id_buyer
         )
-        buyer.in_shopping_cart.append(cart_product)
         self.cart_repo.add(cart_product)
-        self.session.commit()
         return cart_product
 
     def get_by_id(self, id_buyer, id_seller_product) -> InShoppingCart:
