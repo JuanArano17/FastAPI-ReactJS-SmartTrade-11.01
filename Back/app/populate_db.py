@@ -10,6 +10,7 @@ from schemas.buyer import BuyerCreate, BuyerUpdate
 from schemas.card import CardCreate, CardUpdate
 from schemas.category import CategoryCreate, CategoryUpdate
 from schemas.in_shopping_cart import InShoppingCartCreate, InShoppingCartUpdate
+from schemas.in_wish_list import InWishListCreate
 from schemas.product_line import ProductLineCreate
 from service.image import ImageService
 from service.product import ProductService
@@ -34,7 +35,8 @@ address_service=AddressService(session,buyer_service)
 order_service=OrderService(session,buyer_service, card_service,address_service)
 seller_product_serv=SellerProductService(session,seller_service=seller_service,product_service=product_service)
 in_shopping_cart_service=InShoppingCartService(session,buyer_service,seller_product_serv)
+in_wish_list_service=InWishListService(session=session,buyer_service=buyer_service,seller_product_service=seller_product_serv)
 product_line_service=ProductLineService(session,buyer_service=buyer_service, order_service=order_service,seller_product_service=seller_product_serv)
 
-in_shopping_cart=InShoppingCartUpdate(quantity=11)
-in_shopping_cart_service.update(1,2,in_shopping_cart)
+in_wish_list=InWishListCreate(id_seller_product=3)
+print(in_wish_list_service.get_by_id(2,3).id_buyer)
