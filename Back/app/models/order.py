@@ -7,9 +7,11 @@ class Order(Base):
     __tablename__ = "Order"
 
     id = Column(Integer, primary_key=True, index=True)
-    id_buyer = Column(Integer, ForeignKey("Buyer.id", ondelete="CASCADE"))
-    id_card = Column(Integer, ForeignKey("Card.id"))
-    id_address = Column(Integer, ForeignKey("Address.id"))
+    id_buyer = Column(
+        Integer, ForeignKey("Buyer.id", ondelete="CASCADE", name="fk_order_buyer_id")
+    )
+    id_card = Column(Integer, ForeignKey("Card.id", name="fk_order_card_id"))
+    id_address = Column(Integer, ForeignKey("Address.id", name="fk_order_address_id"))
     order_date = Column(Date, nullable=False)
     total = Column(Float, nullable=False)
 

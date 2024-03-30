@@ -8,7 +8,13 @@ class RefundProduct(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     id_product_line = Column(
-        Integer, ForeignKey("ProductLine.id", ondelete="CASCADE"), nullable=False
+        Integer,
+        ForeignKey(
+            "ProductLine.id",
+            ondelete="CASCADE",
+            name="fk_refund_product_product_line_id",
+        ),
+        nullable=False,
     )
     quantity = Column(Integer, nullable=False)
     refund_date = Column(Date, nullable=False)

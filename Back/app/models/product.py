@@ -8,7 +8,9 @@ class Product(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     id_category = Column(
-        Integer, ForeignKey("Category.id", ondelete="CASCADE"), nullable=False
+        Integer,
+        ForeignKey("Category.id", ondelete="CASCADE", name="fk_product_category_id"),
+        nullable=False,
     )
     name = Column(String(255), nullable=False)
     description = Column(String(255))

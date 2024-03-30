@@ -8,7 +8,9 @@ class Image(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     id_product = Column(
-        Integer, ForeignKey("Product.id", ondelete="CASCADE"), nullable=False
+        Integer,
+        ForeignKey("Product.id", ondelete="CASCADE", name="fk_image_product_id"),
+        nullable=False,
     )
     # should url be unique?
     url = Column(String, nullable=False)

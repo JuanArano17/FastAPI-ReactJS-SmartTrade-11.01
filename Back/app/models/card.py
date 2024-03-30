@@ -8,7 +8,9 @@ class Card(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     id_buyer = Column(
-        Integer, ForeignKey("Buyer.id", ondelete="CASCADE"), nullable=False
+        Integer,
+        ForeignKey("Buyer.id", ondelete="CASCADE", name="fk_card_buyer_id"),
+        nullable=False,
     )
     card_number = Column(String, nullable=False)
     card_name = Column(String, nullable=False)

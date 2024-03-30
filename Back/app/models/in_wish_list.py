@@ -8,13 +8,17 @@ class InWishList(Base):
 
     id_seller_product = Column(
         Integer,
-        ForeignKey("SellerProduct.id", ondelete="CASCADE"),
+        ForeignKey(
+            "SellerProduct.id",
+            ondelete="CASCADE",
+            name="fk_wish_list_seller_product_id",
+        ),
         primary_key=True,
         index=True,
     )
     id_buyer = Column(
         Integer,
-        ForeignKey("Buyer.id", ondelete="CASCADE"),
+        ForeignKey("Buyer.id", ondelete="CASCADE", name="fk_wish_list_buyer_id"),
         primary_key=True,
         index=True,
     )

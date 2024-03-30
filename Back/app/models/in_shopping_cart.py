@@ -8,13 +8,15 @@ class InShoppingCart(Base):
 
     id_seller_product = Column(
         Integer,
-        ForeignKey("SellerProduct.id", ondelete="CASCADE"),
+        ForeignKey(
+            "SellerProduct.id", ondelete="CASCADE", name="fk_cart_seller_product_id"
+        ),
         primary_key=True,
         index=True,
     )
     id_buyer = Column(
         Integer,
-        ForeignKey("Buyer.id", ondelete="CASCADE"),
+        ForeignKey("Buyer.id", ondelete="CASCADE", name="fk_cart_buyer_id"),
         primary_key=True,
         index=True,
     )

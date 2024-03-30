@@ -8,7 +8,9 @@ class Address(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     id_buyer = Column(
-        Integer, ForeignKey("Buyer.id", ondelete="CASCADE"), nullable=False
+        Integer,
+        ForeignKey("Buyer.id", ondelete="CASCADE", name="fk_address_buyer_id"),
+        nullable=False,
     )
     street = Column(String, nullable=False)
     floor = Column(Integer)
