@@ -1,10 +1,10 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.service.user import UserService
 from app.schemas.buyer import BuyerCreate, BuyerUpdate
 from app.models.buyer import Buyer
 from app.crud_repository import CRUDRepository
-from service.seller import SellerRepository
 
 
 class BuyerRepository(CRUDRepository):
@@ -12,36 +12,29 @@ class BuyerRepository(CRUDRepository):
         super().__init__(session=session, model=Buyer)
         self._model = Buyer
 
-    def get_by_email(self, email: str) :#-> Buyer | None:
+    def get_by_email(self, email: str):  # -> Buyer | None:
         return self._db.query(self._model).filter(self._model.email == email).first()
 
-    def get_by_dni(self, dni: str) :#-> Buyer | None:
+    def get_by_dni(self, dni: str):  # -> Buyer | None:
         return self._db.query(self._model).filter(self._model.dni == dni).first()
 
+
 class BuyerService:
-    def __init__(self, session: Session):
+    def __init__(self, session: Session, user_service: UserService):
         self.session = session
         self.buyer_repo = BuyerRepository(session=session)
+        self.user_service = user_service
 
     def add(self, buyer: BuyerCreate) -> Buyer:
         if self.buyer_repo.get_by_dni(buyer.dni):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=status.HTTP_409_CONFLICT,
                 detail=f"Buyer with dni {buyer.dni} already exists.",
             )
 
-        if self.buyer_repo.get_by_email(buyer.email):
+        if self.user_service.get_by_email(buyer.email):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Buyer with email {buyer.email} already exists.",
-            )
-        
-        seller_repo=SellerRepository(self.session)
-       
-
-        if seller_repo.get_by_email(buyer.email):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=status.HTTP_409_CONFLICT,
                 detail=f"User with email {buyer.email} already exists.",
             )
 
@@ -62,22 +55,15 @@ class BuyerService:
     def update(self, buyer_id, new_data: BuyerUpdate) -> Buyer:
         buyer = self.get_by_id(buyer_id)
 
-        if new_data.email and self.buyer_repo.get_by_email(new_data.email):
+        if new_data.email and self.user_service.get_by_email(new_data.email):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Buyer with email {new_data.email} already exists.",
-            )
-        
-        seller_repo=SellerRepository(self.session)
-        if new_data.email and seller_repo.get_by_email(new_data.email):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"User with email {new_data.email} already exists.",
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"User with email {buyer.email} already exists.",
             )
 
         if new_data.dni and self.buyer_repo.get_by_dni(new_data.dni):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=status.HTTP_409_CONFLICT,
                 detail=f"Buyer with dni {new_data.dni} already exists.",
             )
 
