@@ -27,13 +27,13 @@ class SellerService:
         if self.seller_repo.get_by_email(seller.email):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Buyer with email {seller.email} already exists.",
+                detail=f"Seller with email {seller.email} already exists.",
             )
         
         if self.seller_repo.get_by_cif(seller.cif):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Buyer with email {seller.cif} already exists.",
+                detail=f"Seller with email {seller.cif} already exists.",
             )
         
        # buyer_repo=CRUDRepository(self.session,Buyer).first()

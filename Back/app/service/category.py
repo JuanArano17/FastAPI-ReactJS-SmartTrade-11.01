@@ -46,7 +46,7 @@ class CategoryService:
         if new_data.name and self.category_repo.get_by_name(new_data.name):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Buyer with dni {new_data.name} already exists.",
+                detail=f"Category with name {new_data.name} already exists.",
             )
         return self.category_repo.update(category, new_data)
 
