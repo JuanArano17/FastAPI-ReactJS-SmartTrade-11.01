@@ -84,6 +84,7 @@ class BuyerService:
         return self.buyer_repo.update(buyer, new_data)
 
     def delete_by_id(self, id):
+        self.buyer_repo.get_by_id(id)
         self.buyer_repo.delete_by_id(id)
 
     def delete_all(self):
