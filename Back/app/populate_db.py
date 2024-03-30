@@ -1,3 +1,4 @@
+from pydantic_extra_types.payment import PaymentCardNumber
 from app.service.seller import SellerService
 from app.service.buyer import BuyerRepository, BuyerService
 from app.service.card import CardService
@@ -6,6 +7,7 @@ from app.database import get_session
 from datetime import datetime
 from app.service.seller_product import SellerProductService
 from schemas.buyer import BuyerCreate, BuyerUpdate
+from schemas.card import CardCreate
 from schemas.product_line import ProductLineCreate
 from service.image import ImageService
 from service.product import ProductService
@@ -29,5 +31,5 @@ order_service=OrderService(session,buyer_service, card_service,address_service)
 seller_product_serv=SellerProductService(session,seller_service=seller_service,product_service=product_service)
 product_line_service=ProductLineService(session,buyer_service=buyer_service, order_service=order_service,seller_product_service=seller_product_serv)
 
-buyer=BuyerUpdate(email="seller@gmail.com")
-buyer_service.update(1,buyer)
+card=CardCreate(card_number=PaymentCardNumber('5500000000000004'), card_name="Pedro Tomás", card_exp_date=datetime(2025,1,1).date(),card_security_num="421")
+card_service.add(1,card)

@@ -14,7 +14,7 @@ class Card(Base):
     )
     card_number = Column(String, nullable=False)
     card_name = Column(String, nullable=False)
-    card_security_num = Column(Integer, nullable=False)
+    card_security_num = Column(String, nullable=False)
     card_exp_date = Column(Date, nullable=False)
 
     orders = relationship("Order", back_populates="card")
