@@ -29,6 +29,15 @@ class InShoppingCartRepository(CRUDRepository):
             )
             .first()
         )
+    
+    def update(self, entity, new_entity, exclude_defaults: bool = True):
+        data = new_entity.model_dump(
+            exclude_unset=True, exclude_defaults=exclude_defaults
+        )
+        self._db.query(self._model).filter(self._model.id_buyer == entity.id_buyer, self._model.id_seller_product == entity.id_seller_product).update({**data})  # type: ignore
+        self._db.commit()
+        self._db.refresh(entity)
+        return entity
 
 
 class InShoppingCartService:

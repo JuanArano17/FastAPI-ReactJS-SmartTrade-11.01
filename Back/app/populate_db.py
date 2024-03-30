@@ -9,6 +9,7 @@ from app.service.seller_product import SellerProductService
 from schemas.buyer import BuyerCreate, BuyerUpdate
 from schemas.card import CardCreate, CardUpdate
 from schemas.category import CategoryCreate, CategoryUpdate
+from schemas.in_shopping_cart import InShoppingCartCreate, InShoppingCartUpdate
 from schemas.product_line import ProductLineCreate
 from service.image import ImageService
 from service.product import ProductService
@@ -35,5 +36,5 @@ seller_product_serv=SellerProductService(session,seller_service=seller_service,p
 in_shopping_cart_service=InShoppingCartService(session,buyer_service,seller_product_serv)
 product_line_service=ProductLineService(session,buyer_service=buyer_service, order_service=order_service,seller_product_service=seller_product_serv)
 
-category=CategoryUpdate(name="Electronics")
-category_service.update(3,category)
+in_shopping_cart=InShoppingCartUpdate(quantity=11)
+in_shopping_cart_service.update(1,2,in_shopping_cart)
