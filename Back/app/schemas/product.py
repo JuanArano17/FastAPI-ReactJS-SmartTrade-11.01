@@ -10,7 +10,7 @@ class ProductBase(BaseModel):
     description: Optional[str] = None
     eco_points: NonNegativeFloat
     spec_sheet: str = Field(min_length=1, max_length=240)
-    stock: NonNegativeInt
+    stock: NonNegativeInt = Field(default=0)
 
 
 class ProductCreate(ProductBase):

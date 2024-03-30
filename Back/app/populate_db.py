@@ -11,7 +11,9 @@ from schemas.card import CardCreate, CardUpdate
 from schemas.category import CategoryCreate, CategoryUpdate
 from schemas.in_shopping_cart import InShoppingCartCreate, InShoppingCartUpdate
 from schemas.in_wish_list import InWishListCreate
+from schemas.product import ProductCreate, ProductCreateWithCategory
 from schemas.product_line import ProductLineCreate
+from schemas.seller_product import SellerProductCreate, SellerProductUpdate
 from service.image import ImageService
 from service.product import ProductService
 from service.address import AddressService
@@ -38,5 +40,5 @@ in_shopping_cart_service=InShoppingCartService(session,buyer_service,seller_prod
 in_wish_list_service=InWishListService(session=session,buyer_service=buyer_service,seller_product_service=seller_product_serv)
 product_line_service=ProductLineService(session,buyer_service=buyer_service, order_service=order_service,seller_product_service=seller_product_serv)
 
-in_wish_list=InWishListCreate(id_seller_product=3)
-print(in_wish_list_service.get_by_id(2,3).id_buyer)
+product=ProductCreate(eco_points=0,name="Headphones",spec_sheet="Hello")
+product_service.add(3,product=product)
