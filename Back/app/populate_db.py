@@ -40,10 +40,8 @@ seller_product_serv=SellerProductService(session,seller_service=seller_service,p
 in_shopping_cart_service=InShoppingCartService(session,buyer_service,seller_product_serv)
 in_wish_list_service=InWishListService(session=session,buyer_service=buyer_service,seller_product_service=seller_product_serv)
 product_line_service=ProductLineService(session,buyer_service=buyer_service, order_service=order_service,seller_product_service=seller_product_serv)
+refund_product_service=RefundProductService(session=session,buyer_service=buyer_service, order_service=order_service,seller_product_service=seller_product_serv,product_line_service=product_line_service)
 
-
-seller_product=seller_product_serv.get_by_id(3)
-quantity=2
-product_line=ProductLineCreate(quantity=quantity, subtotal=seller_product.price*quantity, id_seller_product=3)
-product_line_service.add(3,1,product_line)
+refund_product=RefundProductCreate(quantity=2, refund_date=datetime(2021,1,2).date())
+refund_product_service.delete_by_id(id_order=3,id_buyer=1, id_product_line=4,refund_product_id=8)
 
