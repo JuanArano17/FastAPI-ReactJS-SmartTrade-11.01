@@ -30,7 +30,7 @@ async def create_seller(*, seller: SellerCreate):
     """
     Create a new seller.
     """
-    return seller.add(seller)
+    return seller_service.add(seller)
 
 
 @router.put("/{seller_id}", response_model=Seller)
