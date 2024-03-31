@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from app.schemas.seller import Seller, SellerCreate, SellerUpdate
 from database import get_session
-from service.buyer import SellerService
+from service.seller import SellerService
 from service.user import UserService
 
 router = APIRouter(prefix="/sellers", tags=["sellers"])
