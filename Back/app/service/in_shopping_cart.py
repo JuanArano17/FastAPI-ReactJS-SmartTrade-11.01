@@ -29,6 +29,15 @@ class InShoppingCartRepository(CRUDRepository):
             )
             .first()
         )
+    
+    def update(self, entity, new_entity, exclude_defaults: bool = True):
+        data = new_entity.model_dump(
+            exclude_unset=True, exclude_defaults=exclude_defaults
+        )
+        self._db.query(self._model).filter(self._model.id_buyer == entity.id_buyer, self._model.id_seller_product == entity.id_seller_product).update({**data})  # type: ignore
+        self._db.commit()
+        self._db.refresh(entity)
+        return entity
 
 
 class InShoppingCartService:
@@ -51,7 +60,7 @@ class InShoppingCartService:
             shopping_cart_product.id_seller_product
         )
 
-        if self.get_by_id(id_buyer, shopping_cart_product.id_seller_product):
+        if self.cart_repo.get_where(InShoppingCart.id_buyer==id_buyer, InShoppingCart.id_seller_product==shopping_cart_product.id_seller_product):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Product already in shopping cart",
@@ -66,9 +75,7 @@ class InShoppingCartService:
         cart_product = InShoppingCart(
             **shopping_cart_product.model_dump(), id_buyer=id_buyer
         )
-        buyer.in_shopping_cart.append(cart_product)
         self.cart_repo.add(cart_product)
-        self.session.commit()
         return cart_product
 
     def get_by_id(self, id_buyer, id_seller_product) -> InShoppingCart:

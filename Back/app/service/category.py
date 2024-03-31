@@ -43,6 +43,11 @@ class CategoryService:
 
     def update(self, category_id, new_data: CategoryUpdate) -> Category:
         category = self.get_by_id(category_id)
+        if new_data.name and self.category_repo.get_by_name(new_data.name):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Category with name {new_data.name} already exists.",
+            )
         return self.category_repo.update(category, new_data)
 
     def delete_by_id(self, id):

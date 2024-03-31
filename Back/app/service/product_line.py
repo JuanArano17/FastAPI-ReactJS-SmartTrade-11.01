@@ -26,7 +26,6 @@ class ProductLineService:
     def add(self, id_order, id_buyer, product_line: ProductLineCreate) -> ProductLine:
         self.buyer_service.get_by_id(id_buyer)
         order = self.order_service.get_by_id(id_order)
-
         if order.id_buyer != id_buyer:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -36,14 +35,15 @@ class ProductLineService:
         seller_product = self.seller_product_service.get_by_id(
             product_line.id_seller_product
         )
-
+        
+        original_product_line=product_line
         for product_line in order.product_lines:
             if product_line.id_seller_product == seller_product.id:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Product already in order",
                 )
-
+        product_line=original_product_line
         if seller_product.quantity < product_line.quantity:  # type: ignore
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -57,13 +57,10 @@ class ProductLineService:
             )
 
         product_line = ProductLine(**product_line.model_dump(), id_order=id_order)
-        product_line = self.product_line_repo.add(product_line)
         order.total += product_line.subtotal  # type: ignore
 
         seller_product.quantity -= product_line.quantity  # type: ignore
-
-        # TODO: test it withouth the commit
-        self.session.commit()
+        product_line = self.product_line_repo.add(product_line)
         return product_line
 
     def get_by_id(self, product_line_id) -> ProductLine:

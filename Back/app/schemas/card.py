@@ -10,14 +10,14 @@ class CardBase(BaseModel):
 
 
 class CardCreate(CardBase):
-    card_security_num: int = Field(min_length=3, max_length=4)
+    card_security_num: str = Field(pattern=r'^\d{3}$')
 
 
 class CardUpdate(BaseModel):
     card_number: Optional[PaymentCardNumber] = None
     card_name: str = Field(default=None, min_length=1, max_length=60)
     card_exp_date: Optional[FutureDate] = None
-    card_security_num: Optional[int] = Field(default=None, min_length=3, max_length=4)
+    card_security_num: Optional[str] = Field(default=None, pattern=r'^\d{3}$')
 
 
 class Card(CardBase):

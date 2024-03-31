@@ -44,6 +44,11 @@ class InWishListService:
         self.buyer_service = buyer_service
 
     def add(self, id_buyer, wish_list_item: InWishListCreate) -> InWishList:
+        if self.wishlist_repo.get_where(InWishList.id_buyer==id_buyer, InWishList.id_seller_product==wish_list_item.id_seller_product):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Product already in wish list",
+            )
         self.buyer_service.get_by_id(id_buyer)
         self.seller_product_service.get_by_id(wish_list_item.id_seller_product)
 
