@@ -5,7 +5,6 @@ from app.schemas.product import ProductCreate, ProductUpdate
 from app.models.product import Product
 from app.crud_repository import CRUDRepository
 
-
 class ProductService:
     def __init__(self, session: Session):
         self.session = session

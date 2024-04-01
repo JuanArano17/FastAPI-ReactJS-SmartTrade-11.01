@@ -20,6 +20,7 @@ class SellerRepository(CRUDRepository):
         return self._db.query(self._model).filter(self._model.cif == cif).first()
 
 
+
 class SellerService:
     def __init__(self, session: Session, user_service: UserService):
         self.session = session

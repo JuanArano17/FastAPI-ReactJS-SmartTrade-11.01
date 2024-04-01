@@ -8,9 +8,9 @@ class SellerBase(BaseModel):
     email: EmailStr
     name: str = Field(min_length=1, max_length=20)
     surname: str = Field(min_length=1, max_length=40)
-    bank_data: str = Field(min_length=30, max_length=140)
+    bank_data: str = Field(min_length=10, max_length=140)
     # TODO: change it later for a more formal validation
-    cif: str = Field(pattern=r"^[A-HJNPQRSUVW]{1}[0-9]{7}[0-9A-J]$")
+    cif: str = Field(pattern=r"^[A-Z][0-9]{8}$")
 
 
 class SellerCreate(SellerBase):
@@ -21,10 +21,10 @@ class SellerUpdate(SellerBase):
     email: Optional[EmailStr] = None
     name: Optional[str] = Field(default=None, min_length=1, max_length=20)
     surname: Optional[str] = Field(default=None, min_length=1, max_length=40)
-    bank_data: Optional[str] = Field(default=None, min_length=30, max_length=140)
+    bank_data: Optional[str] = Field(default=None, min_length=10, max_length=140)
     # TODO: change it later for a more formal validation
     cif: Optional[str] = Field(
-        default=None, pattern=r"^[A-HJNPQRSUVW]{1}[0-9]{7}[0-9A-J]$"
+        default=None, pattern=r"^[A-Z][0-9]{8}$"
     )
 
 
