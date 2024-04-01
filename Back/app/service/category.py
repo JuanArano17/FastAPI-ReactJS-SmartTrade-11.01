@@ -14,7 +14,6 @@ class CategoryRepository(CRUDRepository):
     def get_by_name(self, name: str) -> Category | None:
         return self._db.query(self._model).filter(self._model.name == name).first()
 
-
 class CategoryService:
     def __init__(self, session: Session):
         self.session = session

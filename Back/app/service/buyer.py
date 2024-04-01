@@ -17,7 +17,7 @@ class BuyerRepository(CRUDRepository):
 
     def get_by_dni(self, dni: str):  # -> Buyer | None:
         return self._db.query(self._model).filter(self._model.dni == dni).first()
-
+    
 
 class BuyerService:
     def __init__(self, session: Session, user_service: UserService):

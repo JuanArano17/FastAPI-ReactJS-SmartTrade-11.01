@@ -48,3 +48,9 @@ class CRUDRepository:
         self._db.query(self._model).delete()
         self._db.commit()
         
+    def get_id_list(self):
+        items=self._db.query(self._model).all()
+        ids=[]
+        for item in items:
+            ids.append(item.id)
+        return ids
