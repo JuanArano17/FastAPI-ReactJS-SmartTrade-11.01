@@ -1,25 +1,15 @@
 from sqlalchemy.orm import Session
 
-from app.models.buyer import Buyer
-from app.models.seller import Seller
+from app.crud_repository import CRUDRepository
+from app.models.user import User
 
 
-# TODO: this is a temporary workaround to get buyers or sellers by their email, avoiding circular dependencies
-# this is not the best approach, we should have a user table
-class UserRepository:
+class UserRepository(CRUDRepository):
     def __init__(self, *, session: Session) -> None:
-        self._db = session
+        super().__init__(session=session, model=User)
 
-    def get_by_email(self, email: str) -> Buyer | Seller | None:
-        buyer = self._db.query(Buyer).filter(Buyer.email == email).first()
-        if buyer:
-            return buyer
-
-        seller = self._db.query(Seller).filter(Seller.email == email).first()
-        if seller:
-            return seller
-
-        return None
+    def get_by_email(self, email: str) -> User | None:
+        return self._db.query(User).filter(User.email == email).first()
 
 
 class UserService:
@@ -27,5 +17,5 @@ class UserService:
         self._db = session
         self._user_repository = UserRepository(session=session)
 
-    def get_by_email(self, email: str) -> Buyer | Seller | None:
+    def get_by_email(self, email: str) -> User | None:
         return self._user_repository.get_by_email(email=email)
