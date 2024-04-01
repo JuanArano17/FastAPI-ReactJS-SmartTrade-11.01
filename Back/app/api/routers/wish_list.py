@@ -36,15 +36,15 @@ async def create_list_item(*, buyer_id: int ,wish_list_item: InWishListCreate):
     return wish_list_service.add(id_buyer=buyer_id,wish_list_item=wish_list_item)
 
 @router.delete("/")
-async def delete_list_item(buyer_id:int):
+async def delete_list(buyer_id:int):
     """
     Delete all list items from a buyer.
     """
     return wish_list_service.delete_by_id_buyer(id_buyer=buyer_id)
 
 @router.delete("/{seller_product_id}")
-async def delete_address(*, buyer_id=int, seller_product_id: int):
+async def delete_list_item(*, buyer_id=int, seller_product_id: int):
     """
-    Delete an item from wish list.
+    Delete an item from a wish list.
     """
     return wish_list_service.delete_by_id(id_buyer=int(buyer_id), id_seller_product=int(seller_product_id))
