@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.api.routers import wish_list
 from app.api.routers import shopping_cart
 from app.api.routers import images
 from app.api.routers import buyers
@@ -14,3 +15,4 @@ api_router.include_router(products.router)
 api_router.include_router(addresses.router)
 api_router.include_router(images.router)
 api_router.include_router(shopping_cart.router)
+api_router.include_router(wish_list.router)

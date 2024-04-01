@@ -55,8 +55,8 @@ async def update_quantity(*, buyer_id=int, seller_product_id: int, cart_item: In
     return shopping_cart_service.update(id_buyer=int(buyer_id),id_seller_product=int(seller_product_id),new_data=cart_item)
 
 @router.delete("/{seller_product_id}")
-async def delete_address(*, buyer_id=int, seller_product_id: int):
+async def delete_item(*, buyer_id=int, seller_product_id: int):
     """
-    Delete an address.
+    Delete an item from shopping cart.
     """
     return shopping_cart_service.delete_by_id(id_buyer=int(buyer_id), id_seller_product=int(seller_product_id))

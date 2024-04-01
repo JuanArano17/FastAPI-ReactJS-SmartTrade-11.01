@@ -30,7 +30,7 @@ class InShoppingCartRepository(CRUDRepository):
             .first()
         )
     
-    def get_by_id_buyer(self, *, id_buyer) -> InShoppingCart:
+    def get_by_id_buyer(self, *, id_buyer) -> list[InShoppingCart]:
         return (
             self._db.query(self._model)
             .filter(
@@ -39,7 +39,7 @@ class InShoppingCartRepository(CRUDRepository):
             .all()
         )
     
-    def delete_by_id_buyer(self, *, id_buyer) -> InShoppingCart:
+    def delete_by_id_buyer(self, *, id_buyer):
             self._db.query(self._model).filter(
                 self._model.id_buyer == id_buyer).delete()
             self._db.commit()
@@ -130,5 +130,5 @@ class InShoppingCartService:
     def get_by_id_buyer(self, id_buyer)-> list[InShoppingCart]:
         return self.cart_repo.get_by_id_buyer(id_buyer=id_buyer)
     
-    def delete_by_id_buyer(self, id_buyer)-> list[InShoppingCart]:
+    def delete_by_id_buyer(self, id_buyer):
         return self.cart_repo.delete_by_id_buyer(id_buyer=id_buyer)
