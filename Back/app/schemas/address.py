@@ -5,7 +5,7 @@ from pydantic_extra_types.country import CountryAlpha3
 
 class AddressBase(BaseModel):
     street: str = Field(min_length=5, max_length=35)
-    floor: Optional[PositiveInt] = Field(le=200)
+    floor: Optional[PositiveInt] = Field(default=1,le=200)
     door: str = Field(min_length=1, max_length=6)
     adit_info: Optional[str] = Field(max_length=70)
     city: str = Field(min_length=1, max_length=28)

@@ -7,6 +7,20 @@ from app.models.seller_product import SellerProduct
 from app.crud_repository import CRUDRepository
 from app.service.product import ProductService
 
+class SellerProductRepository(CRUDRepository):
+    def __init__(self, session: Session):
+        super().__init__(session=session, model=SellerProduct)
+        self._model = SellerProduct
+
+    def get_by_id_product(self, id_product) -> list[SellerProduct]:
+        return (
+            self._db.query(self._model).filter(self._model.id_product == id_product).all()
+        )
+    
+    def delete_by_id_product(self, id_product):
+        self._db.query(self._model).filter(self._model.id_product == id_product).delete()  # type: ignore
+        self._db.commit()
+
 
 class SellerProductService:
     def __init__(
@@ -16,7 +30,7 @@ class SellerProductService:
         product_service: ProductService,
     ):
         self.session = session
-        self.seller_product_repo = CRUDRepository(session=session, model=SellerProduct)
+        self.seller_product_repo = SellerProductRepository(session=session)
         self.seller_service = seller_service
         self.product_service = product_service
 
@@ -74,3 +88,9 @@ class SellerProductService:
             product = self.product_service.get_by_id(seller_product.id_product)
             product.stock -= seller_product.quantity  # type: ignore
         self.seller_product_repo.delete_all()
+    
+    def get_by_id_product(self, id_product)-> list[SellerProduct]:
+        return self.seller_product_repo.get_by_id_product(id_product=id_product)
+    
+    def delete_by_id_product(self, id_product):
+        return self.seller_product_repo.delete_by_id_product(id_product=id_product)

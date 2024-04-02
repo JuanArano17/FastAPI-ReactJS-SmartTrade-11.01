@@ -29,6 +29,20 @@ class InWishListRepository(CRUDRepository):
             )
             .first()
         )
+    
+    def get_by_id_buyer(self, *, id_buyer) -> list[InWishList]:
+        return (
+            self._db.query(self._model)
+            .filter(
+                self._model.id_buyer == id_buyer
+            )
+            .all()
+        )
+    
+    def delete_by_id_buyer(self, *, id_buyer):
+            self._db.query(self._model).filter(
+                self._model.id_buyer == id_buyer).delete()
+            self._db.commit()
 
 
 class InWishListService:
@@ -81,3 +95,9 @@ class InWishListService:
     # We probably will never use this
     def delete_all(self):
         self.wishlist_repo.delete_all()
+    
+    def get_by_id_buyer(self, id_buyer)-> list[InWishList]:
+        return self.wishlist_repo.get_by_id_buyer(id_buyer=id_buyer)
+    
+    def delete_by_id_buyer(self, id_buyer):
+        return self.wishlist_repo.delete_by_id_buyer(id_buyer=id_buyer)

@@ -6,11 +6,26 @@ from app.models.image import Image
 from app.crud_repository import CRUDRepository
 from app.service.product import ProductService
 
+class ImageRepository(CRUDRepository):
+    def __init__(self, session: Session):
+        super().__init__(session=session, model=Image)
+        self._model = Image
+
+    def get_by_id_product(self, id_product) -> list[Image]:
+        return (
+            self._db.query(self._model).filter(self._model.id_product == id_product).all()
+        )
+    
+    def delete_by_id_product(self, id_product):
+        self._db.query(self._model).filter(self._model.id_product == id_product).delete()  # type: ignore
+        self._db.commit()
+
+
 
 class ImageService:
     def __init__(self, session: Session, product_service: ProductService):
         self.session = session
-        self.image_repo = CRUDRepository(session=session, model=Image)
+        self.image_repo = ImageRepository(session=session)
         self.product_service = product_service
 
     def add(self, id_product: int, image: ImageCreate) -> Image:
@@ -41,3 +56,9 @@ class ImageService:
 
     def delete_all(self):
         self.image_repo.delete_all()
+
+    def get_by_id_product(self, id_product)-> list[Image]:
+        return self.image_repo.get_by_id_product(id_product=id_product)
+    
+    def delete_by_id_product(self, id_product)-> list[Image]:
+        return self.image_repo.delete_by_id_product(id_product=id_product)
