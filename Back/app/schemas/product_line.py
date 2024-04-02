@@ -1,10 +1,9 @@
-from pydantic import BaseModel, ConfigDict, NonNegativeFloat, PositiveInt
-
+from pydantic import BaseModel, ConfigDict, NonNegativeFloat, NonNegativeInt
 from app.schemas.refund_product import RefundProduct
 
 
 class ProductLineBase(BaseModel):
-    quantity: PositiveInt
+    quantity: NonNegativeInt
     subtotal: NonNegativeFloat
 
 

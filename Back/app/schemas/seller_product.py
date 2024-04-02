@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, ConfigDict, NonNegativeFloat, PositiveInt
+from pydantic import BaseModel, ConfigDict, NonNegativeFloat, NonNegativeInt
 
 from app.schemas.product_line import ProductLine
 from app.schemas.in_shopping_cart import InShoppingCart
@@ -7,7 +7,7 @@ from app.schemas.in_wish_list import InWishList
 
 
 class SellerProductBase(BaseModel):
-    quantity: PositiveInt
+    quantity: NonNegativeInt
     price: NonNegativeFloat
     shipping_costs: NonNegativeFloat
 
@@ -17,7 +17,7 @@ class SellerProductCreate(SellerProductBase):
 
 
 class SellerProductUpdate(SellerProductBase):
-    quantity: Optional[PositiveInt] = None
+    quantity: Optional[NonNegativeInt] = None
     price: Optional[NonNegativeFloat] = None
     shipping_costs: Optional[NonNegativeFloat] = None
 
