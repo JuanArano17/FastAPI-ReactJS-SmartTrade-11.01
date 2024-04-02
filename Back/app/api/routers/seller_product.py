@@ -26,11 +26,13 @@ async def read_seller_products(*, product_id: int):
     return seller_product_service.get_by_id_product(id_product=product_id)
 
 @router.post("/", response_model=SellerProduct)
-async def create_seller_product(*, product_id: int ,seller_product: SellerProductCreate):
+async def create_seller_product(*, product_id: int, seller_id:int ,seller_product: SellerProductCreate):
     """
     Create a new seller product.
     """
-    return seller_product_service.add(id_product=product_id, seller_product=seller_product)
+    if seller_product is None or seller_product.id_product != product_id:
+        raise HTTPException(status_code=404, detail="Product not correct")
+    return seller_product_service.add(id_seller=seller_id, seller_product=seller_product)
 
 @router.delete("/")
 async def delete_seller_products(product_id:int):
@@ -39,7 +41,7 @@ async def delete_seller_products(product_id:int):
     """
     return seller_product_service.delete_by_id_product(id_product=product_id)
 
-@router.get("/{product_id}", response_model=SellerProduct)
+@router.get("/{seller_product_id}", response_model=SellerProduct)
 async def read_seller_product(*,product_id:int ,seller_product_id: int):
     """
     Retrieve a specific seller product.

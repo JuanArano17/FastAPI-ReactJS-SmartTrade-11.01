@@ -42,6 +42,6 @@ in_wish_list_service=InWishListService(session=session,buyer_service=buyer_servi
 product_line_service=ProductLineService(session,buyer_service=buyer_service, order_service=order_service,seller_product_service=seller_product_serv)
 refund_product_service=RefundProductService(session=session,buyer_service=buyer_service, order_service=order_service,seller_product_service=seller_product_serv,product_line_service=product_line_service)
 
-refund_product=RefundProductCreate(quantity=2, refund_date=datetime(2021,1,2).date())
-refund_product_service.delete_by_id(id_order=3,id_buyer=1, id_product_line=4,refund_product_id=8)
+category=CategoryCreate(name="Games", description="D")
+category_service.add(category)
 
