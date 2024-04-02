@@ -19,6 +19,9 @@ email-validator = "^2.1.1"
 pydantic-extra-types = "^2.6.0"
 pycountry = "^23.12.11"
 faker = "^24.4.0"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+python-multipart = "^0.0.9"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.2"
