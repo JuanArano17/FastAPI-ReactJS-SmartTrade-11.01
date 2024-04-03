@@ -9,7 +9,7 @@ class User(Base):
     email = Column(String(50), nullable=False, unique=True)
     name = Column(String(20), nullable=False)
     surname = Column(String(50), nullable=False)
-    password = Column(String(25), nullable=False)
+    password = Column(String(255), nullable=False)
     type = Column(String, nullable=False)
 
     __mapper_args__ = {
