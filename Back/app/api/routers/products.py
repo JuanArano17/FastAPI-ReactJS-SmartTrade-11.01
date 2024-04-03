@@ -9,7 +9,7 @@ router = APIRouter(prefix="/products", tags=["products"])
 session=get_session()
 product_service=ProductService(session=session)
 
-@router.get("/", response_model=list[Product])
+@router.get("/")
 async def read_products():
     """
     Retrieve products.
@@ -17,7 +17,7 @@ async def read_products():
     return product_service.get_all()
 
 
-@router.get("/{product_id}", response_model=Product)
+@router.get("/{product_id}")
 async def read_product(*, product_id: int):
     """
     Retrieve a product.
@@ -25,16 +25,16 @@ async def read_product(*, product_id: int):
     return product_service.get_by_id(product_id)
 
 
-@router.post("/{category_id}", response_model=Product)
-async def create_product(*, category_id:int , product: ProductCreate):
+@router.post("/{category_name}")
+async def create_product(*, category_name:str , product: dict):
     """
     Create a new product.
     """
-    return product_service.add(id_category=category_id, product=product)
+    return product_service.add(category=category_name, product_data=product)
 
 
-@router.put("/{product_id}", response_model=Product)
-async def update_product(*, product_id: int, product: ProductUpdate):
+@router.put("/{product_id}")
+async def update_product(*, product_id: int, product: dict):
     """
     Update a product.
     """
