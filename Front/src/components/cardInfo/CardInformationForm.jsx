@@ -1,9 +1,8 @@
-// CardInformationForm.jsx
 import React from 'react';
 import { Box, Grid, TextField, Typography, Button } from '@mui/material';
 import styles from "../../styles/styles";
 
-const CardInformationForm = ({ formData, handleChange }) => {
+const CardInformationForm = ({ cardData, handleChange }) => {
     return (
         <Box component="form" sx={styles.formContainer}>
             <Grid container spacing={3}>
@@ -17,7 +16,7 @@ const CardInformationForm = ({ formData, handleChange }) => {
                         placeholder="1234-1234-1234-1234*"
                         required
                         fullWidth
-                        value={formData.CardNumber}
+                        value={cardData.CardNumber}
                         onChange={handleChange}
                         inputProps={{ maxLength: 16 }}
                         sx={{ ...styles.textfields, backgroundColor: "white" }}
@@ -33,7 +32,7 @@ const CardInformationForm = ({ formData, handleChange }) => {
                         placeholder="09/26*"
                         required
                         fullWidth
-                        value={formData.ExpiryDate}
+                        value={cardData.ExpiryDate}
                         onChange={handleChange}
                         inputProps={{ maxLength: 5 }}
                         sx={{ ...styles.textfields, backgroundColor: "white" }}
@@ -49,7 +48,7 @@ const CardInformationForm = ({ formData, handleChange }) => {
                         placeholder="123*"
                         required
                         fullWidth
-                        value={formData.CVV}
+                        value={cardData.CVV}
                         onChange={handleChange}
                         inputProps={{ maxLength: 3 }}
                         sx={{ ...styles.textfields, backgroundColor: "white" }}
@@ -57,9 +56,9 @@ const CardInformationForm = ({ formData, handleChange }) => {
                 </Grid>
             </Grid>
             <Button
-                type="submit"
                 fullWidth
                 sx={styles.registerButton}
+                onClick={() => console.log("Listo para guardar después del registro del usuario")}
             >
                 Save
             </Button>

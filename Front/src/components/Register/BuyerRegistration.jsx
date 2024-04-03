@@ -2,28 +2,41 @@ import React, { useState } from "react";
 import { Box, Typography, TextField, Button, Container, Grid, Paper, IconButton, InputAdornment, } from "@mui/material";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import CardInformationForm from './CardInformationForm';
+import CardInformationForm from '../cardInfo/CardInformationForm';
 import { getDefaultRegisterModel } from "../../models/RegisterModel";
-import { validateEmail, validatePassword, validateAge, validateDNI} from "../../utils/registerFormValidations";
+import { getDefaultCardInformationModel } from "../../models/CardInformationModel";
+import { validateEmail, validatePassword, validateAge, validateDNI } from "../../utils/registerFormValidations";
 import styles from "../../styles/styles";
+import registerUserService from "../../api/services/user/AuthService";
+import registerCardService from "../../api/services/user/BuyerService";
 const formFields = [
-    { id: "firstName", name: "Name", placeholder: "Patricio*",  autoComplete: "fname", autoFocus: true },
-    { id: "lastName", name: "Surname", placeholder: "Letelier*",  autoComplete: "lname" },
-    { id: "email", name: "Email", placeholder: "letelier@upv.edu.es*",  autoComplete: "email" },
+    { id: "firstName", name: "Name", placeholder: "Patricio*", autoComplete: "fname", autoFocus: true },
+    { id: "lastName", name: "Surname", placeholder: "Letelier*", autoComplete: "lname" },
+    { id: "email", name: "Email", placeholder: "letelier@upv.edu.es*", autoComplete: "email" },
     { id: "dni", name: "DNI", placeholder: "12345678A*" },
-    { id: "password", name: "Password", placeholder: "PSW_curso_2023_2024*",  autoComplete: "new-password", type: "password" },
+    { id: "password", name: "Password", placeholder: "PSW_curso_2023_2024*", autoComplete: "new-password", type: "password" },
     { id: "age", name: "Birth date", type: "date" }
 ];
 const BuyerRegistration = () => {
     const [formData, setFormData] = useState(getDefaultRegisterModel());
+    const [cardData, setCardData] = useState(getDefaultCardInformationModel());
     const [showPassword, setShowPassword] = useState(false);
     const [formErrors, setFormErrors] = useState({});
+    const togglePasswordVisibility = () => {
+        setShowPassword((prev) => !prev);
+    };
+    const handleCardChange = (e) => {
+        const { name, value } = e.target;
+        setCardData(prevCardData => ({
+            ...prevCardData,
+            [name]: value
+        }));
+    };
     const isFormValid = () => {
         const isAnyFieldEmpty = formFields.some(field => !formData[field.id]);
         const isAnyFieldError = formFields.some(field => formErrors[field.id]);
         return !isAnyFieldEmpty && !isAnyFieldError;
     };
-    
     const handleChange = (e) => {
         const { id, value } = e.target;
         let errors = { ...formErrors };
@@ -42,12 +55,27 @@ const BuyerRegistration = () => {
         setFormErrors(errors);
         setFormData({ ...formData, [id]: value });
     }
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Logic for communicating with backend
-    };
-    const togglePasswordVisibility = () => {
-        setShowPassword((prev) => !prev);
+        if (isFormValid()) {
+            try {
+                console.log('Se esta intentando registrar un usuario')
+                const userResponse = await registerUserService(formData);
+                console.log('Se a registrado un usuario', userResponse)
+                const userId = userResponse.userId;
+                if (userId && Object.values(cardData).some(value => value !== "")) {
+                    try {
+                        await registerCardService({ ...cardData, userId });
+                    } catch (cardError) {
+                        console.error('Hubo un error al registrar la tarjeta:', cardError);
+                    }
+                }
+            } catch (error) {
+                console.error('Hubo un error al registrar al usuario:', error);
+            }
+        } else {
+            console.log('El formulario no es válido.');
+        }
     };
     return (
         <Container component="main" maxWidth="lg">
@@ -118,7 +146,7 @@ const BuyerRegistration = () => {
                             <Typography component="h2" variant="h6" color="#629c44" mb={2}>
                                 Enter your card information (OPTIONAL)
                             </Typography>
-                            <CardInformationForm formData={formData} handleChange={handleChange} />
+                            <CardInformationForm cardData={cardData} handleChange={handleCardChange} />
                         </Paper>
                     </Grid>
                 </Grid>

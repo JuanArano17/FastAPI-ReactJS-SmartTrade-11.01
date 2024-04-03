@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Box, Typography, Button } from "@mui/material";
-import TopBar from "../components/TopBar/TopBar";
-import Footer from "../components/Footer/Footer";
-import SellerRegistration from "../components/Register/SellerRegistration";
-import BuyerRegistration from "../components/Register/BuyerRegistration";
+import TopBar from "../components/topbar/TopBar";
+import Footer from "../components/footer/Footer";
+import SellerRegistration from "../components/register/SellerRegistration";
+import BuyerRegistration from "../components/register/BuyerRegistration";
 import img_Buyer from "../images/img_Buyer.png";
 import img_Seller from "../images/img_Seller.png";
 import img_mundo from "../images/img_mundo.png";

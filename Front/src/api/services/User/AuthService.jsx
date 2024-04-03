@@ -1,6 +1,5 @@
-import axios from './axiosInstance'; 
-
-const registerUser = async (userData) => {
+import axios from '../AxiosInstance'; 
+const registerUserService = async (userData) => {
     try {
         const response = await axios.post('auth/register', userData);
         console.log('Registro exitoso', response.data);
@@ -10,5 +9,4 @@ const registerUser = async (userData) => {
         throw error;
     }
 };
-
-export default registerUser;
+export default registerUserService;
