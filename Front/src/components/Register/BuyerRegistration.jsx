@@ -2,29 +2,45 @@ import React, { useState } from "react";
 import { Box, Typography, TextField, Button, Container, Grid, Paper, IconButton, InputAdornment, } from "@mui/material";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import CardInformationForm from './CardInformationForm';
+import { getDefaultRegisterModel } from "../../models/RegisterModel";
+import { validateEmail, validatePassword, validateAge, validateDNI} from "../../utils/registerFormValidations";
 import styles from "../../styles/styles";
 const formFields = [
-    { id: "firstName", placeholder: "Patricio*", name: "Name", autoComplete: "fname", autoFocus: true },
-    { id: "lastName", placeholder: "Letelier*", name: "Surname", autoComplete: "lname" },
-    { id: "email", placeholder: "letelier@upv.edu.es*", name: "Email", autoComplete: "email" },
+    { id: "firstName", name: "Name", placeholder: "Patricio*",  autoComplete: "fname", autoFocus: true },
+    { id: "lastName", name: "Surname", placeholder: "Letelier*",  autoComplete: "lname" },
+    { id: "email", name: "Email", placeholder: "letelier@upv.edu.es*",  autoComplete: "email" },
     { id: "dni", name: "DNI", placeholder: "12345678A*" },
-    { id: "password", placeholder: "PSW_curso_2023_2024*", name: "Password", autoComplete: "new-password", type: "password" },
-    { id: "age", name: "Date Of Birth", type: "date" }
+    { id: "password", name: "Password", placeholder: "PSW_curso_2023_2024*",  autoComplete: "new-password", type: "password" },
+    { id: "age", name: "Birth date", type: "date" }
 ];
 const BuyerRegistration = () => {
-    const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
-        email: "",
-        dni: "",
-        password: "",
-        dateOfBirth: "",
-        CardNumber: "",
-        ExpiryDate: "",
-        CVV: "",
-    });
+    const [formData, setFormData] = useState(getDefaultRegisterModel());
     const [showPassword, setShowPassword] = useState(false);
+    const [formErrors, setFormErrors] = useState({});
+    const isFormValid = () => {
+        const isAnyFieldEmpty = formFields.some(field => !formData[field.id]);
+        const isAnyFieldError = formFields.some(field => formErrors[field.id]);
+        return !isAnyFieldEmpty && !isAnyFieldError;
+    };
+    
     const handleChange = (e) => {
+        const { id, value } = e.target;
+        let errors = { ...formErrors };
+        if (id === 'email') {
+            errors.email = validateEmail(value) ? '' : 'Email is not valid!';
+        }
+        if (id === 'password') {
+            errors.password = validatePassword(value) ? '' : 'Password does not meet criteria!';
+        }
+        if (id === 'age') {
+            errors.age = validateAge(value) ? '' : 'Age is not valid!';
+        }
+        if (id === 'dni') {
+            errors.dni = validateDNI(value) ? '' : 'DNI is not valid!';
+        }
+        setFormErrors(errors);
+        setFormData({ ...formData, [id]: value });
     }
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -50,20 +66,21 @@ const BuyerRegistration = () => {
                                     {field.type === 'password' ? (
                                         <TextField
                                             {...field}
-                                            required
                                             fullWidth
-                                            value={formData[field.name]}
+                                            variant="outlined"
+                                            error={!!formErrors[field.id]}
+                                            helperText={formErrors[field.id]}
                                             onChange={handleChange}
                                             sx={styles.textfields}
-                                            inputProps={field.name === 'DNI' ? { maxLength: 9 } : {}}
+                                            value={formData[field.id]}
                                             type={showPassword ? 'text' : 'password'}
                                             InputProps={{
                                                 endAdornment: (
                                                     <InputAdornment position="end">
                                                         <IconButton
+                                                            aria-label="toggle password visibility"
                                                             onClick={togglePasswordVisibility}
                                                             edge="end"
-                                                            aria-label="toggle password visibility"
                                                         >
                                                             {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
                                                         </IconButton>
@@ -74,12 +91,13 @@ const BuyerRegistration = () => {
                                     ) : (
                                         <TextField
                                             {...field}
-                                            required
                                             fullWidth
-                                            value={formData[field.name]}
+                                            variant="outlined"
+                                            error={!!formErrors[field.id]}
+                                            helperText={formErrors[field.id]}
                                             onChange={handleChange}
                                             sx={styles.textfields}
-                                            inputProps={field.name === 'DNI' ? { maxLength: 9 } : {}}
+                                            value={formData[field.id]}
                                         />
                                     )}
                                 </Grid>
@@ -89,6 +107,7 @@ const BuyerRegistration = () => {
                                 fullWidth
                                 variant="contained"
                                 sx={styles.registerButton}
+                                disabled={!isFormValid()}
                             >
                                 Register BUYER
                             </Button>
@@ -99,65 +118,7 @@ const BuyerRegistration = () => {
                             <Typography component="h2" variant="h6" color="#629c44" mb={2}>
                                 Enter your card information (OPTIONAL)
                             </Typography>
-                            <Box component="form" onSubmit={handleSubmit} sx={styles.formContainer}>
-                                <Grid container spacing={3}>
-                                    <Grid item xs={12}>
-                                        <Typography variant="body2" color="232323" sx={{ textAlign: 'left' }}>
-                                            Card Number
-                                        </Typography>
-                                        <TextField
-                                            id="CardNumber"
-                                            name="CardNumber"
-                                            placeholder="1234-1234-1234-1234*"
-                                            required
-                                            fullWidth
-                                            value={formData.CardNumber}
-                                            onChange={handleChange}
-                                            inputProps={{ maxLength: 16 }}
-                                            sx={{ ...styles.textfields, backgroundColor: "white" }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body2" color="232323" sx={{ textAlign: 'left' }}>
-                                            Date of expiry
-                                        </Typography>
-                                        <TextField
-                                            id="ExpiryDate"
-                                            name="ExpiryDate"
-                                            placeholder="09/26*"
-                                            required
-                                            fullWidth
-                                            value={formData.ExpiryDate}
-                                            onChange={handleChange}
-                                            inputProps={{ maxLength: 5 }}
-                                            sx={{ ...styles.textfields, backgroundColor: "white" }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body2" color="232323" sx={{ textAlign: 'left' }}>
-                                            CVV
-                                        </Typography>
-                                        <TextField
-                                            id="CVV"
-                                            name="CVV"
-                                            placeholder="123*"
-                                            required
-                                            fullWidth
-                                            value={formData.CVV}
-                                            onChange={handleChange}
-                                            inputProps={{ maxLength: 3 }}
-                                            sx={{ ...styles.textfields, backgroundColor: "white" }}
-                                        />
-                                    </Grid>
-                                </Grid>
-                                <Button
-                                    type="submit"
-                                    fullWidth
-                                    sx={styles.registerButton}
-                                >
-                                    Save
-                                </Button>
-                            </Box>
+                            <CardInformationForm formData={formData} handleChange={handleChange} />
                         </Paper>
                     </Grid>
                 </Grid>
