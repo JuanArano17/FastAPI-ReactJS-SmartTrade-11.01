@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy_utils import database_exists, create_database
 from dotenv import load_dotenv
 
-#Base = declarative_base()
+# Base = declarative_base()
 from app.models.buyer import Buyer
 from app.models.address import Address
 from app.models.category import Category
@@ -37,7 +37,13 @@ def get_engine() -> Engine:
     return engine
 
 
-def get_session():
-    engine = get_engine()
-    session = sessionmaker(bind=engine)
-    return session()
+engine = create_engine(get_db_url(), pool_size=50, echo=True)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
