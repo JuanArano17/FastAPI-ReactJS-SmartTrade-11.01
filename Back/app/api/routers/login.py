@@ -8,10 +8,10 @@ from app.schemas.token import Token
 from app.api.deps import CurrentUserDep, UserServiceDep
 from app.core.security import create_access_token, authenticate_user
 
-router = APIRouter(prefix="/login", tags=["login"])
+router = APIRouter(tags=["login"])
 
 
-@router.post("/access-token")
+@router.post("/login/access-token")
 async def login_access_token(
     user_service: UserServiceDep,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
@@ -29,7 +29,7 @@ async def login_access_token(
     return Token(access_token=create_access_token(user.email), token_type="bearer")
 
 
-@router.post("/test-token")
+@router.post("/login/test-token")
 async def test_token(current_user: CurrentUserDep) -> Buyer | Seller:
     """
     Test access token
