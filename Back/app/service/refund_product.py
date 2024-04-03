@@ -8,7 +8,7 @@ from app.models.refund_product import RefundProduct
 from app.service.order import OrderService
 from app.service.product_line import ProductLineService
 from app.crud_repository import CRUDRepository
-from service.seller_product import SellerProductService
+from app.service.seller_product import SellerProductService
 
 
 class RefundProductService:
@@ -33,7 +33,7 @@ class RefundProductService:
     ) -> RefundProduct:
         order = self.order_service.get_buyer_order(id_buyer, id_order)
         product_line = self.product_line_service.get_by_id(id_product_line)
-        #seller_product=self.seller_product_service.get_by_id(product_line.id_seller_product)
+        # seller_product=self.seller_product_service.get_by_id(product_line.id_seller_product)
         if product_line.id_order != id_order:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -61,11 +61,11 @@ class RefundProductService:
         refund_product = RefundProduct(
             **refund_product.model_dump(), id_product_line=id_product_line
         )
-        
+
         product_line.quantity -= refund_product.quantity  # type: ignore
-        #must update seller product quantity whenever refund is made
-        #product_line.subtotal=seller_product.price*product_line.quantity
-        #seller_product.quantity += refund_product.quantity
+        # must update seller product quantity whenever refund is made
+        # product_line.subtotal=seller_product.price*product_line.quantity
+        # seller_product.quantity += refund_product.quantity
         refund_product = self.refund_product_repo.add(refund_product)
         return refund_product
 
@@ -104,7 +104,7 @@ class RefundProductService:
         self.buyer_service.get_by_id(id_buyer)
         order = self.order_service.get_buyer_order(id_buyer, id_order)
         product_line = self.product_line_service.get_by_id(id_product_line)
-        #seller_product=self.seller_product_service.get_by_id(product_line.id_seller_product)
+        # seller_product=self.seller_product_service.get_by_id(product_line.id_seller_product)
 
         if product_line.id_order != id_order:
             raise HTTPException(
@@ -119,7 +119,7 @@ class RefundProductService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"The refund product with id {refund_product_id} does not belong to the product line with id {id_product_line}.",
             )
-        
+
         if product_line.id_order != order.id:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -127,7 +127,7 @@ class RefundProductService:
             )
 
         product_line.quantity += refund_product.quantity  # type: ignore
-        #seller_product.quantity -= refund_product.quantity
+        # seller_product.quantity -= refund_product.quantity
         self.refund_product_repo.delete_by_id(refund_product_id)
 
     def delete_by_product_line(self, id_buyer, id_order, id_product_line):

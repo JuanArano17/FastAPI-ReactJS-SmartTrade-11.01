@@ -5,6 +5,7 @@ from app.service.user import UserService
 from app.schemas.seller import SellerCreate, SellerUpdate
 from app.models.seller import Seller
 from app.crud_repository import CRUDRepository
+from app.core.security import get_password_hash
 # from models.buyer import Buyer
 
 
@@ -18,7 +19,6 @@ class SellerRepository(CRUDRepository):
 
     def get_by_cif(self, cif: str) -> Seller | None:
         return self._db.query(self._model).filter(self._model.cif == cif).first()
-
 
 
 class SellerService:
@@ -40,7 +40,12 @@ class SellerService:
                 detail=f"Seller with cif {seller.cif} already exists.",
             )
 
-        return self.seller_repo.add(Seller(**seller.model_dump()))
+        return self.seller_repo.add(
+            Seller(
+                **seller.model_dump(exclude={"password"}),
+                password=get_password_hash(seller.password),
+            )
+        )
 
     def get_by_id(self, seller_id) -> Seller:
         if seller := self.seller_repo.get_by_id(seller_id):

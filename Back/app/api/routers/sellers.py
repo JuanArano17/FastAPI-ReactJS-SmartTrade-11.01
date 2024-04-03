@@ -1,32 +1,29 @@
 from fastapi import APIRouter
 
+from app.api.deps import SellerServiceDep
 from app.schemas.seller import Seller, SellerCreate, SellerUpdate
-from database import get_session
-from service.seller import SellerService
-from service.user import UserService
 
 router = APIRouter(prefix="/sellers", tags=["sellers"])
 
-session=get_session()
-user_service=UserService(session=session)
-seller_service=SellerService(session=session,user_service=user_service)
 
 @router.get("/", response_model=list[Seller])
-async def read_sellers():
+async def read_sellers(seller_service: SellerServiceDep):
     """
     Retrieve sellers.
     """
     return seller_service.get_all()
 
+
 @router.get("/{seller_id}", response_model=Seller)
-async def read_seller(*, seller_id: int):
+async def read_seller(*, seller_id: int, seller_service: SellerServiceDep):
     """
     Retrieve a seller.
     """
     return seller_service.get_by_id(seller_id)
 
+
 @router.post("/", response_model=Seller)
-async def create_seller(*, seller: SellerCreate):
+async def create_seller(*, seller: SellerCreate, seller_service: SellerServiceDep):
     """
     Create a new seller.
     """
@@ -34,14 +31,17 @@ async def create_seller(*, seller: SellerCreate):
 
 
 @router.put("/{seller_id}", response_model=Seller)
-async def update_seller(*, seller_id: int, seller: SellerUpdate):
+async def update_seller(
+    *, seller_id: int, seller: SellerUpdate, seller_service: SellerServiceDep
+):
     """
     Update a seller.
     """
-    return seller_service.update(seller_id,seller)
+    return seller_service.update(seller_id, seller)
+
 
 @router.delete("/{seller_id}")
-async def delete_seller(*, seller_id: int):
+async def delete_seller(*, seller_id: int, seller_service: SellerServiceDep):
     """
     Delete a seller.
     """
@@ -49,7 +49,7 @@ async def delete_seller(*, seller_id: int):
 
 
 @router.delete("/")
-async def delete_sellers():
+async def delete_sellers(seller_service: SellerServiceDep):
     """
     Delete all sellers.
     """

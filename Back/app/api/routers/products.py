@@ -1,16 +1,13 @@
 from fastapi import APIRouter
 
+from app.api.deps import ProductServiceDep
 from app.schemas.product import Product, ProductCreate, ProductUpdate
-from database import get_session
-from service.product import ProductService
 
 router = APIRouter(prefix="/products", tags=["products"])
 
-session=get_session()
-product_service=ProductService(session=session)
 
 @router.get("/", response_model=list[Product])
-async def read_products():
+async def read_products(product_service: ProductServiceDep):
     """
     Retrieve products.
     """
@@ -18,7 +15,7 @@ async def read_products():
 
 
 @router.get("/{product_id}", response_model=Product)
-async def read_product(*, product_id: int):
+async def read_product(*, product_id: int, product_service: ProductServiceDep):
     """
     Retrieve a product.
     """
@@ -26,7 +23,9 @@ async def read_product(*, product_id: int):
 
 
 @router.post("/{category_id}", response_model=Product)
-async def create_product(*, category_id:int , product: ProductCreate):
+async def create_product(
+    *, category_id: int, product: ProductCreate, product_service: ProductServiceDep
+):
     """
     Create a new product.
     """
@@ -34,15 +33,17 @@ async def create_product(*, category_id:int , product: ProductCreate):
 
 
 @router.put("/{product_id}", response_model=Product)
-async def update_product(*, product_id: int, product: ProductUpdate):
+async def update_product(
+    *, product_id: int, product: ProductUpdate, product_service: ProductServiceDep
+):
     """
     Update a product.
     """
-    return product_service.update(product_id,product)
+    return product_service.update(product_id, product)
 
 
 @router.delete("/{product_id}")
-async def delete_product(*, product_id: int):
+async def delete_product(*, product_id: int, product_service: ProductServiceDep):
     """
     Delete a product.
     """
@@ -50,7 +51,7 @@ async def delete_product(*, product_id: int):
 
 
 @router.delete("/")
-async def delete_products():
+async def delete_products(product_service: ProductServiceDep):
     """
     Delete all products.
     """
