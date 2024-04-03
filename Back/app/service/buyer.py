@@ -5,6 +5,7 @@ from app.service.user import UserService
 from app.schemas.buyer import BuyerCreate, BuyerUpdate
 from app.models.buyer import Buyer
 from app.crud_repository import CRUDRepository
+from app.core.security import get_password_hash
 
 
 class BuyerRepository(CRUDRepository):
@@ -17,7 +18,7 @@ class BuyerRepository(CRUDRepository):
 
     def get_by_dni(self, dni: str):  # -> Buyer | None:
         return self._db.query(self._model).filter(self._model.dni == dni).first()
-    
+
 
 class BuyerService:
     def __init__(self, session: Session, user_service: UserService):
@@ -38,7 +39,12 @@ class BuyerService:
                 detail=f"User with email {buyer.email} already exists.",
             )
 
-        return self.buyer_repo.add(Buyer(**buyer.model_dump()))
+        return self.buyer_repo.add(
+            Buyer(
+                **buyer.model_dump(exclude={"password"}),
+                password=get_password_hash(buyer.password),
+            )
+        )
 
     def get_all(self) -> list[Buyer]:
         return self.buyer_repo.get_all()
