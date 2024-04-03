@@ -1,33 +1,13 @@
 from fastapi import APIRouter
 
-from app.database import get_db
+from app.api.deps import WishListServiceDep
 from app.schemas.in_wish_list import InWishList, InWishListCreate
-from app.service.buyer import BuyerService
-from app.service.in_wish_list import InWishListService
-from app.service.product import ProductService
-from app.service.seller import SellerService
-from app.service.seller_product import SellerProductService
-from app.service.user import UserService
 
 router = APIRouter(prefix="/buyers/{buyer_id}/wish_list", tags=["wish_list"])
 
-session = get_db()
-user_service = UserService(session=session)
-buyer_service = BuyerService(session=session, user_service=user_service)
-seller_service = SellerService(session=session, user_service=user_service)
-product_service = ProductService(session=session)
-seller_product_service = SellerProductService(
-    session=session, seller_service=seller_service, product_service=product_service
-)
-wish_list_service = InWishListService(
-    session=session,
-    buyer_service=buyer_service,
-    seller_product_service=seller_product_service,
-)
-
 
 @router.get("/", response_model=list[InWishList])
-async def read_list_items(*, buyer_id: int):
+async def read_list_items(*, buyer_id: int, wish_list_service: WishListServiceDep):
     """
     Retrieve list items from buyer.
     """
@@ -36,7 +16,12 @@ async def read_list_items(*, buyer_id: int):
 
 
 @router.post("/", response_model=InWishList)
-async def create_list_item(*, buyer_id: int, wish_list_item: InWishListCreate):
+async def create_list_item(
+    *,
+    buyer_id: int,
+    wish_list_item: InWishListCreate,
+    wish_list_service: WishListServiceDep,
+):
     """
     Create a new wish list item for the buyer.
     """
@@ -44,7 +29,7 @@ async def create_list_item(*, buyer_id: int, wish_list_item: InWishListCreate):
 
 
 @router.delete("/")
-async def delete_list(buyer_id: int):
+async def delete_list(buyer_id: int, wish_list_service: WishListServiceDep):
     """
     Delete all list items from a buyer.
     """
@@ -52,7 +37,9 @@ async def delete_list(buyer_id: int):
 
 
 @router.delete("/{seller_product_id}")
-async def delete_list_item(*, buyer_id=int, seller_product_id: int):
+async def delete_list_item(
+    *, buyer_id=int, seller_product_id: int, wish_list_service: WishListServiceDep
+):
     """
     Delete an item from a wish list.
     """

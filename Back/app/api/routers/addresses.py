@@ -1,21 +1,13 @@
 from fastapi import APIRouter, HTTPException
 
-from app.database import get_db
+from app.api.deps import AddressServiceDep
 from app.schemas.address import Address, AddressCreate, AddressUpdate
-from app.service.address import AddressService
-from app.service.buyer import BuyerService
-from app.service.user import UserService
 
 router = APIRouter(prefix="/buyers/{buyer_id}/addresses", tags=["addresses"])
 
-session = get_db()
-user_service = UserService(session=session)
-buyer_service = BuyerService(session=session, user_service=user_service)
-address_service = AddressService(session=session, buyer_service=buyer_service)
-
 
 @router.get("/", response_model=list[Address])
-async def read_addresses(*, buyer_id: int):
+async def read_addresses(*, buyer_id: int, address_service: AddressServiceDep):
     """
     Retrieve addresses from buyer.
     """
@@ -23,7 +15,7 @@ async def read_addresses(*, buyer_id: int):
 
 
 @router.get("/default", response_model=Address)
-async def read_default(*, buyer_id: int):
+async def read_default(*, buyer_id: int, address_service: AddressServiceDep):
     """
     Retrieve default address from buyer.
     """
@@ -31,7 +23,9 @@ async def read_default(*, buyer_id: int):
 
 
 @router.post("/", response_model=Address)
-async def create_address(*, buyer_id: int, address: AddressCreate):
+async def create_address(
+    *, buyer_id: int, address: AddressCreate, address_service: AddressServiceDep
+):
     """
     Create a new address for the buyer.
     """
@@ -39,7 +33,7 @@ async def create_address(*, buyer_id: int, address: AddressCreate):
 
 
 @router.delete("/")
-async def delete_addresses(buyer_id: int):
+async def delete_addresses(buyer_id: int, address_service: AddressServiceDep):
     """
     Delete all addresses from a buyer.
     """
@@ -47,7 +41,9 @@ async def delete_addresses(buyer_id: int):
 
 
 @router.get("/{address_id}", response_model=Address)
-async def read_address(*, buyer_id: int, address_id: int):
+async def read_address(
+    *, buyer_id: int, address_id: int, address_service: AddressServiceDep
+):
     """
     Retrieve a specific buyer address.
     """
@@ -61,7 +57,13 @@ async def read_address(*, buyer_id: int, address_id: int):
 
 
 @router.put("/{address_id}", response_model=Address)
-async def update_address(*, buyer_id=int, address_id: int, address: AddressUpdate):
+async def update_address(
+    *,
+    buyer_id=int,
+    address_id: int,
+    address: AddressUpdate,
+    address_service: AddressServiceDep,
+):
     """
     Update an address.
     """
@@ -74,7 +76,9 @@ async def update_address(*, buyer_id=int, address_id: int, address: AddressUpdat
 
 
 @router.delete("/{address_id}")
-async def delete_address(*, buyer_id=int, address_id: int):
+async def delete_address(
+    *, buyer_id=int, address_id: int, address_service: AddressServiceDep
+):
     """
     Delete an address.
     """

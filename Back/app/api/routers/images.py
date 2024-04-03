@@ -1,19 +1,13 @@
 from fastapi import APIRouter, HTTPException
 
-from app.database import get_db
+from app.api.deps import ImageServiceDep
 from app.schemas.image import Image, ImageCreate, ImageUpdate
-from app.service.image import ImageService
-from app.service.product import ProductService
 
 router = APIRouter(prefix="/products/{product_id}/images", tags=["images"])
 
-session = get_db()
-product_service = ProductService(session=session)
-image_service = ImageService(session=session, product_service=product_service)
-
 
 @router.get("/", response_model=list[Image])
-async def read_images(*, product_id: int):
+async def read_images(*, product_id: int, image_service: ImageServiceDep):
     """
     Retrieve images from product.
     """
@@ -21,7 +15,9 @@ async def read_images(*, product_id: int):
 
 
 @router.post("/", response_model=Image)
-async def create_image(*, product_id: int, image: ImageCreate):
+async def create_image(
+    *, product_id: int, image: ImageCreate, image_service: ImageServiceDep
+):
     """
     Create a new image for the product.
     """
@@ -29,7 +25,7 @@ async def create_image(*, product_id: int, image: ImageCreate):
 
 
 @router.delete("/")
-async def delete_images(product_id: int):
+async def delete_images(product_id: int, image_service: ImageServiceDep):
     """
     Delete all image from a product.
     """
@@ -37,7 +33,7 @@ async def delete_images(product_id: int):
 
 
 @router.get("/{image_id}", response_model=Image)
-async def read_image(*, product_id: int, image_id: int):
+async def read_image(*, product_id: int, image_id: int, image_service: ImageServiceDep):
     """
     Retrieve a specific product image.
     """
@@ -51,7 +47,9 @@ async def read_image(*, product_id: int, image_id: int):
 
 
 @router.put("/{image_id}", response_model=Image)
-async def update_image(*, product_id=int, image_id: int, image: ImageUpdate):
+async def update_image(
+    *, product_id=int, image_id: int, image: ImageUpdate, image_service: ImageServiceDep
+):
     """
     Update an image.
     """
@@ -64,7 +62,9 @@ async def update_image(*, product_id=int, image_id: int, image: ImageUpdate):
 
 
 @router.delete("/{image_id}")
-async def delete_image(*, product_id=int, image_id: int):
+async def delete_image(
+    *, product_id=int, image_id: int, image_service: ImageServiceDep
+):
     """
     Delete an image.
     """

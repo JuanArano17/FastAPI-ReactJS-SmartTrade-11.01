@@ -1,19 +1,13 @@
 from fastapi import APIRouter
 
+from app.api.deps import BuyerServiceDep
 from app.schemas.buyer import Buyer, BuyerCreate, BuyerUpdate
-from app.database import get_db
-from app.service.buyer import BuyerService
-from app.service.user import UserService
 
 router = APIRouter(prefix="/buyers", tags=["buyers"])
 
-session = get_db()
-user_service = UserService(session=session)
-buyer_service = BuyerService(session=session, user_service=user_service)
-
 
 @router.get("/", response_model=list[Buyer])
-async def read_buyers():
+async def read_buyers(buyer_service: BuyerServiceDep):
     """
     Retrieve buyers.
     """
@@ -21,7 +15,7 @@ async def read_buyers():
 
 
 @router.get("/{buyer_id}", response_model=Buyer)
-async def read_buyer(*, buyer_id: int):
+async def read_buyer(*, buyer_id: int, buyer_service: BuyerServiceDep):
     """
     Retrieve a buyer.
     """
@@ -29,7 +23,7 @@ async def read_buyer(*, buyer_id: int):
 
 
 @router.post("/", response_model=Buyer)
-async def create_buyer(*, buyer: BuyerCreate):
+async def create_buyer(*, buyer: BuyerCreate, buyer_service: BuyerServiceDep):
     """
     Create a new buyer.
     """
@@ -37,7 +31,9 @@ async def create_buyer(*, buyer: BuyerCreate):
 
 
 @router.put("/{buyer_id}", response_model=Buyer)
-async def update_buyer(*, buyer_id: int, buyer: BuyerUpdate):
+async def update_buyer(
+    *, buyer_id: int, buyer: BuyerUpdate, buyer_service: BuyerServiceDep
+):
     """
     Update a buyer.
     """
@@ -45,7 +41,7 @@ async def update_buyer(*, buyer_id: int, buyer: BuyerUpdate):
 
 
 @router.delete("/{buyer_id}")
-async def delete_buyer(*, buyer_id: int):
+async def delete_buyer(*, buyer_id: int, buyer_service: BuyerServiceDep):
     """
     Delete a buyer.
     """
@@ -53,7 +49,7 @@ async def delete_buyer(*, buyer_id: int):
 
 
 @router.delete("/")
-async def delete_buyers():
+async def delete_buyers(buyer_service: BuyerServiceDep):
     """
     Delete all buyers.
     """
