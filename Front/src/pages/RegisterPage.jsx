@@ -18,7 +18,7 @@ const RegisterPage = () => {
 
     return (
         <Box>
-            <TopBar />
+            <TopBar showRegisterButton={false}/>
             {selectedOption === null ? (
                 <>
                     <Typography variant="h4" align="center" color="#629c44" marginTop={"20px"} marginBottom={"20px"}>

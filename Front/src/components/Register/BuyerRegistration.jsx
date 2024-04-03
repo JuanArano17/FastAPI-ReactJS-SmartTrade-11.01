@@ -3,7 +3,6 @@ import { Box, Typography, TextField, Button, Container, Grid, Paper, IconButton,
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import styles from "../../styles/styles";
-
 const formFields = [
     { id: "firstName", placeholder: "Patricio*", name: "Name", autoComplete: "fname", autoFocus: true },
     { id: "lastName", placeholder: "Letelier*", name: "Surname", autoComplete: "lname" },
@@ -12,7 +11,6 @@ const formFields = [
     { id: "password", placeholder: "PSW_curso_2023_2024*", name: "Password", autoComplete: "new-password", type: "password" },
     { id: "age", name: "Date Of Birth", type: "date" }
 ];
-
 const BuyerRegistration = () => {
     const [formData, setFormData] = useState({
         firstName: "",
@@ -25,83 +23,16 @@ const BuyerRegistration = () => {
         ExpiryDate: "",
         CVV: "",
     });
-
-    const [isValidPassword, setIsValidPassword] = useState(false);
-    const [isAllFieldsFilled, setIsAllFieldsFilled] = useState(false);
-    const [dniError, setDniError] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-
-    const validatePassword = (value) => {
-        // Use regex to validate password requirements
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        return passwordRegex.test(value);
-    };
-
-    const validateDNI = (value) => {
-        // Use regex to validate DNI format
-        const dniRegex = /^\d{8}[A-Z]$/;
-        return dniRegex.test(value);
-    };
-
     const handleChange = (e) => {
-        const { name, value } = e.target;
-
-        if (name === "Name" || name === "Surname") {
-            setFormData((prevData) => ({
-                ...prevData,
-                [name]: value.replace(/[^A-Za-z]/g, ""),
-            }));
-        } else if (name === "CVV" || name === "CardNumber") {
-            setFormData((prevData) => ({
-                ...prevData,
-                [name]: value.replace(/\D/g, ""),
-            }));
-        } else if (name === "DNI") {
-            const formattedDNI = value.replace(/[^A-Za-z0-9]/g, "");
-            setFormData((prevData) => ({
-                ...prevData,
-                [name]: formattedDNI.slice(0, -1) + formattedDNI.slice(-1),
-            }));
-            if (!validateDNI(formattedDNI)) {
-                setDniError("Invalid DNI format");
-            } else {
-                setDniError("");
-            }
-        } else if (name === "ExpiryDate") {
-            let formattedDate = value
-                .slice(0, 5)
-                .replace(/(\d{2})(\d{2})/, "$1/$2");
-            if (value.length === 2 && !value.includes("/")) {
-                formattedDate += "/";
-            }
-            setFormData((prevData) => ({
-                ...prevData,
-                [name]: formattedDate,
-            }));
-        } else if (name === "Password") {
-            setFormData((prevData) => ({
-                ...prevData,
-                [name]: value,
-            }));
-            setIsValidPassword(validatePassword(value));
-        } else {
-            setFormData((prevData) => ({ ...prevData, [name]: value }));
-        }
-
-        const requiredFields = ["firstName", "lastName", "email", "dni", "password", "age"];
-        const isFilled = requiredFields.every((field) => formData[field]);
-        setIsAllFieldsFilled(isFilled);
-    };
-
+    }
     const handleSubmit = (e) => {
         e.preventDefault();
         // Logic for communicating with backend
     };
-
     const togglePasswordVisibility = () => {
         setShowPassword((prev) => !prev);
     };
-
     return (
         <Container component="main" maxWidth="lg">
             <Paper elevation={3} sx={styles.paperContainer}>
@@ -125,8 +56,6 @@ const BuyerRegistration = () => {
                                             onChange={handleChange}
                                             sx={styles.textfields}
                                             inputProps={field.name === 'DNI' ? { maxLength: 9 } : {}}
-                                            error={field.name === 'DNI' && dniError !== ""}
-                                            helperText={field.name === 'DNI' && dniError}
                                             type={showPassword ? 'text' : 'password'}
                                             InputProps={{
                                                 endAdornment: (
@@ -151,8 +80,6 @@ const BuyerRegistration = () => {
                                             onChange={handleChange}
                                             sx={styles.textfields}
                                             inputProps={field.name === 'DNI' ? { maxLength: 9 } : {}}
-                                            error={field.name === 'DNI' && dniError !== ""}
-                                            helperText={field.name === 'DNI' && dniError}
                                         />
                                     )}
                                 </Grid>
@@ -162,7 +89,6 @@ const BuyerRegistration = () => {
                                 fullWidth
                                 variant="contained"
                                 sx={styles.registerButton}
-                                disabled={!isAllFieldsFilled || !isValidPassword}
                             >
                                 Register BUYER
                             </Button>
