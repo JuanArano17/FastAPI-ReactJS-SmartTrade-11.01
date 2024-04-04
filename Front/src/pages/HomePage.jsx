@@ -3,13 +3,14 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import Footer from "../components/Footer/Footer";
-import TopBar from "../components/TopBar/TopBar";
+import Footer from "../components/footer/Footer";
+import TopBar from "../components/topbar/TopBar";
+import styles from "../styles/styles";
 
 const HomePage = () => {
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            <TopBar toggleSearchBar='False'/>
+        <Box sx={styles.mainBox}>
+            <TopBar />
             <Container component="main" sx={{ mt: 4, mb: 4, flex: 1 }}>
                 <Grid container spacing={3} alignItems="center" justifyContent="center">
                     <Grid item xs={12} md={8}>
