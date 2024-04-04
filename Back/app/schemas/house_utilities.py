@@ -10,9 +10,9 @@ class HouseUtilitiesBase(BaseModel):
     eco_points: NonNegativeFloat
     spec_sheet: str = Field(min_length=1, max_length=240)
     stock: NonNegativeInt = Field(default=0)
-    brand: str = Field(min_length=1, max_length=30)
+    brand: str = Field(min_length=1, max_length=40)
     type: str = Field(min_length=1, max_length=20)
-    
+
 class HouseUtilitiesCreate(HouseUtilitiesBase):
     pass
 

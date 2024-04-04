@@ -10,7 +10,7 @@ class GameBase(BaseModel):
     eco_points: NonNegativeFloat
     spec_sheet: str = Field(min_length=1, max_length=240)
     stock: NonNegativeInt = Field(default=0)
-    publisher: str = Field(min_length=1, max_length=30)
+    publisher: str = Field(min_length=1, max_length=40)
     platform: str = Field(min_length=1, max_length=20)
     size: str = Field(max_length=7, pattern=r'^(\d+(\.\d+)?)(\s*[GgMmKk][Bb])?$')
 
