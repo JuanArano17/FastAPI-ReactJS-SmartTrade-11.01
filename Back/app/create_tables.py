@@ -5,6 +5,11 @@ from app.models.address import Address
 from app.models.product import Product
 from app.models.game import Game
 from app.models.book import Book
+from app.models.clothes import Clothes
+from app.models.electronics import Electronics
+from app.models.house_utilities import HouseUtilities
+from app.models.food import Food
+from app.models.electrodomestics import Electrodomestics
 from app.models.image import Image
 from app.models.card import Card
 from app.models.seller import Seller
