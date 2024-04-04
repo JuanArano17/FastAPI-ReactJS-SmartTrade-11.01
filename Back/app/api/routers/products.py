@@ -2,14 +2,14 @@ from typing import List, Union
 from fastapi import APIRouter
 
 from app.api.deps import ProductServiceDep
-from app.schemas.product import Product, ProductCreate, ProductUpdate
-from schemas.book import Book, BookCreate, BookUpdate
-from schemas.clothes import Clothes, ClothesCreate, ClothesUpdate
-from schemas.electrodomestics import Electrodomestics, ElectrodomesticsCreate, ElectrodomesticsUpdate
-from schemas.electronics import Electronics, ElectronicsCreate, ElectronicsUpdate
-from schemas.food import Food, FoodCreate, FoodUpdate
-from schemas.game import Game, GameCreate, GameUpdate
-from schemas.house_utilities import HouseUtilities, HouseUtilitiesCreate, HouseUtilitiesUpdate
+from app.schemas.product import Product
+from schemas.book import Book
+from schemas.clothes import Clothes
+from schemas.electrodomestics import Electrodomestics
+from schemas.electronics import Electronics
+from schemas.food import Food
+from schemas.game import Game
+from schemas.house_utilities import HouseUtilities
 
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -19,7 +19,7 @@ async def read_products(product_service: ProductServiceDep):
     """
     Retrieve products.
     """
-    return product_service.get_all()
+    return product_service.product_factory.get_all()
 
 
 @router.get("/{product_id}", response_model=(Union[Game,Book,Food,HouseUtilities,Electronics,Electrodomestics,Clothes]))
@@ -27,7 +27,7 @@ async def read_product(*, product_id: int, product_service: ProductServiceDep):
     """
     Retrieve a product.
     """
-    return product_service.product_repo.get_by_id(product_id)
+    return product_service.get_by_id(product_id)
 
 
 @router.post("/", response_model=(Union[Game,Book,Food,HouseUtilities,Electronics,Electrodomestics,Clothes]))

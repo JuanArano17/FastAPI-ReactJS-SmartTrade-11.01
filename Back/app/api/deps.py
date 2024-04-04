@@ -21,7 +21,6 @@ from app.service.address import AddressService
 from app.service.card import CardService
 from app.service.product import ProductService
 from app.service.order import OrderService
-from app.service.category import CategoryService
 from app.service.product_line import ProductLineService
 from app.service.seller_product import SellerProductService
 from app.service.refund_product import RefundProductService
@@ -99,13 +98,6 @@ def get_address_service(session: SessionDep, buyer_service: BuyerServiceDep):
 
 
 AddressServiceDep = Annotated[AddressService, Depends(get_address_service)]
-
-
-def get_category_service(session: SessionDep):
-    return CategoryService(session=session)
-
-
-CategoryServiceDep = Annotated[CategoryService, Depends(get_category_service)]
 
 
 def get_card_service(session: SessionDep, buyer_service: BuyerServiceDep):
