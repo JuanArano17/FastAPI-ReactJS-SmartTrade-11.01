@@ -4,28 +4,30 @@ from pydantic import BaseModel, ConfigDict, Field, NonNegativeFloat, NonNegative
 from app.schemas.image import Image
 from app.schemas.seller_product import SellerProduct
 
-
-class ProductBase(BaseModel):
+class FoodBase(BaseModel):
     name: str = Field(min_length=1, max_length=40)
     description: Optional[str] = None
     eco_points: NonNegativeFloat
     spec_sheet: str = Field(min_length=1, max_length=240)
     stock: NonNegativeInt = Field(default=0)
-
-
-class ProductCreate(ProductBase):
+    brand: str = Field(min_length=1, max_length=40)
+    type: str = Field(min_length=1, max_length=20)
+    ingredients: str = Field(min_length=1, max_length=60)
+    
+class FoodCreate(FoodBase):
     pass
 
-
-class ProductUpdate(ProductBase):
+class FoodUpdate(FoodBase):
     name: Optional[str] = Field(default=None, min_length=1, max_length=40)
     description: Optional[str] = None
     eco_points: Optional[NonNegativeFloat] = None
     spec_sheet: str = Field(default=None, min_length=1, max_length=240)
     stock: Optional[NonNegativeInt] = None
+    brand: Optional[str] = Field(default=None, min_length=1, max_length=30)
+    type: Optional[str] = Field(default=None, min_length=1, max_length=20)
+    ingredients: Optional[str] = Field(default=None, min_length=1, max_length=60)
 
-
-class Product(ProductBase):
+class Food(FoodBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

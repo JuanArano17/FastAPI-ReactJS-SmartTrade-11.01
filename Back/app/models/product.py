@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Float
+from sqlalchemy import Column, Integer, String, Float
 from sqlalchemy.orm import relationship
 from app.base import Base
 
@@ -7,16 +7,17 @@ class Product(Base):
     __tablename__ = "Product"
 
     id = Column(Integer, primary_key=True, index=True)
-    id_category = Column(
-        Integer,
-        ForeignKey("Category.id", ondelete="CASCADE", name="fk_product_category_id"),
-        nullable=False,
-    )
     name = Column(String(255), nullable=False)
     description = Column(String(255))
     eco_points = Column(Float, nullable=False)
     spec_sheet = Column(String(255), nullable=False)
     stock = Column(Integer, nullable=False)
+    category = Column(String, nullable=False)
+
+    __mapper_args__ = {
+        "polymorphic_identity": "Product",
+        "polymorphic_on": category,
+    }
 
     images = relationship(
         "Image", back_populates="product", cascade="all, delete-orphan"
@@ -27,7 +28,6 @@ class Product(Base):
         cascade="all, delete-orphan",
         passive_deletes=True,
     )
-    category = relationship("Category", back_populates="products")
 
     def __repr__(self):
-        return f"Product(id={self.id}, id_category={self.id_category}, name='{self.name}', description='{self.description}', eco_points={self.eco_points}, spec_sheet='{self.spec_sheet}', stock={self.stock})"
+        return f"Product(id={self.id}, name='{self.name}', description='{self.description}', eco_points={self.eco_points}, spec_sheet='{self.spec_sheet}', stock={self.stock}, type={self.category})"
