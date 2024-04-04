@@ -31,6 +31,5 @@ class Game(GameBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    id_category: int
     images: List[Image]
     seller_products: List[SellerProduct] = []

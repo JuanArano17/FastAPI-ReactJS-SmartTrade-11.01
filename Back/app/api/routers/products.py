@@ -25,7 +25,7 @@ async def read_product(*, product_id: int):
     return product_service.get_by_id(product_id)
 
 
-@router.post("/{category_name}")
+@router.post("/")
 async def create_product(*, category_name:str , product: dict):
     """
     Create a new product.

@@ -17,10 +17,6 @@ class ProductCreate(ProductBase):
     pass
 
 
-class ProductCreateWithCategory(ProductCreate):
-    id_category: int
-
-
 class ProductUpdate(ProductBase):
     name: Optional[str] = Field(default=None, min_length=1, max_length=40)
     description: Optional[str] = None
@@ -33,6 +29,5 @@ class Product(ProductBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    id_category: int
     images: List[Image]
     seller_products: List[SellerProduct] = []

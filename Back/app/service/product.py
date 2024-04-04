@@ -18,7 +18,7 @@ class ProductService:
         self.product_factory=ProductFactory(service=self)
 
     def add(self, category:str, product_data: dict):
-        self.product_factory.create_product(category=category, product_data=product_data)
+        return self.product_factory.create_product(category=category, product_data=product_data)
 
     def get_by_id(self, product_id):
         #if product := self.product_repo.get_by_id(product_id):
@@ -40,10 +40,10 @@ class ProductService:
 
     def delete_by_id(self, product_id):
         #self.product_repo.delete_by_id(product_id)
-        self.product_factory.delete_product_by_id(product_id=product_id)
+        self.product_repo.delete_by_id(id=product_id)
 
     def delete_all(self):
-        self.product_factory.delete_all()
+        self.product_repo.delete_all()
 
 class ProductFactory:
     def __init__ (self, service:ProductService):
@@ -52,10 +52,10 @@ class ProductFactory:
     def create_product(self, category: str, product_data: dict):
         if category.lower() == 'book':
             product = BookCreate(**product_data)
-            self.service.book_repo.add(Book(**product.model_dump()))
+            return self.service.book_repo.add(Book(**product.model_dump()))
         elif category.lower() == 'game':
             product = GameCreate(**product_data)
-            self.service.game_repo.add(Game(**product.model_dump()))
+            return self.service.game_repo.add(Game(**product.model_dump()))
         else:
             raise ValueError("Invalid product category")
         
@@ -73,21 +73,10 @@ class ProductFactory:
             return self.service.book_repo.get_by_id(product_id)
         elif product.category.lower() == 'game':
             return self.service.game_repo.get_by_id(product_id)
-        
-    def delete_product_by_id(self, product_id:int):
-        product=self.service.product_repo.get_by_id(product_id)
-        if product.category.lower() == 'book':
-            return self.service.book_repo.delete_by_id(product_id)
-        elif product.category.lower() == 'game':
-            return self.service.game_repo.delete_by_id(product_id)
 
     def get_all(self):
         products=self.service.game_repo.get_all()
-        products.append(self.service.book_repo.get_all())
+        products+=self.service.book_repo.get_all()
         return products
     
-    def delete_all(self):
-        self.service.game_repo.delete_all()
-        self.service.book_repo.delete_all()
-        
 

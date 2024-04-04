@@ -15,7 +15,7 @@ class BuyerBase(BaseModel):
     # TODO: change it later for a more formal validation
     dni: str = Field(min_length=9, max_length=9, pattern=r"^\d{8}[a-zA-Z]$")
     billing_address: str = Field(min_length=1, max_length=100)
-    payment_method: str = Field(min_length=1, max_length=20)
+    payment_method: str = Field(default="Credit Card",min_length=1, max_length=20)
 
 
 class BuyerCreate(BuyerBase):

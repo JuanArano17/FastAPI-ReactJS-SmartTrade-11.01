@@ -97,7 +97,7 @@ for i in range(num_buyers):
         "eco_points": 0.0,
         "dni": dni,
         "billing_address": faker.address(),
-        "payment_method": random.choice(["Credit Card", "PayPal", "Bizum"]),
+        "payment_method": "Credit Card",
         "password": faker.password(length=12)
     }
 
