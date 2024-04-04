@@ -1,5 +1,5 @@
 import axios from '../AxiosInstance'; 
-const registerUserService = async (userData) => {
+const registerUserBuyerService = async (userData) => {
     try {
         const response = await axios.post('auth/register', userData);
         console.log('Registro exitoso', response.data);
@@ -9,4 +9,14 @@ const registerUserService = async (userData) => {
         throw error;
     }
 };
-export default registerUserService;
+const registerUserSellerService = async (userData) => {
+    try {
+        const response = await axios.post('auth/register', userData);
+        console.log('Registro exitoso', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Hubo un error al registrar al usuario:', error);
+        throw error;
+    }
+};
+export default {registerUserSellerService, registerUserBuyerService};

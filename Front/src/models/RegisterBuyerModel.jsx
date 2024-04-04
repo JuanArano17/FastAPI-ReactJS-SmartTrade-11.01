@@ -1,8 +1,8 @@
-export const getDefaultRegisterModel = () => ({
+export const getDefaultRegisterBuyerModel = () => ({
     firstName: "",
     lastName: "",
     email: "",
     dni: "",
     password: "",
-    dateOfBirth: new Date(),
+    birthDate: new Date(),
 });

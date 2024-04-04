@@ -3,11 +3,11 @@ import { Box, Typography, TextField, Button, Container, Grid, Paper, IconButton,
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import CardInformationForm from '../cardInfo/CardInformationForm';
-import { getDefaultRegisterModel } from "../../models/RegisterModel";
+import { getDefaultRegisterBuyerModel } from "../../models/RegisterBuyerModel";
 import { getDefaultCardInformationModel } from "../../models/CardInformationModel";
 import { validateEmail, validatePassword, validateAge, validateDNI } from "../../utils/registerFormValidations";
 import styles from "../../styles/styles";
-import registerUserService from "../../api/services/user/AuthService";
+import registerUserBuyerService from "../../api/services/user/AuthService";
 import registerCardService from "../../api/services/user/BuyerService";
 const formFields = [
     { id: "firstName", name: "Name", placeholder: "Patricio*", autoComplete: "fname", autoFocus: true },
@@ -18,7 +18,7 @@ const formFields = [
     { id: "age", name: "Birth date", type: "date" }
 ];
 const BuyerRegistration = () => {
-    const [formData, setFormData] = useState(getDefaultRegisterModel());
+    const [formData, setFormData] = useState(getDefaultRegisterBuyerModel());
     const [cardData, setCardData] = useState(getDefaultCardInformationModel());
     const [showPassword, setShowPassword] = useState(false);
     const [formErrors, setFormErrors] = useState({});
@@ -27,10 +27,7 @@ const BuyerRegistration = () => {
     };
     const handleCardChange = (e) => {
         const { name, value } = e.target;
-        setCardData(prevCardData => ({
-            ...prevCardData,
-            [name]: value
-        }));
+        setCardData(prevCardData => ({ ...prevCardData, [name]: value }));
     };
     const isFormValid = () => {
         const isAnyFieldEmpty = formFields.some(field => !formData[field.id]);
@@ -59,9 +56,9 @@ const BuyerRegistration = () => {
         e.preventDefault();
         if (isFormValid()) {
             try {
-                console.log('Se esta intentando registrar un usuario')
-                const userResponse = await registerUserService(formData);
-                console.log('Se a registrado un usuario', userResponse)
+                console.log('Se esta intentando registrar un usuario Buyer')
+                const userResponse = await registerUserBuyerService(formData);
+                console.log('Se a registrado un usuario Buyer', userResponse)
                 const userId = userResponse.userId;
                 if (userId && Object.values(cardData).some(value => value !== "")) {
                     try {

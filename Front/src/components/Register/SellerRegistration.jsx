@@ -1,51 +1,143 @@
 import React, { useState } from "react";
-import { Box, Typography, TextField, Button, Container, Grid, Paper } from "@mui/material";
+import { Box, Typography, TextField, Button, Container, Grid, Paper, IconButton, InputAdornment, } from "@mui/material";
+import { getDefaultRegisterSellerModel } from "../../models/RegisterSellerModel";
+import { validateEmail, validatePassword, validateAge, validateCIF } from "../../utils/registerFormValidations";
+import registerUserSellerService from "../../api/services/user/AuthService";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import styles from "../../styles/styles";
 const formFields = [
-    { id: "firstName", label: "Patricio", name: "Name", autoComplete: "fname", autoFocus: true },
-    { id: "lastName", label: "Letelier", name: "Surname", autoComplete: "lname" },
-    { id: "email", label: "letelier@upv.edu.es", name: "Email", autoComplete: "email" },
-    { id: "password", label: "PSW_curso_2023_2024", name: "Password", autoComplete: "new-password", type: "password" },
-    { id: "age", name: "Date Of Birth", type: "date" },
+    { id: "firstName", name: "Name", label: "Patricio", autoComplete: "fname", autoFocus: true },
+    { id: "lastName", name: "Surname", label: "Letelier", autoComplete: "lname" },
+    { id: "email", name: "Email", label: "letelier@upv.edu.es", autoComplete: "email" },
+    { id: "password", name: "Password", label: "PSW_curso_2023_2024", autoComplete: "new-password", type: "password" },
+    { id: "age", name: "Birth date", type: "date" },
 ];
+const formBankFields = [
+    { id: "cif", name: "CIF", label: "CIF", autoComplete: "cif" },
+    { id: "bankData", name: "Bank data", label: "your bank data", autoComplete: "cif" }
+]
 const SellerRegistration = () => {
-    const [formData, setFormData] = useState({
-        firstName: "",
-        lastName: "",
-        email: "",
-        password: "",
-        dateOfBirth: "",
-    });
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({ ...prevData, [name]: value }));
+    const [formData, setFormData] = useState(getDefaultRegisterSellerModel());
+    const [formErrors, setFormErrors] = useState({});
+    const [showPassword, setShowPassword] = useState(false);
+    const togglePasswordVisibility = () => {
+        setShowPassword((prev) => !prev);
     };
-    const handleSubmit = (e) => {
+    const isFormValid = () => {
+        const isAnyFieldEmpty = formFields.some(field => !formData[field.id]);
+        const isAnyFieldError = formFields.some(field => formErrors[field.id]);
+        return !isAnyFieldEmpty && !isAnyFieldError;
+    };
+    const handleChange = (e) => {
+        const { id, value } = e.target;
+        let errors = { ...formErrors };
+        if (id === 'email') {
+            errors.email = validateEmail(value) ? '' : 'Email is not valid!';
+        }
+        if (id === 'password') {
+            errors.password = validatePassword(value) ? '' : 'Password does not meet criteria!';
+        }
+        if (id === 'age') {
+            errors.age = validateAge(value) ? '' : 'Age is not valid!';
+        }
+        if (id === 'cif') {
+            errors.cif = validateCIF(value) ? '' : 'CIF is not valid!';
+        }
+        setFormErrors(errors);
+        setFormData((prevData) => ({ ...prevData, [id]: value }));
+    };
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Lógica comunicación con backend
+        if (isFormValid()) {
+            try {
+                console.log('Se esta intentando registrar un usuario Seller')
+                const userResponse = await registerUserSellerService(formData);
+                console.log('Se a registrado un usuario Seller', userResponse)
+            } catch (error) {
+                console.error('Hubo un error al registrar al usuario:', error);
+            }
+        } else {
+            console.log('El formulario no es válido.');
+        }
     };
     return (
-        <Container component="main" maxWidth="xs">
+        <Container component="main" maxWidth="lg">
             <Paper elevation={3} sx={styles.paperContainer}>
-                <Typography component="h1" variant="h5" color="#629c44">
+                <Typography component="h1" variant="h5" color="#629c44" mb={2} textAlign="center">
                     Register
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} sx={styles.formContainer}>
-                    <Grid container spacing={2}>
-                        {formFields.map((field) => (
-                            <Grid item xs={12} key={field.id}>
-                                <Typography variant="body2" color="232323" sx={{ textAlign: 'left' }}>
-                                    {field.name}
+                    <Grid container spacing={3}>
+                        <Grid item xs={12} md={6}>
+                            {formFields.map((field) => (
+                                <Box key={field.id} mb={2}>
+                                    <Typography variant="body2" sx={{ textAlign: 'left' }}>{field.name}</Typography>
+                                    {field.id === 'password' ? (
+                                        <TextField
+                                            fullWidth
+                                            required
+                                            {...field}
+                                            error={!!formErrors[field.id]}
+                                            helperText={formErrors[field.id]}
+                                            value={formData[field.name]}
+                                            onChange={handleChange}
+                                            type={showPassword ? 'text' : 'password'}
+                                            InputProps={{
+                                                endAdornment: (
+                                                    <InputAdornment position="end">
+                                                        <IconButton
+                                                            aria-label="toggle password visibility"
+                                                            onClick={togglePasswordVisibility}
+                                                        >
+                                                            {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                                                        </IconButton>
+                                                    </InputAdornment>
+                                                ),
+                                            }}
+                                            sx={styles.textField}
+                                        />
+                                    ) : (
+                                        <TextField
+                                            fullWidth
+                                            required
+                                            {...field}
+                                            error={!!formErrors[field.id]}
+                                            helperText={formErrors[field.id]}
+                                            value={formData[field.name]}
+                                            onChange={handleChange}
+                                            sx={styles.textField}
+                                        />
+                                    )}
+                                </Box>
+                            ))}
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <Paper elevation={3} sx={{ ...styles.paperContainer, backgroundColor: "#f2f2f7", padding: '16px' }}>
+                                <Typography component="h2" variant="h6" mb={2}>
+                                    Enter your bank information
                                 </Typography>
-                                <TextField
-                                    {...field}
-                                    required
-                                    fullWidth
-                                    value={formData[field.name]}
-                                    onChange={handleChange}
-                                />
-                            </Grid>
-                        ))}
+                                {formBankFields.map((field) => (
+                                    <Box key={field.id} mb={2}>
+                                        <Typography variant="body2" color="232323" sx={{ textAlign: 'left' }}>
+                                            {field.name}
+                                        </Typography>
+                                        <TextField
+                                            {...field}
+                                            required
+                                            fullWidth
+                                            value={formData[field.name]}
+                                            onChange={handleChange}
+                                            sx={styles.textField}
+                                            InputProps={{
+                                                sx: styles.textfields
+                                            }}
+                                        />
+
+                                    </Box>
+                                ))}
+                            </Paper>
+                        </Grid>
                     </Grid>
                     <Button
                         type="submit"
@@ -53,7 +145,7 @@ const SellerRegistration = () => {
                         variant="contained"
                         sx={styles.registerButton}
                     >
-                        Register
+                        Register Seller
                     </Button>
                 </Box>
             </Paper>
