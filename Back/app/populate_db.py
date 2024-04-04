@@ -4,7 +4,7 @@ from app.service.seller import SellerService
 from app.service.buyer import BuyerService
 from app.service.card import CardService
 from app.service.category import CategoryService
-from app.database import get_db
+from app.database import SessionLocal as get_db
 from datetime import datetime, timedelta
 from app.service.seller_product import SellerProductService
 from app.schemas.address import AddressCreate
@@ -29,8 +29,6 @@ from app.service.refund_product import RefundProductService
 from app.schemas.refund_product import RefundProductCreate
 from app.schemas.order import OrderCreate
 from app.service.user import UserService
-from sqlalchemy.orm import sessionmaker
-from app.database import get_engine
 from faker import Faker
 
 
@@ -91,10 +89,10 @@ num_orders = 40
 num_product_lines_per_order = 2
 
 
-# Initialize SQLAlchemy session
-engine = get_engine()
-Session = sessionmaker(bind=engine)
-session = Session()
+# # Initialize SQLAlchemy session
+# engine = get_engine()
+# Session = sessionmaker(bind=engine)
+# session = Session()
 
 used_emails = []
 used_dnis = []
