@@ -78,6 +78,7 @@ class BuyerService:
     def delete_by_id(self, id):
         self.buyer_repo.get_by_id(id)
         self.buyer_repo.delete_by_id(id)
+        self.user_service._user_repository.delete_by_id(id)
 
     def delete_all(self):
         self.buyer_repo.delete_all()
