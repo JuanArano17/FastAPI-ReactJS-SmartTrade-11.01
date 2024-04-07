@@ -6,6 +6,7 @@ from app.schemas.seller import SellerCreate, SellerUpdate
 from app.models.seller import Seller
 from app.crud_repository import CRUDRepository
 from app.core.security import get_password_hash
+from schemas.user import UserUpdate
 # from models.buyer import Buyer
 
 
@@ -76,12 +77,24 @@ class SellerService:
                 detail=f"Seller with CIF {new_data.cif} already exists.",
             )
 
-        return self.seller_repo.update(seller, new_data)
+        common_attributes = {}
+        for key in ["email", "name", "surname", "password"]:
+                common_attributes[key] = getattr(new_data, key)
+                setattr(new_data, key, None)  # Set attribute to None after fetching its value
+            
+        if any(value is not None for value in common_attributes.values()):
+            user_update=UserUpdate(**common_attributes)
+            self.user_service._user_repository.update(seller,user_update)
+    
+        if all(value is None for value in vars(new_data).values()):
+            return self.get_by_id(seller_id)
+        
+        return self.seller_repo.update(self.get_by_id(seller_id), new_data)
 
     def delete_by_id(self, seller_id):
-        self.get_by_id(seller_id)
+        self.seller_repo.get_by_id(seller_id)
         self.seller_repo.delete_by_id(seller_id)
-        self.user_service._user_repository.delete_by_id(id)
+        self.user_service._user_repository.delete_by_id(seller_id)
 
     def delete_all(self):
         self.seller_repo.delete_all()

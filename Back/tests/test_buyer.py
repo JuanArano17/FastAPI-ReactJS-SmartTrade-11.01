@@ -12,6 +12,7 @@ buyer_service=BuyerService(session=session,user_service=user_service)
 
 
 class TestBuyer(unittest.TestCase):
+    
     def test_add(self):
         buyer_data=BuyerCreate(email="john201@gmail.com", name="John", surname="Webster", eco_points=0,dni="49764160P", billing_address="Main Street", payment_method="Credit Card", password="password")
         buyer=buyer_service.add(buyer_data)

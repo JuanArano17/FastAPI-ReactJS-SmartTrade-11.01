@@ -26,6 +26,7 @@ class SellerUpdate(SellerBase):
     cif: Optional[str] = Field(
         default=None, pattern=r"^[A-Z][0-9]{8}$"
     )
+    password: Optional[str] = None
 
 
 class Seller(SellerBase):
