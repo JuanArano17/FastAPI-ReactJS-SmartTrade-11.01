@@ -10,7 +10,7 @@ class UserRepository(CRUDRepository):
 
     def get_by_email(self, email: str) -> User | None:
         return self._db.query(User).filter(User.email == email).first()
-
+    
 
 class UserService:
     def __init__(self, *, session: Session) -> None:
