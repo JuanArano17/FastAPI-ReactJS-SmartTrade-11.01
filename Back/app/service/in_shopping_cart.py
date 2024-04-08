@@ -89,6 +89,9 @@ class InShoppingCartService:
         cart_product = InShoppingCart(
             **shopping_cart_product.model_dump(), id_buyer=id_buyer
         )
+
+        # Add the shopping cart as an observer to the seller product
+        seller_product.attach(cart_product)
         self.cart_repo.add(cart_product)
         return cart_product
 
@@ -119,7 +122,9 @@ class InShoppingCartService:
         return self.cart_repo.update(cart_item, new_data)
 
     def delete_by_id(self, id_buyer, id_seller_product):
-        self.get_by_id(id_buyer, id_seller_product)
+        cart_product=self.get_by_id(id_buyer, id_seller_product)
+        seller_product=self.seller_product_service.get_by_id(id_seller_product)
+        seller_product.detach(cart_product)
         self.cart_repo.delete_by_id(
             id_buyer=id_buyer, id_seller_product=id_seller_product
         )

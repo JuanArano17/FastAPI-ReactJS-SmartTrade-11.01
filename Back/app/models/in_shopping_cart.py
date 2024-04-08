@@ -27,3 +27,9 @@ class InShoppingCart(Base):
 
     def __repr__(self):
         return f"InShoppingCart(id_seller_product={self.id_seller_product}, id_buyer={self.id_buyer}, quantity={self.quantity})"
+
+    def update_quantity(self, new_quantity: int):
+        if self.quantity > new_quantity:
+            self.quantity = new_quantity
+        
+    
