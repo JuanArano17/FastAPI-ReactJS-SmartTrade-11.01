@@ -11,7 +11,8 @@ const registerUserBuyerService = async (buyerData) => {
         payment_method: 'Credit Card', 
     };
     try {
-        const response = await axios.post('/buyers', validBuyerData);
+        console.log("buyer: ", validBuyerData)
+        const response = await axios.post('http://127.0.0.1:8000/buyers', validBuyerData);
         console.log('Registro de comprador exitoso', response.data);
         return response.data;
     } catch (error) {
