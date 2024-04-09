@@ -5,7 +5,6 @@ const styles = {
         minHeight: '100vh' 
     },
     paperContainer: {
-        mt: 3,
         p: 4,
         boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
         borderRadius: "20px",
@@ -61,6 +60,17 @@ const styles = {
     headerText:{
         color:"#629c44" ,
         fontWeight:"bold",
-    }
+    },
+    headerText: {
+        fontWeight: "bold",
+        color: "#232323", 
+        display: 'flex',
+        alignItems: 'center',
+    },
+    ThickDivider: {
+        backgroundColor: "#232323", 
+        height: "2px",
+        margin: "20px 0", 
+    },
 }
 export default styles;

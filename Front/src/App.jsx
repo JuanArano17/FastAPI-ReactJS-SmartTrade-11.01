@@ -6,6 +6,7 @@ import RegisterSellerPage from './pages/RegisterSellerPage';
 import RegisterBuyerPage from './pages/RegisterBuyerPage';
 import LoginPage from './pages/LoginPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ProductDetailPage from './pages/ProductDetailPage';
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Switch>
           <Route path="/home" component={HomePage} />
           <Route path="/login" component={LoginPage} />
+          <Route path="/Details" component={ProductDetailPage} />
           <Route path="/forgotPassword" component={ForgotPasswordPage} />
           <Route path="/register" component={RegisterSelectionPage} />
           <Route path="/registerSeller" component={RegisterSellerPage} />
