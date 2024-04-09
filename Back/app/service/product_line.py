@@ -7,6 +7,7 @@ from app.models.product_line import ProductLine
 from app.service.order import OrderService
 from app.service.seller_product import SellerProductService
 from app.crud_repository import CRUDRepository
+from schemas.seller_product import SellerProductUpdate
 
 
 class ProductLineService:
@@ -59,7 +60,9 @@ class ProductLineService:
         product_line = ProductLine(**product_line.model_dump(), id_order=id_order)
         order.total += product_line.subtotal  # type: ignore
 
-        seller_product.quantity -= product_line.quantity  # type: ignore
+        #seller_product.quantity -= product_line.quantity  # type: ignore
+        seller_product_update=SellerProductUpdate(quantity=seller_product.quantity-product_line.quantity)
+        self.seller_product_service.update(seller_product.id,seller_product_update)
         product_line = self.product_line_repo.add(product_line)
         return product_line
 
