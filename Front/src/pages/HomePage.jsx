@@ -11,7 +11,7 @@ const HomePage = () => {
     return (
         <Box sx={styles.mainBox}>
             <TopBar />
-            <Container component="main" sx={{ mt: 4, mb: 4, flex: 1 }}>
+            <Container component="main" maxWidth ="xs" sx={styles.mainContainer}>
                 <Grid container spacing={3} alignItems="center" justifyContent="center">
                     <Grid item xs={12} md={8}>
                         <Typography variant="h3" align="center" gutterBottom color="#629c44">

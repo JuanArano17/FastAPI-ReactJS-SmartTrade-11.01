@@ -1,11 +1,10 @@
 const styles = {
-    mainBox:{
-        display: 'flex', 
-        flexDirection: 'column', 
-        minHeight: '100vh' 
+    mainBox: {
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh'
     },
     paperContainer: {
-        mt: 3,
         p: 4,
         boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)',
         borderRadius: '20px',
@@ -47,12 +46,43 @@ const styles = {
         width: '100%',
         borderRadius: '15px'
     },
-    textfields:{
-        borderColor: 'black', 
-        borderWidth: '1px', 
+    textfields: {
+        borderColor: 'black',
+        borderWidth: '1px',
         borderStyle: 'solid',
         borderRadius: '5px',
         backgroundColor: 'white',
     },
+    mainContainer: {
+        mt: 4,
+        mb: 4,
+        flex: 1
+    },
+    headerText: {
+        color: "#629c44",
+        fontWeight: "bold",
+    },
+    headerText: {
+        fontWeight: "bold",
+        color: "#232323",
+        display: 'flex',
+        alignItems: 'center',
+    },
+    ThickDivider: {
+        backgroundColor: "#232323",
+        height: "2px",
+        margin: "20px 0",
+    },
+    clearFiltersButtonStyle: {
+        minWidth: '120px',
+        border: '1px solid #000',
+        borderRadius: '4px',
+        backgroundColor: '#fff',
+        color: '#000',
+        padding: '6px 16px',
+        '&:hover': {
+            backgroundColor: '#f5f5f5',
+        },
+    }
 }
 export default styles;
