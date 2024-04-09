@@ -21,10 +21,10 @@ class Buyer(User):
     addresses = relationship(
         "Address", back_populates="buyer", cascade="all, delete-orphan"
     )
-    in_shopping_cart = relationship(
+    in_shopping_carts = relationship(
         "InShoppingCart", back_populates="buyer", cascade="all, delete-orphan"
     )
-    in_wish_list = relationship(
+    in_wish_lists = relationship(
         "InWishList", back_populates="buyer", cascade="all, delete-orphan"
     )
     cards = relationship("Card", back_populates="buyer", cascade="all, delete-orphan")

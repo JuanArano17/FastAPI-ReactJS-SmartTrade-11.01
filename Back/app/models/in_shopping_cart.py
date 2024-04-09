@@ -22,14 +22,10 @@ class InShoppingCart(Base):
     )
     quantity = Column(Integer, nullable=False)
 
-    seller_products = relationship("SellerProduct", back_populates="in_shopping_cart")
-    buyer = relationship("Buyer", back_populates="in_shopping_cart")
+    seller_product = relationship("SellerProduct", back_populates="in_shopping_carts")
+    buyer = relationship("Buyer", back_populates="in_shopping_carts")
 
     def __repr__(self):
         return f"InShoppingCart(id_seller_product={self.id_seller_product}, id_buyer={self.id_buyer}, quantity={self.quantity})"
-
-    def update_quantity(self, new_quantity: int):
-        if self.quantity > new_quantity:
-            self.quantity = new_quantity
         
     
