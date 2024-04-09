@@ -119,7 +119,6 @@ class InShoppingCartService:
         return self.cart_repo.update(cart_item, new_data)
 
     def delete_by_id(self, id_buyer, id_seller_product):
-        self.get_by_id(id_buyer, id_seller_product)
         self.cart_repo.delete_by_id(
             id_buyer=id_buyer, id_seller_product=id_seller_product
         )

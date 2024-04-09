@@ -73,6 +73,7 @@ class SellerProductService:
         if new_data.quantity:
             product = self.product_service.get_by_id(seller_product.id_product)
             product.stock += new_data.quantity - seller_product.quantity  # type: ignore
+            seller_product.notify_observers(new_data.quantity)
 
         return self.seller_product_repo.update(seller_product, new_data)
 
