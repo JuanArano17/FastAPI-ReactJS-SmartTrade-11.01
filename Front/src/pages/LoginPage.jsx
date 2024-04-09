@@ -9,7 +9,7 @@ import {
   Paper,
   Link, 
 } from "@mui/material";
-import { useHistory } from "react-router-dom"; // Importar useHistory para la redirección
+import { useHistory } from "react-router-dom";
 import TopBar from "../components/TopBar/TopBar";
 import Footer from "../components/Footer/Footer";
 import styles from "../styles/styles";
@@ -22,7 +22,7 @@ const LoginPage = () => {
     rememberMe: false,
   });
 
-  const history = useHistory(); // Obtener la instancia de history
+  const history = useHistory();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -39,7 +39,7 @@ const LoginPage = () => {
   };
 
   const handleForgotPasswordClick = () => {
-    history.push("/forgotPassword"); // Redirigir a la página /forgotPassword al hacer clic
+    history.push("/forgotPassword"); 
   };
 
   return (

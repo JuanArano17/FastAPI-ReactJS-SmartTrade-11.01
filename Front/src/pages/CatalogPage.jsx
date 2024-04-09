@@ -1,9 +1,8 @@
-// CatalogPage.jsx
 import React, { useState } from 'react';
 import { Box, Container, Grid, Paper, Typography, Slider, Select, MenuItem, FormControl, InputLabel, Button, IconButton, Rating } from '@mui/material';
 import TopBar from '../components/TopBar/TopBar';
 import Footer from '../components/Footer/Footer';
-import ProductDetail from '../components/ProductDetailPage'; // Asumiendo que este componente existe
+import ProductDetail from '../components/products/ProductDetailPage'; 
 import styles from '../styles/styles';
 
 const CatalogPage = () => {
@@ -51,7 +50,7 @@ const CatalogPage = () => {
                         </Select>
                     </FormControl>
                     <Typography id="range-slider" gutterBottom>
-                       Precio Mínimo
+                        Precio Mínimo
                     </Typography>
                     <Slider
                         value={priceRange}
@@ -61,7 +60,7 @@ const CatalogPage = () => {
                         sx={{ width: 300 }}
                     />
                     <Typography id="range-slider" gutterBottom>
-                       Precio Máximo
+                        Precio Máximo
                     </Typography>
                     <Rating
                         name="simple-controlled"
