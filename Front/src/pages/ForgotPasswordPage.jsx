@@ -1,15 +1,7 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Container,
-  Grid,
-  Paper,
-} from "@mui/material";
-import TopBar from "../components/TopBar/TopBar";
-import Footer from "../components/Footer/Footer";
+import { Box, Typography, TextField, Button, Container, Grid, Paper } from "@mui/material";
+import TopBar from "../components/topbar/TopBar";
+import Footer from "../components/footer/Footer";
 import styles from "../styles/styles";
 import img_mundo from "../images/img_mundo.png";
 

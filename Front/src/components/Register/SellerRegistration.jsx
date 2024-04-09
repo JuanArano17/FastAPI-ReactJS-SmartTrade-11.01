@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { Box, Typography, TextField, Button, Container, Grid, Paper, IconButton, InputAdornment, } from "@mui/material";
 import { getDefaultRegisterSellerModel } from "../../models/RegisterSellerModel";
 import { validateEmail, validatePassword, validateAge, validateCIF } from "../../utils/registerFormValidations";
-import registerUserSellerService from "../../api/services/user/AuthService";
+import { registerUserSellerService } from "../../api/services/user/AuthService";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import styles from "../../styles/styles";
+
 const formFields = [
     { id: "firstName", name: "Name", label: "Patricio", autoComplete: "fname", autoFocus: true },
     { id: "lastName", name: "Surname", label: "Letelier", autoComplete: "lname" },

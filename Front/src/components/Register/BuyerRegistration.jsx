@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Box, Typography, TextField, Button, Container, Grid, Paper, IconButton, InputAdornment, } from "@mui/material";
+import { useHistory } from 'react-router-dom';
+import { Box, Typography, TextField, Button, Container, Grid, Paper, IconButton, InputAdornment, Snackbar} from "@mui/material";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import CardInformationForm from '../cardInfo/CardInformationForm';
@@ -7,17 +8,21 @@ import { getDefaultRegisterBuyerModel } from "../../models/RegisterBuyerModel";
 import { getDefaultCardInformationModel } from "../../models/CardInformationModel";
 import { validateEmail, validatePassword, validateAge, validateDNI } from "../../utils/registerFormValidations";
 import styles from "../../styles/styles";
-import registerUserBuyerService from "../../api/services/user/AuthService";
+import { registerUserBuyerService } from "../../api/services/user/AuthService";
 import registerCardService from "../../api/services/user/BuyerService";
+
 const formFields = [
-    { id: "firstName", name: "Name", placeholder: "Patricio*", autoComplete: "fname", autoFocus: true },
-    { id: "lastName", name: "Surname", placeholder: "Letelier*", autoComplete: "lname" },
+    { id: "name", name: "Name", placeholder: "Patricio*", autoComplete: "fname", autoFocus: true },
+    { id: "surname", name: "Surname", placeholder: "Letelier*", autoComplete: "lname" },
     { id: "email", name: "Email", placeholder: "letelier@upv.edu.es*", autoComplete: "email" },
     { id: "dni", name: "DNI", placeholder: "12345678A*" },
     { id: "password", name: "Password", placeholder: "PSW_curso_2023_2024*", autoComplete: "new-password", type: "password" },
+    { id: "billing_address", name: "BillingAddress", placeholder: "Calle nueva 123", autoComplete:""},
     { id: "age", name: "Birth date", type: "date" }
 ];
 const BuyerRegistration = () => {
+    const history = useHistory();
+    const [openSnackbar, setOpenSnackbar] = useState(false);
     const [formData, setFormData] = useState(getDefaultRegisterBuyerModel());
     const [cardData, setCardData] = useState(getDefaultCardInformationModel());
     const [showPassword, setShowPassword] = useState(false);
@@ -58,8 +63,9 @@ const BuyerRegistration = () => {
             try {
                 console.log('Se esta intentando registrar un usuario Buyer')
                 const userResponse = await registerUserBuyerService(formData);
-                console.log('Se a registrado un usuario Buyer', userResponse)
-                const userId = userResponse.userId;
+                console.log('Se ha registrado un usuario Buyer', userResponse);
+                setOpenSnackbar(true);
+                const userId = userResponse.id;
                 if (userId && Object.values(cardData).some(value => value !== "")) {
                     try {
                         await registerCardService({ ...cardData, userId });
@@ -67,6 +73,9 @@ const BuyerRegistration = () => {
                         console.error('Hubo un error al registrar la tarjeta:', cardError);
                     }
                 }
+                setTimeout(() => {
+                    history.push("/");
+                }, 2000);
             } catch (error) {
                 console.error('Hubo un error al registrar al usuario:', error);
             }
@@ -148,6 +157,12 @@ const BuyerRegistration = () => {
                     </Grid>
                 </Grid>
             </Paper>
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={() => setOpenSnackbar(false)}
+                message="Te has registrado con éxito."
+            />
         </Container>
     );
 };

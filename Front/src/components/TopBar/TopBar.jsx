@@ -1,15 +1,5 @@
-// TopBar.jsx
 import React from "react";
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  IconButton,
-  TextField,
-  Box,
-  InputAdornment,
-} from "@mui/material";
+import { AppBar, Toolbar, Typography, Button, IconButton, TextField, Box, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import RecyclingIcon from "@mui/icons-material/Recycling";
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';

@@ -1,11 +1,10 @@
-// ProductDetailPage.jsx
 import React, { useState } from 'react';
 import { Box, Container, Typography, Grid, Button, Paper, Divider, IconButton } from '@mui/material';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import StarIcon from '@mui/icons-material/Star';
-import TopBar from '../TopBar/TopBar';
-import Footer from '../Footer/Footer';
-import styles from '../../styles/styles';
+import TopBar from '../components/topbar/TopBar';
+import Footer from '../components/footer/Footer';
+import styles from '../styles/styles';
 
 const ProductDetailPage = () => {
     const [isFavorite, setIsFavorite] = useState(false);
