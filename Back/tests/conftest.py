@@ -10,6 +10,7 @@ from app.service.seller import SellerService
 from app.service.user import UserService
 from app.database import engine
 from app.main import app
+from service.address import AddressService
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -45,3 +46,7 @@ def buyer_service(db, user_service):
 @pytest.fixture(scope="module")
 def seller_service(db, user_service):
     return SellerService(session=db, user_service=user_service)
+
+@pytest.fixture(scope="module")
+def address_service(db, buyer_service):
+    return AddressService(session=db, buyer_service=buyer_service)
