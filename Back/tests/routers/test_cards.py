@@ -3,20 +3,22 @@ from fastapi.testclient import TestClient
 from fastapi import status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+
 from app.models.card import Card
-from schemas.buyer import BuyerCreate
-from schemas.card import CardCreate
-from service.buyer import BuyerService
-from service.card import CardService
+from app.schemas.buyer import BuyerCreate
+from app.schemas.card import CardCreate
+from app.service.buyer import BuyerService
+from app.service.card import CardService
 
 
 def fake_card():
     return {
-        "card_number":  "5555555555554444",
+        "card_number": "5555555555554444",
         "card_name": "Pedro Fernandez Gómez",
-        "card_exp_date": datetime(2025,1,1).date().strftime("%Y-%m-%d"),
+        "card_exp_date": datetime(2025, 1, 1).date().strftime("%Y-%m-%d"),
         "card_security_num": "123",
     }
+
 
 def fake_buyer():
     return {
@@ -30,10 +32,16 @@ def fake_buyer():
         "password": "arandompassword",
     }
 
-def test_create_card(client: TestClient, buyer_service:BuyerService, card_service: CardService, db: Session):
+
+def test_create_card(
+    client: TestClient,
+    buyer_service: BuyerService,
+    card_service: CardService,
+    db: Session,
+):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
-    
+
     data = fake_card()
     response = client.post(f"/buyers/{buyer.id}/cards/", json=data)
     assert response.status_code == status.HTTP_200_OK
@@ -47,9 +55,10 @@ def test_create_card(client: TestClient, buyer_service:BuyerService, card_servic
 
     card = card_service.get_by_id(content["id"])
     assert card is not None
-    assert card.id_buyer==content["id_buyer"]
+    assert card.id_buyer == content["id_buyer"]
 
-def test_create_card_invalid_data(client: TestClient, buyer_service:BuyerService):
+
+def test_create_card_invalid_data(client: TestClient, buyer_service: BuyerService):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
@@ -61,26 +70,39 @@ def test_create_card_invalid_data(client: TestClient, buyer_service:BuyerService
     assert "detail" in response.json()
 
 
-def test_create_same_card_for_buyer(client: TestClient, buyer_service: BuyerService, card_service: CardService, db: Session):
-    data = fake_buyer()
-    buyer = buyer_service.add(BuyerCreate(**data))
-
-    data=fake_card()
-    card=card_service.add(buyer.id,CardCreate(**data))
-
-    response = client.post(f"/buyers/{buyer.id}/cards/", json=data)
-    assert response.status_code == status.HTTP_409_CONFLICT
-    content = response.json()
-    card_num=data["card_number"]
-    assert content["detail"] == f"Card with number {card_num} already exists for buyer with id {buyer.id}."
-
-
-def test_get_card_by_id(client: TestClient, card_service:CardService, buyer_service: BuyerService, db: Session):
+def test_create_same_card_for_buyer(
+    client: TestClient,
+    buyer_service: BuyerService,
+    card_service: CardService,
+    db: Session,
+):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
     data = fake_card()
-    card=card_service.add(buyer.id,CardCreate(**data))
+    card_service.add(buyer.id, CardCreate(**data))
+
+    response = client.post(f"/buyers/{buyer.id}/cards/", json=data)
+    assert response.status_code == status.HTTP_409_CONFLICT
+    content = response.json()
+    card_num = data["card_number"]
+    assert (
+        content["detail"]
+        == f"Card with number {card_num} already exists for buyer with id {buyer.id}."
+    )
+
+
+def test_get_card_by_id(
+    client: TestClient,
+    card_service: CardService,
+    buyer_service: BuyerService,
+    db: Session,
+):
+    data = fake_buyer()
+    buyer = buyer_service.add(BuyerCreate(**data))
+
+    data = fake_card()
+    card = card_service.add(buyer.id, CardCreate(**data))
 
     response = client.get(f"/buyers/{buyer.id}/cards/{card.id}")  # type: ignore
     assert response.status_code == status.HTTP_200_OK
@@ -92,7 +114,7 @@ def test_get_card_by_id(client: TestClient, card_service:CardService, buyer_serv
     assert "id_buyer" in content
     assert "card_security_num" not in content
     assert content["id"] == card.id  # type: ignore
-    assert content["id_buyer"] == card.id_buyer # type: ignore
+    assert content["id_buyer"] == card.id_buyer  # type: ignore
     assert card.card_security_num == data["card_security_num"]  # type: ignore
 
 
@@ -108,8 +130,12 @@ def test_get_card_not_found(
     assert content["detail"] == "Card with id 999 not found."
 
 
-def test_get_cards(client: TestClient, buyer_service: BuyerService, card_service: CardService, db: Session):
-    
+def test_get_cards(
+    client: TestClient,
+    buyer_service: BuyerService,
+    card_service: CardService,
+    db: Session,
+):
     john = buyer_service.add(
         BuyerCreate(
             email="johnwepkins@gmail.com",
@@ -134,33 +160,36 @@ def test_get_cards(client: TestClient, buyer_service: BuyerService, card_service
             password="mypass@123",
         )
     )
-    
-    card1 = card_service.add(john.id,
-        CardCreate(
-            card_number=  "5555555555554444",
-            card_name= "Pedro Fernandez Gómez",
-            card_exp_date= datetime(2026,2,1).date(),
-            card_security_num= "333",
-    ))
 
-    card2 = card_service.add(john.id,
+    card1 = card_service.add(
+        john.id,
         CardCreate(
-            card_number=  "7618085117080457",
-            card_name= "Marta Garcia Gómez",
-            card_exp_date= datetime(2025,1,1).date(),
-            card_security_num= "123",
-    )
-    )
-    card3 = card_service.add(maria.id,
-        CardCreate(
-            card_number=  "1517468977888257",
-            card_name= "Mario Perez Martinez",
-            card_exp_date= datetime(2027,9,1).date(),
-            card_security_num= "193",
-    )
+            card_number="5555555555554444",
+            card_name="Pedro Fernandez Gómez",
+            card_exp_date=datetime(2026, 2, 1).date(),
+            card_security_num="333",
+        ),
     )
 
-    
+    card2 = card_service.add(
+        john.id,
+        CardCreate(
+            card_number="7618085117080457",
+            card_name="Marta Garcia Gómez",
+            card_exp_date=datetime(2025, 1, 1).date(),
+            card_security_num="123",
+        ),
+    )
+    card3 = card_service.add(
+        maria.id,
+        CardCreate(
+            card_number="1517468977888257",
+            card_name="Mario Perez Martinez",
+            card_exp_date=datetime(2027, 9, 1).date(),
+            card_security_num="193",
+        ),
+    )
+
     response = client.get(f"/buyers/{maria.id}/cards/")
     response1 = client.get(f"/buyers/{john.id}/cards/")
     assert response.status_code == status.HTTP_200_OK
@@ -174,17 +203,22 @@ def test_get_cards(client: TestClient, buyer_service: BuyerService, card_service
     assert card2.id in [address["id"] for address in content]
 
 
-def test_update_card(client: TestClient, card_service:CardService, buyer_service: BuyerService, db: Session):
+def test_update_card(
+    client: TestClient,
+    card_service: CardService,
+    buyer_service: BuyerService,
+    db: Session,
+):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
-    data=fake_card()
-    card=card_service.add(buyer.id,CardCreate(**data))
+    data = fake_card()
+    card = card_service.add(buyer.id, CardCreate(**data))
     # new_data = data.copy()
     new_data = {
-        "card_number":  "9683282416651254",
+        "card_number": "9683282416651254",
         "card_name": "Marta Garcia Gómez",
-        "card_exp_date": datetime(2026,1,1).date().strftime("%Y-%m-%d"),
+        "card_exp_date": datetime(2026, 1, 1).date().strftime("%Y-%m-%d"),
         "card_security_num": "123",
     }
     response = client.put(f"/buyers/{buyer.id}/cards/{card.id}", json=new_data)  # type: ignore
@@ -201,51 +235,69 @@ def test_update_card(client: TestClient, card_service:CardService, buyer_service
 
 
 def test_update_card_invalid_data(
-    client: TestClient, card_service:CardService, buyer_service: BuyerService, db: Session
+    client: TestClient,
+    card_service: CardService,
+    buyer_service: BuyerService,
+    db: Session,
 ):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
     data = fake_card()
-    card = card_service.add(buyer.id,CardCreate(**data))
+    card = card_service.add(buyer.id, CardCreate(**data))
     new_data = data.copy()
-    new_data["card_number"] = "1"  # Invalid card number  
+    new_data["card_number"] = "1"  # Invalid card number
 
     response = client.put(f"/buyers/{buyer.id}/cards/{card.id}", json=new_data)  # type: ignore
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "detail" in response.json()
 
 
-def test_update_same_card_for_buyer(client: TestClient, buyer_service: BuyerService, card_service: CardService, db: Session):
+def test_update_same_card_for_buyer(
+    client: TestClient,
+    buyer_service: BuyerService,
+    card_service: CardService,
+    db: Session,
+):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
-    data=fake_card()
-    data["card_exp_date"]=datetime(2026,1,1).date()
-    card_service.add(buyer.id,CardCreate(**data))
+    data = fake_card()
+    data["card_exp_date"] = datetime(2026, 1, 1).date()
+    card_service.add(buyer.id, CardCreate(**data))
 
-    card2 = card_service.add(buyer.id,
+    card2 = card_service.add(
+        buyer.id,
         CardCreate(
-            card_number=  "9683282416651254",
-            card_name= "Marta Garcia Gomez",
-            card_exp_date= datetime(2027,1,1).date(),
-            card_security_num= "123",
-    ))
+            card_number="9683282416651254",
+            card_name="Marta Garcia Gomez",
+            card_exp_date=datetime(2027, 1, 1).date(),
+            card_security_num="123",
+        ),
+    )
 
-    update_data={"card_number": data["card_number"]}
+    update_data = {"card_number": data["card_number"]}
     response = client.put(f"/buyers/{buyer.id}/cards/{card2.id}", json=update_data)
     assert response.status_code == status.HTTP_409_CONFLICT
     content = response.json()
-    card_num=data["card_number"]
-    assert content["detail"] == f"Card with number {card_num} already exists for buyer with id {buyer.id}."
+    card_num = data["card_number"]
+    assert (
+        content["detail"]
+        == f"Card with number {card_num} already exists for buyer with id {buyer.id}."
+    )
 
 
-def test_delete_card(client: TestClient, card_service: CardService, buyer_service: BuyerService, db: Session):
+def test_delete_card(
+    client: TestClient,
+    card_service: CardService,
+    buyer_service: BuyerService,
+    db: Session,
+):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
-    data=fake_card()
-    card = card_service.add(buyer.id,CardCreate(**data))
+    data = fake_card()
+    card = card_service.add(buyer.id, CardCreate(**data))
 
     response = client.delete(f"/buyers/{buyer.id}/cards/{card.id}")  # type: ignore
     assert response.status_code == status.HTTP_200_OK
@@ -265,7 +317,12 @@ def test_delete_card_not_found(client: TestClient, buyer_service: BuyerService):
     assert content["detail"] == "Card with id 999 not found."
 
 
-def test_delete_cards(client: TestClient, card_service: CardService, buyer_service: BuyerService, db: Session):
+def test_delete_cards(
+    client: TestClient,
+    card_service: CardService,
+    buyer_service: BuyerService,
+    db: Session,
+):
     john = buyer_service.add(
         BuyerCreate(
             email="johnwepkins@gmail.com",
@@ -278,30 +335,34 @@ def test_delete_cards(client: TestClient, card_service: CardService, buyer_servi
             password="arandompassword",
         )
     )
-    
-    card1 = card_service.add(john.id,
-        CardCreate(
-            card_number=  "5555555555554444",
-            card_name= "Pedro Fernandez Gómez",
-            card_exp_date= datetime(2026,2,1).date().strftime("%Y-%m-%d"),
-            card_security_num= "333",
-    ))
 
-    card2 = card_service.add(john.id,
+    card_service.add(
+        john.id,
         CardCreate(
-            card_number=  "0625824103481501",
-            card_name= "Marta Garcia Gómez",
-            card_exp_date= datetime(2025,1,1).date().strftime("%Y-%m-%d"),
-            card_security_num= "123",
+            card_number="5555555555554444",
+            card_name="Pedro Fernandez Gómez",
+            card_exp_date=datetime(2026, 2, 1).date().strftime("%Y-%m-%d"),
+            card_security_num="333",
+        ),
     )
-    )
-    card3 = card_service.add(john.id,
+
+    card_service.add(
+        john.id,
         CardCreate(
-            card_number=  "0199322468415426",
-            card_name= "Mario Perez Martinez",
-            card_exp_date= datetime(2027,9,1).date().strftime("%Y-%m-%d"),
-            card_security_num= "193",
+            card_number="0625824103481501",
+            card_name="Marta Garcia Gómez",
+            card_exp_date=datetime(2025, 1, 1).date().strftime("%Y-%m-%d"),
+            card_security_num="123",
+        ),
     )
+    card_service.add(
+        john.id,
+        CardCreate(
+            card_number="0199322468415426",
+            card_name="Mario Perez Martinez",
+            card_exp_date=datetime(2027, 9, 1).date().strftime("%Y-%m-%d"),
+            card_security_num="193",
+        ),
     )
 
     response = client.delete(f"/buyers/{john.id}/cards")
@@ -309,5 +370,5 @@ def test_delete_cards(client: TestClient, card_service: CardService, buyer_servi
     content = response.json()
     assert content is None or content == {}
 
-    cards = db.execute(select(Card).where(Card.id_buyer==john.id)).all()
+    cards = db.execute(select(Card).where(Card.id_buyer == john.id)).all()
     assert len(cards) == 0

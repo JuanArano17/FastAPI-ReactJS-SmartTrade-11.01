@@ -6,7 +6,7 @@ from app.schemas.buyer import BuyerCreate, BuyerUpdate
 from app.models.buyer import Buyer
 from app.crud_repository import CRUDRepository
 from app.core.security import get_password_hash
-from schemas.user import UserUpdate
+from app.schemas.user import UserUpdate
 
 
 class BuyerRepository(CRUDRepository):
@@ -61,7 +61,7 @@ class BuyerService:
 
     def update(self, buyer_id, new_data: BuyerUpdate) -> Buyer:
         buyer = self.get_by_id(buyer_id)
-        
+
         if new_data.email and self.user_service.get_by_email(new_data.email):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
@@ -73,19 +73,21 @@ class BuyerService:
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"Buyer with dni {new_data.dni} already exists.",
             )
-        
+
         common_attributes = {}
         for key in ["email", "name", "surname", "password"]:
-                common_attributes[key] = getattr(new_data, key)
-                setattr(new_data, key, None)  # Set attribute to None after fetching its value
-            
+            common_attributes[key] = getattr(new_data, key)
+            setattr(
+                new_data, key, None
+            )  # Set attribute to None after fetching its value
+
         if any(value is not None for value in common_attributes.values()):
-            user_update=UserUpdate(**common_attributes)
-            self.user_service._user_repository.update(buyer,user_update)
-    
+            user_update = UserUpdate(**common_attributes)
+            self.user_service._user_repository.update(buyer, user_update)
+
         if all(value is None for value in vars(new_data).values()):
             return self.get_by_id(buyer_id)
-        
+
         return self.buyer_repo.update(self.get_by_id(buyer_id), new_data)
 
     def delete_by_id(self, id):

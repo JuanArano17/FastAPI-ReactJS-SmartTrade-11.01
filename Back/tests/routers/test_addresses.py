@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 from app.schemas.address import AddressCreate
 from app.models.address import Address
 from app.service.address import AddressService
-from schemas.buyer import BuyerCreate
-from service.buyer import BuyerService
+from app.schemas.buyer import BuyerCreate
+from app.service.buyer import BuyerService
 
 
 def fake_address():
@@ -22,6 +22,7 @@ def fake_address():
         "default": True,
     }
 
+
 def fake_buyer():
     return {
         "email": "mytestemail@gmail.com",
@@ -34,10 +35,16 @@ def fake_buyer():
         "password": "arandompassword",
     }
 
-def test_create_address(client: TestClient, buyer_service:BuyerService, address_service: AddressService, db: Session):
+
+def test_create_address(
+    client: TestClient,
+    buyer_service: BuyerService,
+    address_service: AddressService,
+    db: Session,
+):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
-    
+
     data = fake_address()
 
     response = client.post(f"/buyers/{buyer.id}/addresses", json=data)
@@ -56,9 +63,10 @@ def test_create_address(client: TestClient, buyer_service:BuyerService, address_
 
     address = address_service.get_by_id(content["id"])
     assert address is not None
-    assert address.id_buyer==content["id_buyer"]
+    assert address.id_buyer == content["id_buyer"]
 
-def test_create_address_invalid_data(client: TestClient, buyer_service:BuyerService):
+
+def test_create_address_invalid_data(client: TestClient, buyer_service: BuyerService):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
@@ -69,12 +77,18 @@ def test_create_address_invalid_data(client: TestClient, buyer_service:BuyerServ
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "detail" in response.json()
 
-def test_default_address_change(client: TestClient, db: Session, address_service:AddressService, buyer_service:BuyerService):
+
+def test_default_address_change(
+    client: TestClient,
+    db: Session,
+    address_service: AddressService,
+    buyer_service: BuyerService,
+):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
-    
+
     data = fake_address()
-    address=address_service.add(buyer.id,AddressCreate(**data))
+    address = address_service.add(buyer.id, AddressCreate(**data))
 
     address2 = fake_address()
     address2["default"] = True
@@ -84,7 +98,7 @@ def test_default_address_change(client: TestClient, db: Session, address_service
     assert content1["default"] == True
     response = client.get(f"/buyers/{buyer.id}/addresses/{address.id}")
     content = response.json()
-    assert content["default"] == False 
+    assert content["default"] == False
     address3 = fake_address()
     address3["default"] = True
     response = client.post(f"/buyers/{buyer.id}/addresses", json=address3)
@@ -94,17 +108,23 @@ def test_default_address_change(client: TestClient, db: Session, address_service
     response = client.get(f"/buyers/{buyer.id}/addresses/{address.id}")
     content = response.json()
     assert content["default"] == False
-    address2_id=content1["id"]
+    address2_id = content1["id"]
     response = client.get(f"/buyers/{buyer.id}/addresses/{address2_id}")
-    content=response.json()
+    content = response.json()
     assert content["default"] == False
 
-def test_get_address_by_id(client: TestClient, address_service:AddressService, buyer_service: BuyerService, db: Session):
+
+def test_get_address_by_id(
+    client: TestClient,
+    address_service: AddressService,
+    buyer_service: BuyerService,
+    db: Session,
+):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
     data = fake_address()
-    address=address_service.add(buyer.id,AddressCreate(**data))
+    address = address_service.add(buyer.id, AddressCreate(**data))
 
     response = client.get(f"/buyers/{buyer.id}/addresses/{address.id}")  # type: ignore
     assert response.status_code == status.HTTP_200_OK
@@ -120,7 +140,8 @@ def test_get_address_by_id(client: TestClient, address_service:AddressService, b
     assert "id" in content
     assert "id_buyer" in content
     assert content["id"] == address.id  # type: ignore
-    assert content["id_buyer"] == address.id_buyer # type: ignore
+    assert content["id_buyer"] == address.id_buyer  # type: ignore
+
 
 def test_get_address_not_found(
     client: TestClient, buyer_service: BuyerService, db: Session
@@ -134,8 +155,12 @@ def test_get_address_not_found(
     assert content["detail"] == "Address with id 999 not found."
 
 
-def test_get_addresses(client: TestClient, buyer_service: BuyerService, address_service: AddressService, db: Session):
-    
+def test_get_addresses(
+    client: TestClient,
+    buyer_service: BuyerService,
+    address_service: AddressService,
+    db: Session,
+):
     john = buyer_service.add(
         BuyerCreate(
             email="johnwepkins@gmail.com",
@@ -160,45 +185,48 @@ def test_get_addresses(client: TestClient, buyer_service: BuyerService, address_
             password="mypass@123",
         )
     )
-    
-    address1 = address_service.add(john.id,
-        AddressCreate(
-            street= "Test Street",
-            floor= 3,
-            adit_info= "Cuidado con el perro",
-            door= "A",
-            city= "Madrid",
-            postal_code= "43211",
-            country= "ESP",
-            default= True,
-    ))
 
-    address2 = address_service.add(john.id,
+    address1 = address_service.add(
+        john.id,
         AddressCreate(
-            street= "Main Street",
+            street="Test Street",
+            floor=3,
+            adit_info="Cuidado con el perro",
+            door="A",
+            city="Madrid",
+            postal_code="43211",
+            country="ESP",
+            default=True,
+        ),
+    )
+
+    address2 = address_service.add(
+        john.id,
+        AddressCreate(
+            street="Main Street",
             floor=1,
-            door= "C",
+            door="C",
             adit_info=None,
-            city= "Vancouver",
-            postal_code= "41111",
-            country= "CAN",
-            default= True,
-        )
+            city="Vancouver",
+            postal_code="41111",
+            country="CAN",
+            default=True,
+        ),
     )
-    address3 = address_service.add(maria.id,
+    address3 = address_service.add(
+        maria.id,
         AddressCreate(
-            street= "Side Street",
-            floor= 1,
-            door= "D",
+            street="Side Street",
+            floor=1,
+            door="D",
             adit_info=None,
-            city= "San Francisco",
-            postal_code= "32222",
-            country= "USA",
-            default= False,
-        )
+            city="San Francisco",
+            postal_code="32222",
+            country="USA",
+            default=False,
+        ),
     )
 
-    
     response = client.get(f"/buyers/{maria.id}/addresses/")
     response1 = client.get(f"/buyers/{john.id}/addresses/")
     assert response.status_code == status.HTTP_200_OK
@@ -212,12 +240,17 @@ def test_get_addresses(client: TestClient, buyer_service: BuyerService, address_
     assert address2.id in [address["id"] for address in content]
 
 
-def test_update_address(client: TestClient, address_service:AddressService, buyer_service: BuyerService, db: Session):
+def test_update_address(
+    client: TestClient,
+    address_service: AddressService,
+    buyer_service: BuyerService,
+    db: Session,
+):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
-    data=fake_address()
-    address=address_service.add(buyer.id,AddressCreate(**data))
+    data = fake_address()
+    address = address_service.add(buyer.id, AddressCreate(**data))
     # new_data = data.copy()
     new_data = {
         "street": "Side Street",
@@ -243,24 +276,30 @@ def test_update_address(client: TestClient, address_service:AddressService, buye
     assert "id" in content
 
 
-def test_update_default(client: TestClient, address_service:AddressService, buyer_service: BuyerService, db: Session):
+def test_update_default(
+    client: TestClient,
+    address_service: AddressService,
+    buyer_service: BuyerService,
+    db: Session,
+):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
-    data=fake_address()
-    address=address_service.add(buyer.id,AddressCreate(**data))
+    data = fake_address()
+    address = address_service.add(buyer.id, AddressCreate(**data))
 
-    address2 = address_service.add(buyer.id,
+    address2 = address_service.add(
+        buyer.id,
         AddressCreate(
-            street= "Side Street",
+            street="Side Street",
             floor=2,
-            door= "D",
+            door="D",
             adit_info=None,
-            city= "San Francisco",
-            postal_code= "32222",
-            country= "USA",
-            default= False,
-        )
+            city="San Francisco",
+            postal_code="32222",
+            country="USA",
+            default=False,
+        ),
     )
 
     # new_data = data.copy()
@@ -278,36 +317,46 @@ def test_update_default(client: TestClient, address_service:AddressService, buye
     content = response.json()
     assert content["default"] == False
 
+
 def test_update_address_invalid_data(
-    client: TestClient, address_service:AddressService, buyer_service: BuyerService, db: Session
+    client: TestClient,
+    address_service: AddressService,
+    buyer_service: BuyerService,
+    db: Session,
 ):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
     data = fake_address()
-    address = address_service.add(buyer.id,AddressCreate(**data))
+    address = address_service.add(buyer.id, AddressCreate(**data))
     new_data = data.copy()
-    new_data["country"] = "España"#Wrong country format
-  
+    new_data["country"] = "España"  # Wrong country format
 
     response = client.put(f"/buyers/{buyer.id}/addresses/{address.id}", json=new_data)  # type: ignore
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "detail" in response.json()
 
 
-def test_delete_address(client: TestClient, address_service: AddressService, buyer_service: BuyerService, db: Session):
+def test_delete_address(
+    client: TestClient,
+    address_service: AddressService,
+    buyer_service: BuyerService,
+    db: Session,
+):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
-    data=fake_address()
-    address = address_service.add(buyer.id,AddressCreate(**data))
+    data = fake_address()
+    address = address_service.add(buyer.id, AddressCreate(**data))
 
     response = client.delete(f"/buyers/{buyer.id}/addresses/{address.id}")  # type: ignore
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content is None or content == {}
 
-    address = db.execute(select(Address).where(Address.id == address.id)).scalar_one_or_none()  # type: ignore
+    address = db.execute(
+        select(Address).where(Address.id == address.id)
+    ).scalar_one_or_none()  # type: ignore
     assert address is None
 
 
@@ -320,7 +369,12 @@ def test_delete_address_not_found(client: TestClient, buyer_service: BuyerServic
     assert content["detail"] == "Address with id 999 not found."
 
 
-def test_delete_addresses(client: TestClient, address_service: AddressService, buyer_service: BuyerService, db: Session):
+def test_delete_addresses(
+    client: TestClient,
+    address_service: AddressService,
+    buyer_service: BuyerService,
+    db: Session,
+):
     john = buyer_service.add(
         BuyerCreate(
             email="johnwepkins@gmail.com",
@@ -333,42 +387,45 @@ def test_delete_addresses(client: TestClient, address_service: AddressService, b
             password="arandompassword",
         )
     )
-    
-    address1 = address_service.add(john.id,
+
+    address_service.add(
+        john.id,
         AddressCreate(
-            street= "Test Street",
-            floor= 3,
-            door= "A",
-            adit_info= "Cuidado con el perro",
-            city= "Madrid",
-            postal_code= "43211",
-            country= "ESP",
-            default= True,
-        )
+            street="Test Street",
+            floor=3,
+            door="A",
+            adit_info="Cuidado con el perro",
+            city="Madrid",
+            postal_code="43211",
+            country="ESP",
+            default=True,
+        ),
     )
-    address2 = address_service.add(john.id,
+    address_service.add(
+        john.id,
         AddressCreate(
-            street= "Main Street",
+            street="Main Street",
             floor=1,
-            door= "C",
+            door="C",
             adit_info=None,
-            city= "Vancouver",
-            postal_code= "41111",
-            country= "CAN",
-            default= True,
-        )
+            city="Vancouver",
+            postal_code="41111",
+            country="CAN",
+            default=True,
+        ),
     )
-    address3 = address_service.add(john.id,
+    address_service.add(
+        john.id,
         AddressCreate(
-            street= "Side Street",
-            floor= 1,
-            door= "D",
+            street="Side Street",
+            floor=1,
+            door="D",
             adit_info=None,
-            city= "San Francisco",
-            postal_code= "32222",
-            country= "USA",
-            default= False,
-        )
+            city="San Francisco",
+            postal_code="32222",
+            country="USA",
+            default=False,
+        ),
     )
 
     response = client.delete(f"/buyers/{john.id}/addresses")
@@ -376,5 +433,5 @@ def test_delete_addresses(client: TestClient, address_service: AddressService, b
     content = response.json()
     assert content is None or content == {}
 
-    cards = db.execute(select(Address).where(Address.id_buyer==john.id)).all()
+    cards = db.execute(select(Address).where(Address.id_buyer == john.id)).all()
     assert len(cards) == 0
