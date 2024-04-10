@@ -7,7 +7,7 @@ from app.models.product_line import ProductLine
 from app.service.order import OrderService
 from app.service.seller_product import SellerProductService
 from app.crud_repository import CRUDRepository
-from schemas.seller_product import SellerProductUpdate
+from app.schemas.seller_product import SellerProductUpdate
 
 
 class ProductLineService:
@@ -36,15 +36,15 @@ class ProductLineService:
         seller_product = self.seller_product_service.get_by_id(
             product_line.id_seller_product
         )
-        
-        original_product_line=product_line
+
+        original_product_line = product_line
         for product_line in order.product_lines:
             if product_line.id_seller_product == seller_product.id:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Product already in order",
                 )
-        product_line=original_product_line
+        product_line = original_product_line
         if seller_product.quantity < product_line.quantity:  # type: ignore
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -60,9 +60,11 @@ class ProductLineService:
         product_line = ProductLine(**product_line.model_dump(), id_order=id_order)
         order.total += product_line.subtotal  # type: ignore
 
-        #seller_product.quantity -= product_line.quantity  # type: ignore
-        seller_product_update=SellerProductUpdate(quantity=seller_product.quantity-product_line.quantity)
-        self.seller_product_service.update(seller_product.id,seller_product_update)
+        # seller_product.quantity -= product_line.quantity  # type: ignore
+        seller_product_update = SellerProductUpdate(
+            quantity=seller_product.quantity - product_line.quantity
+        )
+        self.seller_product_service.update(seller_product.id, seller_product_update)
         product_line = self.product_line_repo.add(product_line)
         return product_line
 

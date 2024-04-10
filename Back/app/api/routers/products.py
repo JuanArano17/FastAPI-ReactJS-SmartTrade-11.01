@@ -1,15 +1,15 @@
-from typing import List, Union
+from typing import Union
 from fastapi import APIRouter
 
 from app.api.deps import ProductServiceDep
 from app.schemas.product import Product
-from schemas.book import Book
-from schemas.clothes import Clothes
-from schemas.electrodomestics import Electrodomestics
-from schemas.electronics import Electronics
-from schemas.food import Food
-from schemas.game import Game
-from schemas.house_utilities import HouseUtilities
+from app.schemas.book import Book
+from app.schemas.clothes import Clothes
+from app.schemas.electrodomestics import Electrodomestics
+from app.schemas.electronics import Electronics
+from app.schemas.food import Food
+from app.schemas.game import Game
+from app.schemas.house_utilities import HouseUtilities
 
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -22,7 +22,12 @@ async def read_products(product_service: ProductServiceDep):
     return product_service.product_factory.get_all()
 
 
-@router.get("/{product_id}", response_model=(Union[Game,Book,Food,HouseUtilities,Electronics,Electrodomestics,Clothes]))
+@router.get(
+    "/{product_id}",
+    response_model=(
+        Union[Game, Book, Food, HouseUtilities, Electronics, Electrodomestics, Clothes]
+    ),
+)
 async def read_product(*, product_id: int, product_service: ProductServiceDep):
     """
     Retrieve a product.
@@ -30,16 +35,39 @@ async def read_product(*, product_id: int, product_service: ProductServiceDep):
     return product_service.get_by_id(product_id)
 
 
-@router.post("/", response_model=(Union[Game,Book,Food,HouseUtilities,Electronics,Electrodomestics,Clothes]))
-async def create_product(*, category_name:str , product: dict, product_service: ProductServiceDep):
+@router.post(
+    "/",
+    response_model=(
+        Union[Game, Book, Food, HouseUtilities, Electronics, Electrodomestics, Clothes]
+    ),
+)
+async def create_product(
+    *, category_name: str, product: dict, product_service: ProductServiceDep
+):
     """
     Create a new product.
     """
     return product_service.add(category=category_name, product_data=product)
 
 
-@router.put("/{product_id}", response_model=(Union[None,Game,Book,Food,HouseUtilities,Electronics,Electrodomestics,Clothes]))
-async def update_product(*, product_id: int, new_data: dict, product_service: ProductServiceDep):
+@router.put(
+    "/{product_id}",
+    response_model=(
+        Union[
+            None,
+            Game,
+            Book,
+            Food,
+            HouseUtilities,
+            Electronics,
+            Electrodomestics,
+            Clothes,
+        ]
+    ),
+)
+async def update_product(
+    *, product_id: int, new_data: dict, product_service: ProductServiceDep
+):
     """
     Update a product.
     """
