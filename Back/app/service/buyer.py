@@ -65,7 +65,7 @@ class BuyerService:
         if new_data.email and self.user_service.get_by_email(new_data.email):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=f"User with email {buyer.email} already exists.",
+                detail=f"User with email {new_data.email} already exists.",
             )
 
         if new_data.dni and self.buyer_repo.get_by_dni(new_data.dni):

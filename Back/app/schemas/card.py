@@ -13,7 +13,7 @@ class CardCreate(CardBase):
     card_security_num: str = Field(pattern=r'^\d{3,4}$')
 
 
-class CardUpdate(BaseModel):
+class CardUpdate(CardBase):
     card_number: Optional[PaymentCardNumber] = None
     card_name: str = Field(default=None, min_length=1, max_length=60)
     card_exp_date: Optional[FutureDate] = None

@@ -376,5 +376,5 @@ def test_delete_addresses(client: TestClient, address_service: AddressService, b
     content = response.json()
     assert content is None or content == {}
 
-    buyers = db.execute(select(Address).where(Address.id_buyer==john.id)).all()
-    assert len(buyers) == 0
+    cards = db.execute(select(Address).where(Address.id_buyer==john.id)).all()
+    assert len(cards) == 0

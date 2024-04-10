@@ -211,6 +211,54 @@ def test_update_buyer_invalid_data(
     assert "detail" in response.json()
 
 
+def test_update_buyer_with_used_dni(client: TestClient, buyer_service:BuyerService, db: Session):
+    buyer = fake_buyer()
+    db.add(Buyer(**buyer))
+    db.commit()
+
+    buyer2 = buyer_service.add(
+        BuyerCreate(
+            email="mariacarey@hotmail.com",
+            name="Maria",
+            surname="Carey",
+            dni="87654321B",
+            eco_points=0,
+            billing_address="Street Molotia 2",
+            payment_method="Bizum",
+            password="mypass@123",
+        )
+    )
+    buyer_update = {"dni":"58263711F",}
+    response = client.put(f"/buyers/{buyer2.id}", json=buyer_update)
+    assert response.status_code == status.HTTP_409_CONFLICT
+    content = response.json()
+    assert content["detail"] == f"Buyer with dni {buyer_update['dni']} already exists."
+
+
+def test_update_buyer_with_used_email(client: TestClient, buyer_service:BuyerService, db: Session):
+    buyer = fake_buyer()
+    db.add(Buyer(**buyer))
+    db.commit()
+
+    buyer2 = buyer_service.add(
+        BuyerCreate(
+            email="mariacarey@hotmail.com",
+            name="Maria",
+            surname="Carey",
+            dni="87654321B",
+            eco_points=0,
+            billing_address="Street Molotia 2",
+            payment_method="Bizum",
+            password="mypass@123",
+        )
+    )
+    buyer_update = {"email":buyer["email"],}
+    response = client.put(f"/buyers/{buyer2.id}", json=buyer_update)
+    assert response.status_code == status.HTTP_409_CONFLICT
+    content = response.json()
+    assert content["detail"] ==f"User with email {buyer_update['email']} already exists."
+
+
 def test_delete_buyer(client: TestClient, buyer_service: BuyerService, db: Session):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))

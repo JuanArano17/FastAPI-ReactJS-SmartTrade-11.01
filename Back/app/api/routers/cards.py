@@ -24,7 +24,7 @@ async def create_card(
 
 
 @router.delete("/")
-async def delete_cards(buyer_id: int, card_service=CardServiceDep):
+async def delete_cards(buyer_id: int, card_service: CardServiceDep):
     """
     Delete all cards from a buyer.
     """
