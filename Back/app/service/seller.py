@@ -66,7 +66,7 @@ class SellerService:
         if new_data.email and self.user_service.get_by_email(new_data.email):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=f"User with email {seller.email} already exists.",
+                detail=f"User with email {new_data.email} already exists.",
             )
 
         if new_data.cif and self.seller_repo.get_where(
@@ -98,3 +98,4 @@ class SellerService:
 
     def delete_all(self):
         self.seller_repo.delete_all()
+        self.user_service._user_repository.delete_all()

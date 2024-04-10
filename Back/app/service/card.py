@@ -6,11 +6,24 @@ from app.service.buyer import BuyerService
 from app.models.card import Card
 from app.crud_repository import CRUDRepository
 
+class CardRepository(CRUDRepository):
+    def __init__(self, session: Session):
+        super().__init__(session=session, model=Card)
+        self._model = Card
+
+    def get_by_id_buyer(self, id_buyer) -> list[Card]:
+        return (
+            self._db.query(self._model).filter(self._model.id_buyer == id_buyer).all()
+        )
+    
+    def delete_by_id_buyer(self, id_buyer):
+        self._db.query(self._model).filter(self._model.id_buyer == id_buyer).delete()  # type: ignore
+        self._db.commit()
 
 class CardService:
     def __init__(self, session: Session, buyer_service: BuyerService):
         self.session = session
-        self.card_repo = CRUDRepository(session=session, model=Card)
+        self.card_repo = CardRepository(session=session)
         self.buyer_service = buyer_service
 
     def add(self, id_buyer, card: CardCreate) -> Card:
@@ -61,3 +74,9 @@ class CardService:
 
     def delete_all(self):
         self.card_repo.delete_all()
+
+    def get_by_id_buyer(self, id_buyer)-> list[Card]:
+        return self.card_repo.get_by_id_buyer(id_buyer=id_buyer)
+    
+    def delete_by_id_buyer(self, id_buyer)-> list[Card]:
+        return self.card_repo.delete_by_id_buyer(id_buyer=id_buyer)

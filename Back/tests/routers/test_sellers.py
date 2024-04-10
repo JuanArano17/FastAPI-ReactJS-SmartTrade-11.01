@@ -194,6 +194,51 @@ def test_update_seller_invalid_data(client: TestClient, seller_service: SellerSe
     assert "detail" in response.json()
 
 
+def test_update_seller_with_used_cif(client: TestClient, seller_service:SellerService, db: Session):
+    seller = fake_seller()
+    db.add(Seller(**seller))
+    db.commit()
+
+    seller2 = seller_service.add(
+        SellerCreate(
+            email="mariacarey@hotmail.com",
+            name="Maria",
+            surname="Carey",
+            bank_data="Whatever bank data",
+            cif="S31002656",
+            password="mypass@123",
+        )
+    )
+    seller_update = {"cif":"S31002655",}
+    response = client.put(f"/sellers/{seller2.id}", json=seller_update)
+    assert response.status_code == status.HTTP_409_CONFLICT
+    content = response.json()
+    assert content["detail"] == f"Seller with CIF {seller_update['cif']} already exists."
+
+
+def test_update_seller_with_used_email(client: TestClient, seller_service:SellerService, db: Session):
+    seller = fake_seller()
+    db.add(Seller(**seller))
+    db.commit()
+
+    seller2 = seller_service.add(
+        SellerCreate(
+            email="mariacarey@hotmail.com",
+            name="Maria",
+            surname="Carey",
+            bank_data="Whatever bank data",
+            cif="S31002656",
+            password="mypass@123",
+        )
+    )
+    seller_update = {"email":"donaldtrump@gmail.com",}
+
+    response = client.put(f"/sellers/{seller2.id}", json=seller_update)
+    assert response.status_code == status.HTTP_409_CONFLICT
+    content = response.json()
+    assert content["detail"] == f"User with email {seller_update['email']} already exists."
+
+
 def test_delete_seller(client: TestClient, seller_service: SellerService, db: Session):
     data = fake_seller()
     seller = seller_service.add(SellerCreate(**data))
