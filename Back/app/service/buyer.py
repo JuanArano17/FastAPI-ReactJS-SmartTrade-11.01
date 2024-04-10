@@ -95,3 +95,4 @@ class BuyerService:
 
     def delete_all(self):
         self.buyer_repo.delete_all()
+        self.user_service._user_repository.delete_all()
