@@ -51,7 +51,7 @@ class ProductService:
             detail=f"Product with id {product_id} not found.",
         )
 
-    def get_all(self) -> list[Product]:
+    def get_all(self):
         return self.product_factory.get_all()
 
     def update(self, product_id, new_data: dict):
@@ -157,13 +157,28 @@ class ProductFactory:
             )
 
     def get_all(self):
-        products=self.service.game_repo.get_all()
+        products=[]
+        products+=self.service.game_repo.get_all()
+        print(len(products))
+        print(products)
         products+=self.service.book_repo.get_all()
+        print(len(products))
+        print(products)
         products+=self.service.clothes_repo.get_all()
+        print(len(products))
+        print(products)
         products+=self.service.electronics_repo.get_all()
+        print(len(products))
+        print(products)
         products+=self.service.house_utilities_repo.get_all()
+        print(len(products))
+        print(products)
         products+=self.service.food_repo.get_all()
+        print(len(products))
+        print(products)
         products+=self.service.electrodomestics_repo.get_all()
+        print(len(products))
+        print(products)
         return products
     
 
