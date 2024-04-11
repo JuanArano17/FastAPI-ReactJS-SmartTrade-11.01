@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 from app.schemas.address import AddressCreate
 from app.models.address import Address
 from app.service.address import AddressService
-from schemas.buyer import BuyerCreate
-from service.buyer import BuyerService
+from app.schemas.buyer import BuyerCreate
+from app.service.buyer import BuyerService
 
 
 def fake_address():
