@@ -9,6 +9,14 @@ from app.models.order import Order
 from app.crud_repository import CRUDRepository
 
 
+class OrderRepository(CRUDRepository):
+    def __init__(self, session: Session):
+        super().__init__(session=session, model=Order)
+
+    def delete_all_by_buyer_id(self, id_buyer):
+        self._db.query(self._model).filter(self._model.id_buyer == id_buyer).delete()  # type: ignore
+
+
 class OrderService:
     def __init__(
         self,
@@ -18,7 +26,7 @@ class OrderService:
         address_service: AddressService,
     ):
         self.session = session
-        self.order_repo = CRUDRepository(session=session, model=Order)
+        self.order_repo = OrderRepository(session=session)
         self.buyer_service = buyer_service
         self.card_service = card_service
         self.address_service = address_service
@@ -58,6 +66,10 @@ class OrderService:
     def get_all(self) -> list[Order]:
         return self.order_repo.get_all()
 
+    def get_all_by_buyer_id(self, id_buyer) -> list[Order]:
+        self.buyer_service.get_by_id(id_buyer)
+        return self.order_repo.get_where(Order.id_buyer == id_buyer)
+
     def get_buyer_order(self, id_buyer, id_order) -> Order:
         self.buyer_service.get_by_id(id_buyer)
         order = self.get_by_id(id_order)
@@ -79,5 +91,21 @@ class OrderService:
         self.get_by_id(order_id)
         self.order_repo.delete_by_id(order_id)
 
+    def delete_by_buyer_id(self, id_buyer, order_id):
+        self.buyer_service.get_by_id(id_buyer)
+        order = self.get_by_id(order_id)
+
+        if order.id_buyer != id_buyer:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"The order with id {order_id} does not belong to the buyer with id {id_buyer}.",
+            )
+
+        self.delete_by_id(order_id)
+
     def delete_all(self):
         self.order_repo.delete_all()
+
+    def delete_all_by_buyer_id(self, id_buyer):
+        self.buyer_service.get_by_id(id_buyer)
+        self.order_repo.delete_all_by_buyer_id(id_buyer)
