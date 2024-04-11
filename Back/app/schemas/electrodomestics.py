@@ -23,7 +23,7 @@ class ElectrodomesticsUpdate(ElectrodomesticsBase):
     eco_points: Optional[NonNegativeFloat] = None
     spec_sheet: str = Field(default=None, min_length=1, max_length=240)
     stock: Optional[NonNegativeInt] = None
-    brand: Optional[str] = Field(default=None, min_length=1, max_length=30)
+    brand: Optional[str] = Field(default=None, min_length=1, max_length=40)
     type: Optional[str] = Field(default=None, min_length=1, max_length=20)
     power_source: Optional[str] = Field(default=None, min_length=1, max_length=20)
 

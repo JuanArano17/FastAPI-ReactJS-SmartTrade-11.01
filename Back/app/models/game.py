@@ -19,4 +19,4 @@ class Game(Product):
     }
 
     def __repr__(self):
-        return f"Game(id={self.id}, id_category={self.id_category}, name='{self.name}', description='{self.description}', eco_points={self.eco_points}, spec_sheet='{self.spec_sheet}', stock={self.stock}, publisher={self.publisher}, platform={self.platform}, size={self.size})"
+        return f"Game(id={self.id}, name='{self.name}', description='{self.description}', eco_points={self.eco_points}, spec_sheet='{self.spec_sheet}', stock={self.stock}, publisher={self.publisher}, platform={self.platform}, size={self.size})"

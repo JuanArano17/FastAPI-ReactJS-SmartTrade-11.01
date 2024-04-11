@@ -19,4 +19,4 @@ class Electrodomestics(Product):
     }
 
     def __repr__(self):
-        return f"Electrodomestics(id={self.id}, id_category={self.id_category}, name='{self.name}', description='{self.description}', eco_points={self.eco_points}, spec_sheet='{self.spec_sheet}', stock={self.stock}, brand={self.brand}, type={self.type}, power_source={self.power_source})"
+        return f"Electrodomestics(id={self.id}, name='{self.name}', description='{self.description}', eco_points={self.eco_points}, spec_sheet='{self.spec_sheet}', stock={self.stock}, brand={self.brand}, type={self.type}, power_source={self.power_source})"

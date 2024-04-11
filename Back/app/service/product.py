@@ -92,7 +92,10 @@ class ProductFactory:
                 electrodomestics=ElectrodomesticsCreate(**product)
                 return self.service.electrodomestics_repo.add(Electrodomestics(**electrodomestics.model_dump()))
             else:
-                raise ValueError("Invalid product category")
+                raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Invalid product category"
+            )
         except ValidationError as e:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
