@@ -19,7 +19,7 @@ async def read_products(product_service: ProductServiceDep):
     """
     Retrieve products.
     """
-    return product_service.product_factory.get_all()
+    return product_service.get_all()
 
 
 @router.get("/{product_id}", response_model=(Union[Game,Book,Food,HouseUtilities,Electronics,Electrodomestics,Clothes]))
