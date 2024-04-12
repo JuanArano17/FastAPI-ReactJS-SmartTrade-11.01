@@ -54,8 +54,7 @@ def test_create_image_invalid_data(client: TestClient, product_service: ProductS
     data = fake_product()
     product = product_service.add("book",data)
 
-    data = fake_image()
-    data["name"] = "name"  # Invalid field
+    data =  {"name":"e"} # Invalid field
 
     response = client.post(f"/products/{product.id}/images", json=data)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

@@ -64,6 +64,12 @@ class ProductService:
 
     def delete_by_id(self, product_id):
         # self.product_repo.delete_by_id(product_id)
+        product=self.get_by_id(product_id)
+        if not product:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Product with id {product_id} not found.",
+                )
         self.product_repo.delete_by_id(id=product_id)
 
     def delete_all(self):

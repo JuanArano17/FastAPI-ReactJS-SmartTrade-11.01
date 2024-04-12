@@ -95,7 +95,12 @@ class SellerService:
         return self.seller_repo.update(self.get_by_id(seller_id), new_data)
 
     def delete_by_id(self, seller_id):
-        self.seller_repo.get_by_id(seller_id)
+        seller=self.seller_repo.get_by_id(seller_id)
+        if not seller:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Seller with id {seller_id} not found.",
+            )
         self.seller_repo.delete_by_id(seller_id)
         self.user_service._user_repository.delete_by_id(seller_id)
 

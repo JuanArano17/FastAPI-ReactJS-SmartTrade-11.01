@@ -91,9 +91,14 @@ class BuyerService:
         return self.buyer_repo.update(self.get_by_id(buyer_id), new_data)
 
     def delete_by_id(self, id):
-        self.buyer_repo.get_by_id(id)
-        self.buyer_repo.delete_by_id(id)
-        self.user_service._user_repository.delete_by_id(id)
+            buyer=self.buyer_repo.get_by_id(id)
+            if not buyer:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Buyer with id {id} not found.",
+                )
+            self.buyer_repo.delete_by_id(id)
+            self.user_service._user_repository.delete_by_id(id)
 
     def delete_all(self):
         self.buyer_repo.delete_all()
