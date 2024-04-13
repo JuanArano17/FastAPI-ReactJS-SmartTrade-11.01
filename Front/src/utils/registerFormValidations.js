@@ -24,3 +24,6 @@ export const validateCIF = (cif) => {
     const re = /^[ABCDEFGHJKLMNPQRSUVW]\d{7}[0-9A-J]$/;
     return re.test(cif);
 }
+export const validateBankData = (bankData) => {
+    return bankData.length >= 10;
+}

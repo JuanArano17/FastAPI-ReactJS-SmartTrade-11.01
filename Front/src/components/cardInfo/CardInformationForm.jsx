@@ -8,6 +8,21 @@ const CardInformationForm = ({ cardData, handleChange }) => {
             <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <Typography variant="body2" color="232323" sx={{ textAlign: 'left' }}>
+                        Card Name
+                    </Typography>
+                    <TextField
+                        id="CardName"
+                        name="CardName"
+                        placeholder="Nombre en la tarjeta"
+                        required
+                        fullWidth
+                        value={cardData.CardName}
+                        onChange={handleChange}
+                        sx={{ ...styles.textfields, backgroundColor: "white" }}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <Typography variant="body2" color="232323" sx={{ textAlign: 'left' }}>
                         Card Number
                     </Typography>
                     <TextField
@@ -29,12 +44,12 @@ const CardInformationForm = ({ cardData, handleChange }) => {
                     <TextField
                         id="ExpiryDate"
                         name="ExpiryDate"
-                        placeholder="09/26*"
+                        placeholder="09/2026*"
                         required
                         fullWidth
                         value={cardData.ExpiryDate}
                         onChange={handleChange}
-                        inputProps={{ maxLength: 5 }}
+                        inputProps={{ maxLength: 7 }}
                         sx={{ ...styles.textfields, backgroundColor: "white" }}
                     />
                 </Grid>
@@ -43,8 +58,8 @@ const CardInformationForm = ({ cardData, handleChange }) => {
                         CVV
                     </Typography>
                     <TextField
-                        id="CVV"
-                        name="CVV"
+                        id="Cvv"
+                        name="Cvv"
                         placeholder="123*"
                         required
                         fullWidth

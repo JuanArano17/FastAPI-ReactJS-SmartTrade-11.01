@@ -11,8 +11,7 @@ const registerUserBuyerService = async (buyerData) => {
         payment_method: 'Credit Card', 
     };
     try {
-        console.log("buyer: ", validBuyerData)
-        const response = await axios.post('http://127.0.0.1:8000/buyers', validBuyerData);
+        const response = await axios.post('/buyers', validBuyerData);
         console.log('Registro de comprador exitoso', response.data);
         return response.data;
     } catch (error) {
@@ -21,9 +20,17 @@ const registerUserBuyerService = async (buyerData) => {
     }
 };
 const registerUserSellerService = async (userData) => {
+    const validUserData = {
+        email:userData.email,
+        name:userData.firstName,
+        surname:userData.lastName,
+        bank_data:userData.bankData,
+        cif:userData.cif,
+        password:userData.password,
+    }
     try {
-        const response = await axios.post('auth/register', userData);
-        console.log('Registro exitoso', response.data);
+        const response = await axios.post('/sellers', validUserData);
+        console.log('Registro de vendedor exitoso', response.data);
         return response.data;
     } catch (error) {
         console.error('Hubo un error al registrar al usuario:', error);

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Box, Typography, TextField, Button, Container, Grid, Paper, IconButton, InputAdornment, } from "@mui/material";
+import { useHistory } from 'react-router-dom';
+import { Box, Typography, TextField, Button, Container, Grid, Paper, IconButton, InputAdornment, Snackbar} from "@mui/material";
 import { getDefaultRegisterSellerModel } from "../../models/RegisterSellerModel";
-import { validateEmail, validatePassword, validateAge, validateCIF } from "../../utils/registerFormValidations";
+import { validateEmail, validatePassword, validateAge, validateCIF, validateBankData } from "../../utils/registerFormValidations";
 import { registerUserSellerService } from "../../api/services/user/AuthService";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
@@ -19,6 +20,8 @@ const formBankFields = [
     { id: "bankData", name: "Bank data", label: "your bank data", autoComplete: "cif" }
 ]
 const SellerRegistration = () => {
+    const history = useHistory();
+    const [openSnackbar, setOpenSnackbar] = useState(false);
     const [formData, setFormData] = useState(getDefaultRegisterSellerModel());
     const [formErrors, setFormErrors] = useState({});
     const [showPassword, setShowPassword] = useState(false);
@@ -45,6 +48,9 @@ const SellerRegistration = () => {
         if (id === 'cif') {
             errors.cif = validateCIF(value) ? '' : 'CIF is not valid!';
         }
+        if (id === 'bankData') {
+            errors.bankData = validateBankData(value) ? '' : 'Bank data must be at least 10 caracrers long!';
+        }
         setFormErrors(errors);
         setFormData((prevData) => ({ ...prevData, [id]: value }));
     };
@@ -52,9 +58,13 @@ const SellerRegistration = () => {
         e.preventDefault();
         if (isFormValid()) {
             try {
-                console.log('Se esta intentando registrar un usuario Seller')
+                console.log('Se esta intentando registrar un usuario Seller: ', formData)
                 const userResponse = await registerUserSellerService(formData);
                 console.log('Se a registrado un usuario Seller', userResponse)
+                setOpenSnackbar(true);
+                setTimeout(() => {
+                    history.push("/");
+                }, 2000);
             } catch (error) {
                 console.error('Hubo un error al registrar al usuario:', error);
             }
@@ -129,6 +139,8 @@ const SellerRegistration = () => {
                                             fullWidth
                                             value={formData[field.name]}
                                             onChange={handleChange}
+                                            error={!!formErrors[field.id]}
+                                            helperText={formErrors[field.id]}
                                             sx={styles.textField}
                                             InputProps={{
                                                 sx: styles.textfields
@@ -150,6 +162,12 @@ const SellerRegistration = () => {
                     </Button>
                 </Box>
             </Paper>
+            <Snackbar
+                open={openSnackbar}
+                autoHideDuration={6000}
+                onClose={() => setOpenSnackbar(false)}
+                message="Te has registrado con éxito."
+            />
         </Container>
     );
 };

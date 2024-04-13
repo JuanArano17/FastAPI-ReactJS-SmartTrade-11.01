@@ -7,8 +7,12 @@ from app.api.main import api_router
 app = FastAPI()
 
 origins = [
-    "http://localhost:3004",
-    "http://127.0.0.1:3004",
+    "http://localhost:3000",
+    "http://localhost:3001"
+    "http://localhost:3002"
+    "http://localhost:3003"
+    "http://localhost:3004"
+    "http://127.0.0.1:8000",
 ]
 
 app.add_middleware(

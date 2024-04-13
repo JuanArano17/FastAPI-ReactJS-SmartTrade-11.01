@@ -66,9 +66,10 @@ const BuyerRegistration = () => {
                 console.log('Se ha registrado un usuario Buyer', userResponse);
                 setOpenSnackbar(true);
                 const userId = userResponse.id;
+                console.log('UserIDBeforeREgisterService: ', userId);
                 if (userId && Object.values(cardData).some(value => value !== "")) {
                     try {
-                        await registerCardService({ ...cardData, userId });
+                        await registerCardService({...cardData}, userId);
                     } catch (cardError) {
                         console.error('Hubo un error al registrar la tarjeta:', cardError);
                     }
