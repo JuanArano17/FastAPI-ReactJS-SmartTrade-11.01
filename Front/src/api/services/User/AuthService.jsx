@@ -1,4 +1,5 @@
-import axios from '../AxiosInstance'; 
+import axiosInstance from '../AxiosInstance'; 
+import { useHistory } from 'react-router-dom';
 const registerUserBuyerService = async (buyerData) => {
     const validBuyerData = {
         name: buyerData.name,
@@ -11,7 +12,7 @@ const registerUserBuyerService = async (buyerData) => {
         payment_method: 'Credit Card', 
     };
     try {
-        const response = await axios.post('/buyers', validBuyerData);
+        const response = await axiosInstance.post('/buyers', validBuyerData);
         console.log('Registro de comprador exitoso', response.data);
         return response.data;
     } catch (error) {
@@ -29,7 +30,7 @@ const registerUserSellerService = async (userData) => {
         password:userData.password,
     }
     try {
-        const response = await axios.post('/sellers', validUserData);
+        const response = await axiosInstance.post('/sellers', validUserData);
         console.log('Registro de vendedor exitoso', response.data);
         return response.data;
     } catch (error) {
@@ -37,4 +38,30 @@ const registerUserSellerService = async (userData) => {
         throw error;
     }
 };
-export {registerUserSellerService, registerUserBuyerService};
+const loginUserService = async (userData) => {
+    const params = new URLSearchParams();
+    params.append('username', userData.email);
+    params.append('password', userData.password);
+    try {
+        console.log('Intentando loguear: ', userData);
+        const response = await axiosInstance.post('/login/access-token', params, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        });
+        localStorage.setItem('accessToken', response.data.access_token);
+        return response.data;
+    } catch (error) {
+        console.error('Hubo un error al loguear el usuario:', error.response ? error.response.data : error);
+        throw error;
+    }
+}
+const useLogout = () => {
+    const history = useHistory();
+    const logout = () => {
+        localStorage.removeItem('accessToken');
+        history.push('/');
+    };
+    return logout;
+};
+export {registerUserSellerService, registerUserBuyerService, loginUserService, useLogout};

@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { Box, Typography, TextField, Button, Container, Grid, Paper, Link } from "@mui/material";
 import { useHistory } from "react-router-dom";
+import { loginUserService } from "../api/services/user/AuthService";
 import TopBar from "../components/topbar/TopBar";
 import Footer from "../components/footer/Footer";
 import styles from "../styles/styles";
 import img_mundo from "../images/img_mundo.png";
 
 const LoginPage = () => {
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -24,13 +26,28 @@ const LoginPage = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Lógica de envío aquí
+    setError(''); 
+    try {
+      console.log('Se esta intentando loguear un usuario: ', formData);
+      const userResponse = await loginUserService(formData);
+      console.log('Se ha logueado un usuario', userResponse);
+      setTimeout(() => {
+        history.push("/");
+      }, 2000);
+    } catch (error) {
+      console.error('Hubo un error al intentar loguear al usuario:', error);
+      const errorMessage = error.response && error.response.data && error.response.data.detail
+        ? error.response.data.detail
+        : 'An unexpected error occurred'; 
+      setError(errorMessage);
+    }
   };
+  
 
   const handleForgotPasswordClick = () => {
-    history.push("/forgotPassword"); 
+    history.push("/forgotPassword");
   };
 
   return (
@@ -57,6 +74,11 @@ const LoginPage = () => {
           <Box component="form" onSubmit={handleSubmit} sx={styles.formContainer}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
+                {error && (
+                  <Typography color="error" style={{ textAlign: "center" }}>
+                    {error}
+                  </Typography>
+                )}
                 <Typography variant="body2" style={{ color: "#232323", textAlign: "left" }}>
                   Email
                 </Typography>
