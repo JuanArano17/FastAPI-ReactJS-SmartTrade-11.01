@@ -1,10 +1,5 @@
-from pydantic import BaseModel, ConfigDict, Field, EmailStr, NonNegativeFloat
-from typing import List, Optional
-from app.schemas.card import Card
-from app.schemas.address import Address
-from app.schemas.in_shopping_cart import InShoppingCart
-from app.schemas.in_wish_list import InWishList
-from app.schemas.order import Order
+from pydantic import BaseModel, ConfigDict, Field, EmailStr
+from typing import Optional
 
 
 class UserBase(BaseModel):
@@ -24,12 +19,20 @@ class UserUpdate(UserBase):
     password: Optional[str] = None
 
 
+# That doesn't seem to make sense. Not all users have these attributes, only buyers.
+# class User(UserBase):
+#     model_config = ConfigDict(from_attributes=True)
+
+#     id: int
+#     addresses: List[Address] = []
+#     in_shopping_cart: List[InShoppingCart] = []
+#     in_wish_list: List[InWishList] = []
+#     cards: List[Card] = []
+#     orders: List[Order] = []
+
+
 class User(UserBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    addresses: List[Address] = []
-    in_shopping_cart: List[InShoppingCart] = []
-    in_wish_list: List[InWishList] = []
-    cards: List[Card] = []
-    orders: List[Order] = []
+    type: str
