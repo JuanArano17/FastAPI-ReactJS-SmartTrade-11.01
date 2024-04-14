@@ -11,6 +11,7 @@ from app.api.routers import products
 from app.api.routers import addresses
 from app.api.routers import seller_product
 from app.api.routers import login
+from app.api.routers import users
 
 api_router = APIRouter()
 api_router.include_router(sellers.router)
@@ -25,3 +26,4 @@ api_router.include_router(login.router)
 api_router.include_router(cards.router)
 api_router.include_router(orders.router)
 api_router.include_router(orders.orders_router)
+api_router.include_router(users.router)
