@@ -83,6 +83,47 @@ const styles = {
         '&:hover': {
             backgroundColor: '#f5f5f5',
         },
-    }
+    },
+    paperContainerdos: {
+        display: 'flex',
+        alignItems: 'center',
+        padding: 2,
+        marginBottom: 2,
+        p: 4,
+        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)',
+        borderRadius: '20px',
+        mb: '80px',
+        mt: '40px',
+        borderColor: 'black',
+        borderWidth: '1px',
+        borderStyle: 'solid'
+    },
+    totalPriceBox: {
+        borderColor: 'black',
+        borderWidth: '1px',
+        borderRadius: '20px',
+        borderStyle: 'solid',
+        backgroundColor: '#cbe8ba',
+        padding: '10px 20px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        mb:2,
+    },
+    cartItemPaper: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        marginBottom: 2,
+        padding: '16px',
+        alignItems: 'center',
+        borderColor: 'black',
+        borderWidth: '2px',
+        borderRadius: '20px',
+        borderStyle: 'solid',
+    },
+    productImage: {
+        width: 100,
+        marginRight: 16
+    },
 }
 export default styles;

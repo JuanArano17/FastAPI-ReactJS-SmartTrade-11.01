@@ -1,8 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Grid, TextField, Typography, Button } from '@mui/material';
 import styles from "../../styles/styles";
 
 const CardInformationForm = ({ cardData, handleChange }) => {
+    const [formValidity, setFormValidity] = useState({
+        CardNumber: false,
+        ExpiryDate: false,
+        CVV: false
+    });
+
+    const handleFieldValidation = (fieldId, value) => {
+        switch (fieldId) {
+            case "CardNumber":
+                return value.length === 16;
+            case "ExpiryDate":
+                return /^\d{2}\/\d{2}$/.test(value);
+            case "CVV":
+                return /^\d{3}$/.test(value);
+            default:
+                return false;
+        }
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        handleChange(e);
+        setFormValidity((prevValidity) => ({
+            ...prevValidity,
+            [name]: handleFieldValidation(name, value)
+        }));
+    };
+
+    const isFormValid = Object.values(formValidity).every(valid => valid);
+
     return (
         <Box component="form" sx={styles.formContainer}>
             <Grid container spacing={3}>
@@ -32,9 +62,10 @@ const CardInformationForm = ({ cardData, handleChange }) => {
                         required
                         fullWidth
                         value={cardData.CardNumber}
-                        onChange={handleChange}
+                        onChange={handleInputChange}
                         inputProps={{ maxLength: 16 }}
                         sx={{ ...styles.textfields, backgroundColor: "white" }}
+                        error={!formValidity.CardNumber}
                     />
                 </Grid>
                 <Grid item xs={6}>
@@ -51,6 +82,7 @@ const CardInformationForm = ({ cardData, handleChange }) => {
                         onChange={handleChange}
                         inputProps={{ maxLength: 7 }}
                         sx={{ ...styles.textfields, backgroundColor: "white" }}
+                        error={!formValidity.ExpiryDate}
                     />
                 </Grid>
                 <Grid item xs={6}>
@@ -64,15 +96,17 @@ const CardInformationForm = ({ cardData, handleChange }) => {
                         required
                         fullWidth
                         value={cardData.CVV}
-                        onChange={handleChange}
+                        onChange={handleInputChange}
                         inputProps={{ maxLength: 3 }}
                         sx={{ ...styles.textfields, backgroundColor: "white" }}
+                        error={!formValidity.CVV}
                     />
                 </Grid>
             </Grid>
             <Button
                 fullWidth
-                sx={styles.registerButton}
+                sx={{ ...styles.registerButton, pointerEvents: isFormValid ? "auto" : "none", opacity: isFormValid ? 1 : 0.5 }}
+                disabled={!isFormValid}
                 onClick={() => console.log("Listo para guardar después del registro del usuario")}
             >
                 Save

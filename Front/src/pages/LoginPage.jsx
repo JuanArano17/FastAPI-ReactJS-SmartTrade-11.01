@@ -1,11 +1,14 @@
 import React, { useState } from "react";
-import { Box, Typography, TextField, Button, Container, Grid, Paper, Link } from "@mui/material";
+import { Box, Typography, TextField, Button, Container, Grid, Paper, Link, IconButton, InputAdornment } from "@mui/material";
 import { useHistory } from "react-router-dom";
 import { loginUserService } from "../api/services/user/AuthService";
 import TopBar from "../components/topbar/TopBar";
 import Footer from "../components/footer/Footer";
 import styles from "../styles/styles";
 import img_mundo from "../images/img_mundo.png";
+import { validateEmail, validatePassword } from "../utils/registerFormValidations";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 const LoginPage = () => {
   const [error, setError] = useState('');
@@ -14,6 +17,7 @@ const LoginPage = () => {
     password: "",
     rememberMe: false,
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const history = useHistory();
 
@@ -48,6 +52,17 @@ const LoginPage = () => {
 
   const handleForgotPasswordClick = () => {
     history.push("/forgotPassword");
+  };
+
+  // Validar correo electrónico y contraseña con las mismas validaciones que en buyerregistration
+  const isEmailValid = validateEmail(formData.email);
+  const isPasswordValid = validatePassword(formData.password);
+
+  // Determinar si los campos de texto están completos y válidos
+  const isFormValid = formData.email !== "" && formData.password !== "" && isEmailValid && isPasswordValid;
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
   };
 
   return (
@@ -90,6 +105,7 @@ const LoginPage = () => {
                   autoComplete="email"
                   value={formData.email}
                   onChange={handleChange}
+                  error={!isEmailValid} // Mostrar error si el correo electrónico no es válido
                 />
               </Grid>
               <Grid item xs={12}>
@@ -101,10 +117,23 @@ const LoginPage = () => {
                   name="password"
                   required
                   fullWidth
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   value={formData.password}
                   onChange={handleChange}
+                  error={!isPasswordValid} // Mostrar error si la contraseña no es válida
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={togglePasswordVisibility}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </Grid>
               <Grid item xs={12} sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -128,7 +157,8 @@ const LoginPage = () => {
               type="submit"
               fullWidth
               variant="contained"
-              sx={styles.registerButton}
+              sx={{ ...styles.registerButton, pointerEvents: isFormValid ? "auto" : "none", opacity: isFormValid ? 1 : 0.5 }}
+              disabled={!isFormValid}
             >
               Login
             </Button>

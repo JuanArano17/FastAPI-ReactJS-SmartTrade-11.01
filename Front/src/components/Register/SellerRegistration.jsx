@@ -15,27 +15,33 @@ const formFields = [
     { id: "password", name: "Password", label: "PSW_curso_2023_2024", autoComplete: "new-password", type: "password" },
     { id: "age", name: "Birth date", type: "date" },
 ];
+
 const formBankFields = [
     { id: "cif", name: "CIF", label: "CIF", autoComplete: "cif" },
-    { id: "bankData", name: "Bank data", label: "your bank data", autoComplete: "cif" }
-]
+    { id: "bankData", name: "Bank data", label: "Your bank data", autoComplete: "cif" }
+];
+
 const SellerRegistration = () => {
     const history = useHistory();
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [formData, setFormData] = useState(getDefaultRegisterSellerModel());
     const [formErrors, setFormErrors] = useState({});
     const [showPassword, setShowPassword] = useState(false);
+
     const togglePasswordVisibility = () => {
         setShowPassword((prev) => !prev);
     };
+
     const isFormValid = () => {
-        const isAnyFieldEmpty = formFields.some(field => !formData[field.id]);
-        const isAnyFieldError = formFields.some(field => formErrors[field.id]);
+        const isAnyFieldEmpty = [...formFields, ...formBankFields].some(field => !formData[field.id]);
+        const isAnyFieldError = [...formFields, ...formBankFields].some(field => formErrors[field.id]);
         return !isAnyFieldEmpty && !isAnyFieldError;
     };
+
     const handleChange = (e) => {
         const { id, value } = e.target;
         let errors = { ...formErrors };
+        
         if (id === 'email') {
             errors.email = validateEmail(value) ? '' : 'Email is not valid!';
         }
@@ -48,12 +54,10 @@ const SellerRegistration = () => {
         if (id === 'cif') {
             errors.cif = validateCIF(value) ? '' : 'CIF is not valid!';
         }
-        if (id === 'bankData') {
-            errors.bankData = validateBankData(value) ? '' : 'Bank data must be at least 10 caracrers long!';
-        }
         setFormErrors(errors);
         setFormData((prevData) => ({ ...prevData, [id]: value }));
     };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (isFormValid()) {
@@ -72,6 +76,7 @@ const SellerRegistration = () => {
             console.log('El formulario no es válido.');
         }
     };
+
     return (
         <Container component="main" maxWidth="lg">
             <Paper elevation={3} sx={styles.paperContainer}>
@@ -142,11 +147,12 @@ const SellerRegistration = () => {
                                             error={!!formErrors[field.id]}
                                             helperText={formErrors[field.id]}
                                             sx={styles.textField}
+                                            error={!!formErrors[field.id]}
+                                            helperText={formErrors[field.id]}
                                             InputProps={{
                                                 sx: styles.textfields
                                             }}
                                         />
-
                                     </Box>
                                 ))}
                             </Paper>
@@ -156,7 +162,8 @@ const SellerRegistration = () => {
                         type="submit"
                         fullWidth
                         variant="contained"
-                        sx={styles.registerButton}
+                        sx={{ ...styles.registerButton, pointerEvents: isFormValid() ? "auto" : "none", opacity: isFormValid() ? 1 : 0.5 }}
+                        disabled={!isFormValid()}
                     >
                         Register Seller
                     </Button>
@@ -171,4 +178,5 @@ const SellerRegistration = () => {
         </Container>
     );
 };
+
 export default SellerRegistration;

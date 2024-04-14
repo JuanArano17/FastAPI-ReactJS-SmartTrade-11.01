@@ -1,20 +1,33 @@
 import React, { useState } from "react";
-import { Box, Typography, TextField, Button, Container, Grid, Paper } from "@mui/material";
+import { Box, Typography, TextField, Button, Container, Paper } from "@mui/material";
 import TopBar from "../components/topbar/TopBar";
 import Footer from "../components/footer/Footer";
 import styles from "../styles/styles";
+import { validateEmail } from "../utils/registerFormValidations"; 
 import img_mundo from "../images/img_mundo.png";
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
-  
+  const [error, setError] = useState(""); 
+
   const handleChange = (e) => {
-    setEmail(e.target.value);
+    const { value } = e.target;
+    setEmail(value);
+    if (!validateEmail(value)) {
+      setError("El email no es válido.");
+    } else {
+      setError(""); 
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Lógica para enviar el correo electrónico de recuperación de contraseña
+    if (validateEmail(email)) {
+      // Lógica para enviar el correo electrónico de recuperación de contraseña
+      console.log("Email enviado para recuperar contraseña.");
+    } else {
+      setError("Por favor ingrese un email válido para continuar.");
+    }
   };
 
   return (
@@ -30,7 +43,7 @@ const ForgotPasswordPage = () => {
           marginBottom: "20px",
           margin: "0 auto",
           borderRadius: "50%",
-          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)",
+          boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.2)"
         }}
       />
       <Container component="main" maxWidth="xs" sx={styles.mainContainer}>
@@ -39,24 +52,25 @@ const ForgotPasswordPage = () => {
             Forgot Password?
           </Typography>
           <Box component="form" onSubmit={handleSubmit} sx={styles.formContainer}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <Typography variant="body2" style={{ color: "#232323", textAlign: "left" }}>
-                  Email
-                </Typography>
-                <TextField
-                  id="email"
-                  name="email"
-                  required
-                  fullWidth
-                  autoComplete="email"
-                  value={email}
-                  onChange={handleChange}
-                />
-              </Grid>
-            </Grid>
+            <TextField
+              id="email"
+              label="Email"
+              type="email"
+              fullWidth
+              autoComplete="email"
+              value={email}
+              onChange={handleChange}
+              error={!!error}
+              helperText={error}
+              required
+              sx={{ marginBottom: '20px' }}
+            />
             <Button
-              type="submit" fullWidth variant="contained" sx={styles.registerButton}
+              type="submit"
+              fullWidth
+              variant="contained"
+              disabled={!email || !!error}
+              sx={styles.registerButton}
             >
               Send Email
             </Button>

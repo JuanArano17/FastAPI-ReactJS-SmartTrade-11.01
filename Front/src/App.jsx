@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import CatalogPage from './pages/CatalogPage';
+import ShoppingCartPage from './pages/ShoppingCartPage';
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
           <Route path="/details" component={ProductDetailPage} />
           <Route path="/catalog" component={CatalogPage} />
           <Route path="/forgotPassword" component={ForgotPasswordPage} />
+          <Route path="/shoppingCart" component={ShoppingCartPage} />
           <Route exact path="/" component={HomePage} />
         </Switch>
       </Router>

@@ -19,13 +19,21 @@ const TopBar = ({
     history.push("/login");
   };
 
+  const handleLogoClick = () => {
+    // Falta la lógica que redirige al usuario al catálogo si está loggeado, de lo contrario, redirige a la página de inicio
+    const destination = showLogoutButton ? "/catalog" : "/";
+    history.push(destination);
+  };
+
   return (
     <AppBar position="static" color="default" elevation={0}>
       <Toolbar>
         <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: '40px', marginRight: 'auto' }}>
-          <IconButton size="large" edge="start" color="inherit" aria-label="recycle">
-            <RecyclingIcon />
-          </IconButton>
+          <Link to={showLogoutButton ? "/catalog" : "/"}>
+            <IconButton size="large" edge="start" color="success" aria-label="recycle">
+              <RecyclingIcon />
+            </IconButton>
+          </Link>
           <Typography variant="h6" color="#629c44" noWrap>
             Smart Trade
           </Typography>
