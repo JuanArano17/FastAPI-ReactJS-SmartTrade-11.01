@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography, Paper } from '@mui/material';
-import styles from "../../styles/styles";
+import styles from "../../../styles/styles";
 
 const CartTotal = ({ total }) => {
     return (

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Box, Container, Typography, Grid, Button, Paper, Divider, IconButton } from '@mui/material';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import StarIcon from '@mui/icons-material/Star';
@@ -7,6 +8,7 @@ import Footer from '../components/footer/Footer';
 import styles from '../styles/styles';
 
 const ProductDetailPage = () => {
+    const { id } = useParams();
     const [isFavorite, setIsFavorite] = useState(false);
 
     const handleFavoriteClick = () => {

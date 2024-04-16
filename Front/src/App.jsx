@@ -17,7 +17,7 @@ function App() {
           <Route path="/home" component={HomePage} />
           <Route path="/register" component={RegisterPage} />
           <Route path="/login" component={LoginPage} />
-          <Route path="/details" component={ProductDetailPage} />
+          <Route path="/catalog/product/:id" component={ProductDetailPage} />
           <Route path="/catalog" component={CatalogPage} />
           <Route path="/forgotPassword" component={ForgotPasswordPage} />
           <Route path="/shoppingCart" component={ShoppingCartPage} />

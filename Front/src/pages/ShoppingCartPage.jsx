@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Box, Container, Typography, Grid, Button } from '@mui/material';
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
-import CartItem from '../components/shoppingcart/CartItem';
-import CartTotal from '../components/shoppingcart/CartTotal';
+import CartItem from '../components/products/shoppingcart/CartItem';
+import CartTotal from '../components/products/shoppingcart/CartTotal';
 import styles from '../styles/styles';
 import imageplaceholder from '../images/img_mundo.png'
 

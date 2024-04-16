@@ -1,32 +1,70 @@
-import React, { useState } from 'react';
-import { Box, Container, Grid, Paper, Typography, Slider, Select, MenuItem, FormControl, InputLabel, Button, IconButton, Rating } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Container, Grid, Paper, Typography, Slider, Select, MenuItem, FormControl, InputLabel, Button, IconButton, Rating, Pagination } from '@mui/material';
+import { useHistory } from 'react-router-dom'; 
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
+import SummarizedProduct from '../components/products/summarizedProduct/SummarizedProduct';
 import styles from '../styles/styles';
+import { getAllProducts } from '../api/services/products/ProductsService';
 
 const CatalogPage = () => {
+    const history = useHistory();
     const [selectedCategory, setSelectedCategory] = useState('');
     const [priceRange, setPriceRange] = useState([20, 40]);
     const [rating, setRating] = useState(0);
-    // Asumiremos que estos datos vendrán de un estado o una API
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const productsPerPage = 12;
     const categories = ['Category 1', 'Category 2', 'Category 3'];
-    const products = [/* array de productos aquí */];
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                setLoading(true);
+                const response = await getAllProducts();
+                console.log("PRODUCTOS: ", response);
+                setProducts(response);
+                setLoading(false);
+                setError(null); // resetear errores anteriores
+            } catch (err) {
+                setError(err.message);
+                setLoading(false);
+            }
+        };
+        fetchProducts();
+    }, []);
+    const totalPages = Math.ceil(products.length / productsPerPage);
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+    const handleChangePage = (event, value) => {
+        setCurrentPage(value);
+    };
     const handleCategoryChange = (event) => {
         setSelectedCategory(event.target.value);
     };
+
     const handlePriceChange = (event, newValue) => {
         setPriceRange(newValue);
     };
+
     const clearFilters = () => {
         setSelectedCategory('');
         setPriceRange([20, 40]);
         setRating(0);
     };
+    const handleProductClick = (productId) => {
+        history.push(`/catalog/product/${productId}`); // Función para manejar el click
+    };
+    if (loading) return <Typography>Cargando...</Typography>;
+    if (error) return <Typography>Error: {error}</Typography>;
+
     return (
         <Box sx={styles.mainBox}>
             <TopBar showSearchBar={true} showLogoutButton={true} />
             <Container sx={styles.mainContainer}>
-                {/* Filtros de búsqueda */}
                 <Box sx={{ padding: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <FormControl variant="outlined" sx={{ m: 1, minWidth: 120 }}>
                         <InputLabel>Categoría</InputLabel>
@@ -43,7 +81,7 @@ const CatalogPage = () => {
                         </Select>
                     </FormControl>
                     <Typography id="range-slider" gutterBottom>
-                        Precio Mínimo
+                        Rango de Precios
                     </Typography>
                     <Slider
                         value={priceRange}
@@ -52,9 +90,6 @@ const CatalogPage = () => {
                         aria-labelledby="range-slider"
                         sx={{ width: 300 }}
                     />
-                    <Typography id="range-slider" gutterBottom>
-                        Precio Máximo
-                    </Typography>
                     <Rating
                         name="simple-controlled"
                         value={rating}
@@ -67,23 +102,29 @@ const CatalogPage = () => {
                         sx={styles.clearFiltersButtonStyle}
                         onClick={clearFilters}
                     >
-                        Clear Filters
+                        Limpiar Filtros
                     </Button>
                 </Box>
-                {/* Lista de productos */}
                 <Paper elevation={3} sx={styles.paperContainer}>
                     <Grid container spacing={3}>
-                        {products.map((product, index) => (
-                            <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                                {/*<ProductDetail product={product} />*/}
+                        {currentProducts && currentProducts.map((product) => (
+                            <Grid item xs={12} sm={4} md={4} lg={4} key={product.id}>
+                                <Button
+                                    onClick={() => handleProductClick(product.id)}
+                                    sx={{ width: '100%', height: '100%', padding: 0 }}
+                                >
+                                    <SummarizedProduct product={product} />
+                                </Button>
                             </Grid>
                         ))}
                     </Grid>
                 </Paper>
+                <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                    <Pagination count={totalPages} page={currentPage} onChange={handleChangePage} />
+                </Box>
             </Container>
             <Footer />
         </Box>
     );
 };
-
 export default CatalogPage;

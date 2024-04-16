@@ -2,7 +2,8 @@ import axiosInstance from '../AxiosInstance';
 const getAllProducts = async () => {
     try {
         console.log("Intentando conseguir todos los productos...")
-        response = axiosInstance.get('/products');
+        const response = await axiosInstance.get('/products');
+        console.log("respuestaapi", response);
         return response.data;
     } catch (error) {
         console.error('Hubo un error al obtener productos', error.response ? error.response.data : error);
