@@ -5,7 +5,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import styles from "../../styles/styles";
 import imagePlaceholder from "../../images/img_mundo.png";
-import deleteItemService from "../../user/ShoppingCartService"
+import deleteItemService from "../../api/services/user/ShoppingCartService";
 const CartItem = ({ item, user_id, setCartItems }) => {
     const updateQuantity = (quantity) => {
         // Aquí va la lógica de actualización de cantidad
