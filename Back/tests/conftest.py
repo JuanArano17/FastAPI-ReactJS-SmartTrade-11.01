@@ -14,6 +14,8 @@ from app.service.address import AddressService
 from app.service.card import CardService
 from app.service.image import ImageService
 from app.service.product import ProductService
+from service.in_wish_list import InWishListService
+from service.seller_product import SellerProductService
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -67,3 +69,11 @@ def product_service(db):
 @pytest.fixture(scope="module")
 def image_service(db, product_service):
     return ImageService(session=db, product_service=product_service)
+
+@pytest.fixture(scope="module")
+def seller_product_service(db, seller_service, product_service):
+    return SellerProductService(session=db, seller_service=seller_service, product_service=product_service)
+
+@pytest.fixture(scope="module")
+def wish_list_service(db, seller_product_service, buyer_service):
+    return InWishListService(session=db, seller_product_service=seller_product_service, buyer_service=buyer_service)
