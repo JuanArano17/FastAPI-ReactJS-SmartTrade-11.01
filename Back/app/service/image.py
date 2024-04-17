@@ -62,3 +62,5 @@ class ImageService:
     
     def delete_by_id_product(self, id_product)-> list[Image]:
         return self.image_repo.delete_by_id_product(id_product=id_product)
+    
+    

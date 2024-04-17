@@ -1,5 +1,6 @@
 from typing import Union
 from fastapi import APIRouter
+from pydantic import BaseModel
 
 from app.api.deps import ProductServiceDep
 from app.schemas.product import Product
@@ -13,6 +14,9 @@ from app.schemas.house_utilities import HouseUtilities
 
 router = APIRouter(prefix="/products", tags=["products"])
 
+class ProductResponse(BaseModel):
+    product: Union[Book, Clothes, Electrodomestics, Electronics, Food, Game, HouseUtilities]
+    category: str
 
 @router.get(
     "/",
@@ -27,15 +31,16 @@ async def read_products(product_service: ProductServiceDep):
 
 @router.get(
     "/{product_id}",
-    response_model=(
-        Union[Game, Book, Food, Electronics, Electrodomestics, Clothes, HouseUtilities]
-    ),
+    response_model=ProductResponse
 )
 async def read_product(*, product_id: int, product_service: ProductServiceDep):
     """
     Retrieve a product.
     """
-    return product_service.get_by_id(product_id)
+    product =  product_service.get_by_id(product_id)
+    category = product.__class__.__name__
+    return ProductResponse(product=product, category=category)
+    
 
 
 @router.post(
