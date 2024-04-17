@@ -8,10 +8,12 @@ from app.models.image import Image
 from app.service.image import ImageService
 from app.schemas.product import ProductCreate
 from app.service.product import ProductService
+from models.in_wish_list import InWishList
 from schemas.book import BookCreate
 from schemas.buyer import BuyerCreate
 from schemas.in_wish_list import InWishListCreate
 from schemas.seller import SellerCreate
+from schemas.seller_product import SellerProductCreate
 from service.buyer import BuyerService
 from service.in_wish_list import InWishListService
 from service.seller import SellerService
@@ -77,9 +79,8 @@ def test_create_wish_list(
     product = product_service.add(BookCreate(**data))
 
     data=fake_seller_product()
-    seller_pro = seller_product_service.add(seller.id)
-
-    seller_product=seller_product_service.add(seller.id, seller_product=seller_pro)
+    data["id_product"]=product.id
+    seller_product = seller_product_service.add(seller.id, SellerProductCreate(**data))
 
     wish_list_item = {"id_seller_product": seller_product.id}
 
@@ -112,9 +113,6 @@ def test_create_duplicate_wish_list(client: TestClient, buyer_service: BuyerServ
 
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
-
-    data = fake_buyer()
-    buyer = buyer_service.add(BuyerCreate(**data))
     
     data=fake_seller()
     seller = seller_service.add(SellerCreate(**data))
@@ -123,9 +121,8 @@ def test_create_duplicate_wish_list(client: TestClient, buyer_service: BuyerServ
     product = product_service.add(BookCreate(**data))
 
     data=fake_seller_product()
-    seller_pro = seller_product_service.add(seller.id)
-
-    seller_product=seller_product_service.add(seller.id, seller_product=seller_pro)
+    data["id_product"]=product.id
+    seller_product = seller_product_service.add(seller.id, SellerProductCreate(**data))
     
     wish_list_item=InWishListCreate(id_seller_product=seller_product.id)
     wish_list_item=wish_list_service.add(buyer.id, wish_list_item=wish_list_item)
@@ -137,17 +134,104 @@ def test_create_duplicate_wish_list(client: TestClient, buyer_service: BuyerServ
     assert "detail" in response.json()
 
 
-def test_get_wish_list_item(
+def test_get_wish_list(
     client: TestClient,
-    product_service:ProductService,
-    db: Session,
+    db: Session, buyer_service: BuyerService, 
+    product_service: ProductService, 
+    seller_service: SellerService,
+    seller_product_service: SellerProductService,
+    wish_list_service: InWishListService
+):
+    data=fake_book()
+    product=product_service.add(BookCreate(**data))
+
+    data=fake_book()
+    data["name"]="Book2"
+    product2=product_service.add(BookCreate(**data))
+
+    data = fake_buyer()
+    buyer = buyer_service.add(BuyerCreate(**data))
+    
+    data= fake_seller()
+    seller = seller_service.add(SellerCreate(**data))
+
+    data= fake_book()
+    product = product_service.add(BookCreate(**data))
+
+    data=fake_seller_product()
+    data["id_product"]=product.id
+    seller_product = seller_product_service.add(seller.id, SellerProductCreate(**data))
+
+    data=fake_seller_product()
+    data["id_product"]=product2.id
+    seller_product2 = seller_product_service.add(seller.id, SellerProductCreate(**data))
+
+    data=fake_seller_product()
+    data["id_product"]=product.id
+    seller_product3 = seller_product_service.add(seller.id, SellerProductCreate(**data))
+    
+    wish_list_item=InWishListCreate(id_seller_product=seller_product.id)
+    wish_list_item=wish_list_service.add(buyer.id, wish_list_item=wish_list_item)
+    wish_list_item2=InWishListCreate(id_seller_product=seller_product2.id)
+    wish_list_item2=wish_list_service.add(buyer.id, wish_list_item=wish_list_item2)
+    wish_list_item3=InWishListCreate(id_seller_product=seller_product3.id)
+    wish_list_item3=wish_list_service.add(buyer.id, wish_list_item=wish_list_item3)
+
+    response = client.get(f"/products/{buyer.id}/wish_list/")
+    assert response.status_code == status.HTTP_200_OK
+    content = response.json()
+    assert len(content) == 3
+    assert wish_list_item.id_seller_product in [wish_list["id_seller_product"] for wish_list in content]
+    assert wish_list_item.id_buyer in [wish_list["id_buyer"] for wish_list in content]
+    assert wish_list_item2.id_seller_product in [wish_list["id_seller_product"] for wish_list in content]
+    assert wish_list_item2.id_buyer in [wish_list["id_buyer"] for wish_list in content]
+    assert wish_list_item3.id_seller_product in [wish_list["id_seller_product"] for wish_list in content]
+    assert wish_list_item3.id_buyer in [wish_list["id_buyer"] for wish_list in content]
+
+
+def test_delete_wish_list_item(
+    client: TestClient,
     buyer_service: BuyerService, 
+    product_service: ProductService, 
     seller_service: SellerService,
     seller_product_service: SellerProductService,
     wish_list_service: InWishListService,
+    db: Session,
 ):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
+    
+    data=fake_seller()
+    seller = seller_service.add(SellerCreate(**data))
+
+    data=fake_book()
+    product = product_service.add(BookCreate(**data))
+
+    data=fake_seller_product()
+    data["id_product"]=product.id
+    seller_product = seller_product_service.add(seller.id, SellerProductCreate(**data))
+    
+    wish_list_item=InWishListCreate(id_seller_product=seller_product.id)
+    wish_list_item=wish_list_service.add(buyer.id, wish_list_item=wish_list_item)
+
+    response = client.delete(f"/buyers/{buyer.id}/wish_list/{seller_product.id}")  # type: ignore
+    assert response.status_code == status.HTTP_200_OK
+    content = response.json()
+    assert content is None or content == {}
+
+    list_item = db.execute(
+        select(InWishList).where(InWishList.id == list_item.id)
+    ).scalar_one_or_none()  # type: ignore
+    assert list_item is None
+
+
+def test_delete_wish_list_item_not_found(
+    client: TestClient,
+    buyer_service: BuyerService, 
+    product_service: ProductService, 
+    seller_service: SellerService,
+    seller_product_service: SellerProductService,
+    wish_list_service: InWishListService,):
 
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
@@ -159,206 +243,63 @@ def test_get_wish_list_item(
     product = product_service.add(BookCreate(**data))
 
     data=fake_seller_product()
-    seller_pro = seller_product_service.add(seller.id)
+    data["id_product"]=product.id
+    seller_product = seller_product_service.add(seller.id, SellerProductCreate(**data))
 
-    seller_product=seller_product_service.add(seller.id, seller_product=seller_pro)
+    response = client.delete(f"/buyers/{buyer.id}/wish_list/{seller_product.id}")
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    content = response.json()
+    assert content["detail"] == "Seller product with id 999 not found."
+
+
+def test_delete_wish_list(
+    client: TestClient,
+    buyer_service: BuyerService, 
+    product_service: ProductService, 
+    seller_service: SellerService,
+    seller_product_service: SellerProductService,
+    wish_list_service: InWishListService,
+    db: Session
+):
+    data=fake_book()
+    product=product_service.add(BookCreate(**data))
+
+    data=fake_book()
+    data["name"]="Book2"
+    product2=product_service.add(BookCreate(**data))
+
+    data = fake_buyer()
+    buyer = buyer_service.add(BuyerCreate(**data))
+    
+    data= fake_seller()
+    seller = seller_service.add(SellerCreate(**data))
+
+    data= fake_book()
+    product = product_service.add(BookCreate(**data))
+
+    data=fake_seller_product()
+    data["id_product"]=product.id
+    seller_product = seller_product_service.add(seller.id, SellerProductCreate(**data))
+
+    data=fake_seller_product()
+    data["id_product"]=product2.id
+    seller_product2 = seller_product_service.add(seller.id, SellerProductCreate(**data))
+
+    data=fake_seller_product()
+    data["id_product"]=product.id
+    seller_product3 = seller_product_service.add(seller.id, SellerProductCreate(**data))
     
     wish_list_item=InWishListCreate(id_seller_product=seller_product.id)
     wish_list_item=wish_list_service.add(buyer.id, wish_list_item=wish_list_item)
+    wish_list_item2=InWishListCreate(id_seller_product=seller_product2.id)
+    wish_list_item2=wish_list_service.add(buyer.id, wish_list_item=wish_list_item2)
+    wish_list_item3=InWishListCreate(id_seller_product=seller_product3.id)
+    wish_list_item3=wish_list_service.add(buyer.id, wish_list_item=wish_list_item3)
 
-    response = client.get(f"/products/{product.id}/images/{image.id}")  # type: ignore
-    assert response.status_code == status.HTTP_200_OK
-    content = response.json()
-    assert content["url"] == data["url"]
-    assert "id" in content
-    assert "id_product" in content
-    assert content["id"] == image.id  # type: ignore
-    assert content["id_product"] == image.id_product  # type: ignore
-
-
-def test_get_image_not_found(
-    client: TestClient, product_service: ProductService, db: Session
-):
-    data = fake_product()
-    product = product_service.add("book", data)
-
-    response = client.get(f"/products/{product.id}/images/999")  # type: ignore
-    assert response.status_code == status.HTTP_404_NOT_FOUND
-    content = response.json()
-    assert content["detail"] == "Image with id 999 not found."
-
-
-def test_get_images(
-    client: TestClient,
-    product_service: ProductService,
-    image_service: ImageService,
-    db: Session,
-):
-    book = product_service.add("book",
-            {
-        "name": "Dune",
-        "spec_sheet": "Specs...",
-        "eco_points": 10,
-        "author": "Frank Herbert",
-        "pages": 900,
-            }
-    )
-    game = product_service.add("game",
-        {
-        "name": "gta6",
-        "spec_sheet": "Specs...",
-        "eco_points": 10,
-        "publisher": "Rockstar",
-        "platform": "ps5",
-        "size":"100GB",
-    }
-    )
-
-    image1 = image_service.add(
-        book.id,
-        ImageCreate(
-            url ="https://dummyimage.com/780x968"
-        ),
-    )
-
-    image2 = image_service.add(
-        book.id,
-        ImageCreate(
-            url ="https://dummyimage2.com/800x968"
-        ),
-    )
-    image3 = image_service.add(
-        game.id,
-        ImageCreate(
-            url ="https://dummyimage3.com/800x968"
-        ),
-    )
-
-    response = client.get(f"/products/{game.id}/images/")
-    response1 = client.get(f"/products/{book.id}/images/")
-    assert response.status_code == status.HTTP_200_OK
-    content = response.json()
-    assert len(content) == 1
-    assert image3.id in [image["id"] for image in content]
-    assert response1.status_code == status.HTTP_200_OK
-    content = response1.json()
-    assert len(content) == 2
-    assert image1.id in [image["id"] for image in content]
-    assert image2.id in [image["id"] for image in content]
-
-
-def test_update_image(
-    client: TestClient,
-    image_service: ImageService,
-    product_service: ProductService,
-    db: Session,
-):
-    data = fake_product()
-    product = product_service.add("book",data)
-
-    data = fake_image()
-    image = image_service.add(product.id, ImageCreate(**data))
-    # new_data = data.copy()
-    new_data = {
-        "url":"https://dummyimage2.com/800x968"
-    }
-    response = client.put(f"/products/{product.id}/images/{image.id}", json=new_data)  # type: ignore
-    assert response.status_code == status.HTTP_200_OK
-    content = response.json()
-    assert content["url"] == new_data["url"]
-    assert "id" in content
-    assert "id_product" in content
-    assert content["id_product"] == product.id
-
-def test_update_image_invalid_data(
-    client: TestClient,
-    image_service: ImageService,
-    product_service: ProductService,
-    db: Session,
-):
-    data = fake_product()
-    product = product_service.add("book",data)
-
-    data = fake_image()
-    image = image_service.add(product.id, ImageCreate(**data))
-    new_data = data.copy()
-    new_data["ur"] = "e"  # Wrong field
-    response = client.put(f"/products/{product.id}/images/{image.id}", json=new_data)  # type: ignore
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert "detail" in response.json()
-
-
-def test_delete_image(
-    client: TestClient,
-    image_service: ImageService,
-    product_service: ProductService,
-    db: Session,
-):
-    data = fake_product()
-    product = product_service.add("book",data)
-    data = fake_image()
-    image = image_service.add(product.id, ImageCreate(**data))
-
-    response = client.delete(f"/products/{product.id}/images/{image.id}")  # type: ignore
+    response = client.delete(f"/buyers/{buyer.id}/wish_list")
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content is None or content == {}
 
-    image = db.execute(
-        select(Image).where(Image.id == image.id)
-    ).scalar_one_or_none()  # type: ignore
-    assert image is None
-
-
-def test_delete_image_not_found(client: TestClient, product_service: ProductService):
-    data = fake_product()
-    product = product_service.add("book",data)
-    response = client.delete(f"/products/{product.id}/images/999")
-    assert response.status_code == status.HTTP_404_NOT_FOUND
-    content = response.json()
-    assert content["detail"] == "Image with id 999 not found."
-
-
-def test_delete_images(
-    client: TestClient,
-    image_service: ImageService,
-    product_service: ProductService,
-    db: Session,
-):
-    book = product_service.add("book",
-            {
-        "name": "Dune",
-        "spec_sheet": "Specs...",
-        "eco_points": 10,
-        "author": "Frank Herbert",
-        "pages": 900,
-            }
-    )
-
-    image1 = image_service.add(
-        book.id,
-        ImageCreate(
-            url ="https://dummyimage.com/780x968"
-        ),
-    )
-
-    image2 = image_service.add(
-        book.id,
-        ImageCreate(
-            url ="https://dummyimage2.com/800x968"
-        ),
-    )
-    image3 = image_service.add(
-        book.id,
-        ImageCreate(
-            url ="https://dummyimage3.com/800x968"
-        ),
-    )
-
-    response = client.delete(f"/products/{book.id}/images")
-    assert response.status_code == status.HTTP_200_OK
-    content = response.json()
-    assert content is None or content == {}
-
-    cards = db.execute(select(Image).where(Image.id_product == book.id)).all()
-    assert len(cards) == 0
+    wish_list = db.execute(select(InWishList).where(InWishList.id_seller_product == seller_product.id and InWishList.id_buyer == buyer.id)).all()
+    assert len(wish_list) == 0
