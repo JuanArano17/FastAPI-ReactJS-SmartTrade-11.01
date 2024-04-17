@@ -14,7 +14,10 @@ from app.schemas.house_utilities import HouseUtilities
 router = APIRouter(prefix="/products", tags=["products"])
 
 
-@router.get("/")
+@router.get(
+    "/",
+    response_model=list[Product],
+)
 async def read_products(product_service: ProductServiceDep):
     """
     Retrieve products.
@@ -22,7 +25,12 @@ async def read_products(product_service: ProductServiceDep):
     return product_service.get_all()
 
 
-@router.get("/{product_id}", response_model=(Union[Game,Book,Food,Electronics,Electrodomestics,Clothes,HouseUtilities]))
+@router.get(
+    "/{product_id}",
+    response_model=(
+        Union[Game, Book, Food, Electronics, Electrodomestics, Clothes, HouseUtilities]
+    ),
+)
 async def read_product(*, product_id: int, product_service: ProductServiceDep):
     """
     Retrieve a product.
@@ -30,16 +38,39 @@ async def read_product(*, product_id: int, product_service: ProductServiceDep):
     return product_service.get_by_id(product_id)
 
 
-@router.post("/", response_model=(Union[Game,Book,Food,Electronics,Electrodomestics,Clothes,HouseUtilities]))
-async def create_product(*, category_name:str , product: dict, product_service: ProductServiceDep):
+@router.post(
+    "/",
+    response_model=(
+        Union[Game, Book, Food, Electronics, Electrodomestics, Clothes, HouseUtilities]
+    ),
+)
+async def create_product(
+    *, category_name: str, product: dict, product_service: ProductServiceDep
+):
     """
     Create a new product.
     """
     return product_service.add(category=category_name, product_data=product)
 
 
-@router.put("/{product_id}", response_model=(Union[None,Game,Book,Food,Electronics,Electrodomestics,Clothes,HouseUtilities]))
-async def update_product(*, product_id: int, new_data: dict, product_service: ProductServiceDep):
+@router.put(
+    "/{product_id}",
+    response_model=(
+        Union[
+            None,
+            Game,
+            Book,
+            Food,
+            Electronics,
+            Electrodomestics,
+            Clothes,
+            HouseUtilities,
+        ]
+    ),
+)
+async def update_product(
+    *, product_id: int, new_data: dict, product_service: ProductServiceDep
+):
     """
     Update a product.
     """
