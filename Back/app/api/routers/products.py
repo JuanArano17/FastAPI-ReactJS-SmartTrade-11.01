@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Any, Union
 from fastapi import APIRouter
 from pydantic import BaseModel
 
@@ -14,10 +14,6 @@ from app.schemas.house_utilities import HouseUtilities
 
 router = APIRouter(prefix="/products", tags=["products"])
 
-class ProductResponse(BaseModel):
-    product: Union[Book, Clothes, Electrodomestics, Electronics, Food, Game, HouseUtilities]
-    category: str
-
 @router.get(
     "/",
     response_model=list[Product],
@@ -30,8 +26,7 @@ async def read_products(product_service: ProductServiceDep):
 
 
 @router.get(
-    "/{product_id}",
-    response_model=ProductResponse
+    "/{product_id}"
 )
 async def read_product(*, product_id: int, product_service: ProductServiceDep):
     """
@@ -39,9 +34,20 @@ async def read_product(*, product_id: int, product_service: ProductServiceDep):
     """
     product =  product_service.get_by_id(product_id)
     category = product.__class__.__name__
-    return ProductResponse(product=product, category=category)
-    
 
+     # Get attributes of the base class
+    product_dict = product.__dict__
+
+    # Add category to the product dictionary
+    product_dict['category'] = category
+    # Get attributes of the product that are specific to the category
+    # Get attributes of the product as a dictionary
+    product_dict.update({column: getattr(product, column) for column in product.__table__.columns.keys()})
+    # Get the list of seller products
+    seller_products = [seller_product.__dict__ for seller_product in product.seller_products]
+    product_dict['seller_products'] = seller_products
+    return product_dict
+    
 
 @router.post(
     "/",
