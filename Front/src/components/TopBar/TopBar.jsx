@@ -1,10 +1,10 @@
 import React from "react";
 import { AppBar, Toolbar, Typography, Button, IconButton, TextField, Box, InputAdornment } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
 import RecyclingIcon from "@mui/icons-material/Recycling";
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import PropTypes from "prop-types";
 import { Link, useHistory } from "react-router-dom";
+import SearchBar from "./searchbar/SearchBar"
 
 const TopBar = ({
   showSearchBar = true,
@@ -40,22 +40,7 @@ const TopBar = ({
         </Box>
 
         {showSearchBar && (
-          <Box sx={{ flexGrow: 1, justifyContent: 'center', display: 'flex' }}>
-            <TextField
-              fullWidth
-              variant="outlined"
-              placeholder="Search"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-                style: { borderRadius: 32 },
-              }}
-              sx={{ maxWidth: '40%' }}
-            />
-          </Box>
+          <SearchBar></SearchBar>
         )}
 
         <Box sx={{ marginRight: '40px', marginLeft: 'auto', display: 'flex' }}>
