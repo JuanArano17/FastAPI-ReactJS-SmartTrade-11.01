@@ -71,9 +71,7 @@ async def read_product(*, product_id: int, product_service: ProductServiceDep):
     product_dict.update({column: getattr(product, column) for column in product.__table__.columns.keys()})
     # Get the list of seller products
     seller_products = [seller_product.__dict__ for seller_product in product.seller_products]
-    images = [image.__dict__ for image in product.images]
     product_dict['seller_products'] = seller_products
-    product_dict['images'] = images
     return product_dict
     
 
