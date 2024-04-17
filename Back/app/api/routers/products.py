@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any, Optional, Union
 from fastapi import APIRouter
 from pydantic import BaseModel
 
@@ -17,23 +17,29 @@ router = APIRouter(prefix="/products", tags=["products"])
 @router.get(
     "/",
 )
-async def read_products(product_service: ProductServiceDep):
+async def read_products(product_service: ProductServiceDep, category: Optional[str] = None):
     """
     Retrieve products.
     """
     products = product_service.get_all()
     product_dicts = []
     for product in products:
-        category = product.__class__.__name__
-        product_dict = product.__dict__
-        product_dict['category'] = category
-        product_dicts.append(product_dict)
-        # Get the list of seller products for the current product
-        seller_products = [seller_product.__dict__ for seller_product in product.seller_products]
-        product_dict['seller_products'] = seller_products
-        # Get the list of images
-        images = [image.__dict__ for image in product.images]
-        product_dict['images'] = images
+        product_category = product.__class__.__name__
+        print(category)
+        print(product_category)
+        if category is None or category.lower() == product_category.lower():
+            product_dict = product.__dict__
+            product_dict['category'] = product_category
+            
+            # Get the list of seller products for the current product
+            seller_products = [seller_product.__dict__ for seller_product in product.seller_products]
+            product_dict['seller_products'] = seller_products
+            
+            # Get the list of images
+            images = [image.__dict__ for image in product.images]
+            product_dict['images'] = images
+            
+            product_dicts.append(product_dict)
     return product_dicts
 
 
