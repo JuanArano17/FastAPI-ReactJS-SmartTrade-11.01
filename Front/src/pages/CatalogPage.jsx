@@ -1,62 +1,54 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Container, Grid, Paper, Typography, Slider, Select, MenuItem, FormControl, InputLabel, Button, IconButton, Rating, Pagination } from '@mui/material';
-import { useHistory } from 'react-router-dom'; 
+import { Box, Container, Grid, Paper, Typography, Button, Pagination } from '@mui/material';
+import { useHistory, useParams } from 'react-router-dom'; 
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
 import SummarizedProduct from '../components/products/summarizedProduct/SummarizedProduct';
+import FilterProducts from '../components/products/filterProducts/FilterProducts';
 import styles from '../styles/styles';
 import { getAllProducts } from '../api/services/products/ProductsService';
 
 const CatalogPage = () => {
     const history = useHistory();
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const [priceRange, setPriceRange] = useState([20, 40]);
-    const [rating, setRating] = useState(0);
+    const { search } = useParams(); 
+    const [searchTerm, setSearchTerm] = useState(search || ""); 
     const [products, setProducts] = useState([]);
+    const [searchFilteredProducts, setSearchFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const productsPerPage = 12;
-    const categories = ['Category 1', 'Category 2', 'Category 3'];
 
     useEffect(() => {
+        setSearchTerm(search || "");
+        console.log("search: ", search);
+        console.log("searchTerm: ", searchTerm);
+        console.log("products: ", products);
+        console.log("filtered products: ", searchFilteredProducts);
         const fetchProducts = async () => {
             try {
                 setLoading(true);
                 const response = await getAllProducts();
-                console.log("PRODUCTOS: ", response);
                 setProducts(response);
                 setLoading(false);
-                setError(null); // resetear errores anteriores
+                setError(null);
             } catch (err) {
                 setError(err.message);
                 setLoading(false);
             }
         };
         fetchProducts();
-    }, []);
-    const totalPages = Math.ceil(products.length / productsPerPage);
+    }, [search]);
+
+    const totalPages = Math.ceil(searchFilteredProducts.length / productsPerPage);
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-    const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+    const currentProducts = searchFilteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
     const handleChangePage = (event, value) => {
         setCurrentPage(value);
     };
-    const handleCategoryChange = (event) => {
-        setSelectedCategory(event.target.value);
-    };
-
-    const handlePriceChange = (event, newValue) => {
-        setPriceRange(newValue);
-    };
-
-    const clearFilters = () => {
-        setSelectedCategory('');
-        setPriceRange([20, 40]);
-        setRating(0);
-    };
     const handleProductClick = (productId) => {
-        history.push(`/catalog/product/${productId}`); // Función para manejar el click
+        history.push(`/catalog/product/${productId}`);
     };
     if (loading) return <Typography>Cargando...</Typography>;
     if (error) return <Typography>Error: {error}</Typography>;
@@ -65,54 +57,12 @@ const CatalogPage = () => {
         <Box sx={styles.mainBox}>
             <TopBar showSearchBar={true} showLogoutButton={true} />
             <Container sx={styles.mainContainer}>
-                <Box sx={{ padding: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <FormControl variant="outlined" sx={{ m: 1, minWidth: 120 }}>
-                        <InputLabel>Categoría</InputLabel>
-                        <Select
-                            value={selectedCategory}
-                            onChange={handleCategoryChange}
-                            label="Categoría"
-                        >
-                            {categories.map((category) => (
-                                <MenuItem key={category} value={category}>
-                                    {category}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                    <Typography id="range-slider" gutterBottom>
-                        Rango de Precios
-                    </Typography>
-                    <Slider
-                        value={priceRange}
-                        onChange={handlePriceChange}
-                        valueLabelDisplay="auto"
-                        aria-labelledby="range-slider"
-                        sx={{ width: 300 }}
-                    />
-                    <Rating
-                        name="simple-controlled"
-                        value={rating}
-                        onChange={(event, newValue) => {
-                            setRating(newValue);
-                        }}
-                    />
-                    <Button
-                        variant="outlined"
-                        sx={styles.clearFiltersButtonStyle}
-                        onClick={clearFilters}
-                    >
-                        Limpiar Filtros
-                    </Button>
-                </Box>
+                <FilterProducts products={products} setSearchFilteredProducts={setSearchFilteredProducts} searchTerm={searchTerm} />
                 <Paper elevation={3} sx={styles.paperContainer}>
                     <Grid container spacing={3}>
                         {currentProducts && currentProducts.map((product) => (
                             <Grid item xs={12} sm={4} md={4} lg={4} key={product.id}>
-                                <Button
-                                    onClick={() => handleProductClick(product.id)}
-                                    sx={{ width: '100%', height: '100%', padding: 0 }}
-                                >
+                                <Button onClick={() => handleProductClick(product.id)} sx={{ width: '100%', height: '100%', padding: 0 }}>
                                     <SummarizedProduct product={product} />
                                 </Button>
                             </Grid>
@@ -127,4 +77,5 @@ const CatalogPage = () => {
         </Box>
     );
 };
+
 export default CatalogPage;
