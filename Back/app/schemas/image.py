@@ -19,3 +19,5 @@ class Image(ImageBase):
 
     id: int
     id_product: int
+
+

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 
 from app.api.deps import ImageServiceDep
 from app.schemas.image import Image, ImageCreate, ImageUpdate
@@ -74,3 +74,18 @@ async def delete_image(
         raise HTTPException(status_code=404, detail="Address not found")
 
     return image_service.delete_by_id(image_id)
+
+image_router = APIRouter(prefix="/images", tags=["get_images"])
+
+@image_router.get("/", response_model=dict[int, list[Image]])
+async def get_images_for_products(*, product_ids: list[int] = Query(..., description="List of product IDs"), image_service: ImageServiceDep):
+    """
+    Retrieve all images for a list of products.
+    """
+    images_by_product = {}
+    for product_id in product_ids:
+        images = image_service.get_by_id_product(id_product=product_id)
+        if images:
+            images_by_product[product_id] = images
+    return images_by_product
+
