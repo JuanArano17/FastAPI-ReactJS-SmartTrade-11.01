@@ -19,16 +19,14 @@ const ProductDetailPage = () => {
     const [similarProducts, setSimilarProducts] = useState([]);
     const [products, setProducts] = useState([]);
 
-    
+    // CONSIGUE EL PRODUCTO A DETALLAR EN LA PAGINA
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
                 const response = await getProduct(id);
                 console.log("PRODUCTOS ID: ", response);
-                console.log("NOMBRE:",response.name);
-                console.log("CATEGORIA:",response.category);
-                setProducts(response);
+                setProductData(response);
                 setLoading(false);
                 setError(null); // resetear errores anteriores
             } catch (err) {
