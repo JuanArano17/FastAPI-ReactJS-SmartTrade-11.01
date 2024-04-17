@@ -13,11 +13,12 @@ import SimilarProduct from '../components/products/similarProduct/SimilarProduct
 const ProductDetailPage = () => {
     const { id } = useParams();
     const [productData, setProductData] = useState(null);
+    const [productsData, setProductsData] = useState([]);
     const [isFavorite, setIsFavorite] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [similarProducts, setSimilarProducts] = useState([]);
-    const [products, setProducts] = useState([]);
+    const [similarProductsFiltered, setSimilarProducts] = useState(null);
+
 
     // CONSIGUE EL PRODUCTO A DETALLAR EN LA PAGINA
     useEffect(() => {
@@ -25,17 +26,31 @@ const ProductDetailPage = () => {
             try {
                 setLoading(true);
                 const response = await getProduct(id);
-                console.log("PRODUCTOS ID: ", response);
-                setProductData(response);
+                const allresponse = await getAllProducts();
+                if (response && allresponse) {
+                    setProductData(response);
+                    setProductsData(allresponse);
+                }
+                
+                const similarProductsFiltered = allresponse.filter(p =>
+                    p.category === response.category && p.id !== response.id
+                );
+
+                setSimilarProducts(similarProductsFiltered);
                 setLoading(false);
                 setError(null); // resetear errores anteriores
+                console.log("hasta aqui todo correcto");
+
+                console.log(similarProductsFiltered);
             } catch (err) {
                 setError(err.message);
                 setLoading(false);
             }
         };
         fetchProducts();
-    }, []);
+    }, [id]);
+
+
 
     const handleFavoriteClick = () => {
         setIsFavorite(!isFavorite);
@@ -114,7 +129,7 @@ const ProductDetailPage = () => {
                             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                                 Similar Products
                             </Typography>
-                            {SimilarProduct.category}
+                            {/*aqui tienen que ir los similar products*/}
                         </Box>
                     </Paper>
                 )}
