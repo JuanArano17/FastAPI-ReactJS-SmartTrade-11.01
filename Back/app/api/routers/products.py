@@ -16,13 +16,25 @@ router = APIRouter(prefix="/products", tags=["products"])
 
 @router.get(
     "/",
-    response_model=list[Product],
 )
 async def read_products(product_service: ProductServiceDep):
     """
     Retrieve products.
     """
-    return product_service.get_all()
+    products = product_service.get_all()
+    product_dicts = []
+    for product in products:
+        category = product.__class__.__name__
+        product_dict = product.__dict__
+        product_dict['category'] = category
+        product_dicts.append(product_dict)
+        # Get the list of seller products for the current product
+        seller_products = [seller_product.__dict__ for seller_product in product.seller_products]
+        product_dict['seller_products'] = seller_products
+        # Get the list of images
+        images = [image.__dict__ for image in product.images]
+        product_dict['images'] = images
+    return product_dicts
 
 
 @router.get(
