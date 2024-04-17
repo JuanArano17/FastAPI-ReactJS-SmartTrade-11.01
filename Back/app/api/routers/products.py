@@ -48,8 +48,6 @@ async def read_products(product_service: ProductServiceDep, category: Optional[s
 
 @router.get(
     "/{product_id}"
-    "/{product_id}",
-    response_model=ProductResponse
 )
 async def read_product(*, product_id: int, product_service: ProductServiceDep):
     """
