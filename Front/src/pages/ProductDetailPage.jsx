@@ -1,81 +1,125 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Container, Typography, Grid, Button, Paper, Divider, IconButton } from '@mui/material';
+import { Box, Container, Typography, Grid, Button, Paper, Divider, IconButton, CircularProgress, Stack, Rating } from '@mui/material';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import StarIcon from '@mui/icons-material/Star';
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
 import styles from '../styles/styles';
+import { getProduct, getAllProducts } from '../api/services/products/ProductsService';
+import SimilarProduct from '../components/products/similarProduct/SimilarProduct';
+
 
 const ProductDetailPage = () => {
     const { id } = useParams();
+    const [productData, setProductData] = useState(null);
     const [isFavorite, setIsFavorite] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [similarProducts, setSimilarProducts] = useState([]);
+    const [products, setProducts] = useState([]);
+
+    
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                setLoading(true);
+                const response = await getProduct(id);
+                console.log("PRODUCTOS ID: ", response);
+                console.log("NOMBRE:",response.name);
+                console.log("CATEGORIA:",response.category);
+                setProducts(response);
+                setLoading(false);
+                setError(null); // resetear errores anteriores
+            } catch (err) {
+                setError(err.message);
+                setLoading(false);
+            }
+        };
+        fetchProducts();
+    }, []);
 
     const handleFavoriteClick = () => {
         setIsFavorite(!isFavorite);
     };
 
-    // Asumiremos que estos datos vendrán de la API o de un componente padre
-    const productData = {
-        brand: {
-            name: "Product Brand",
-            logo: "/path/to/logo.jpg", // Asumiendo que tienes una imagen para el logo
-        },
-        name: "Product Name",
-        description: "Product description",
-        price: "PRICE $$$",
-        characteristics: [
-            { label: "Height", value: "10cm" },
-            { label: "Width", value: "5cm" },
-            // Más características...
-        ],
-        similarProducts: [/* array of similar products data */],
+    const renderAdditionalAttributes = (productData) => {
+        const commonAttributes = ['name', 'description', 'eco_points', 'spec_sheet', 'stock', 'id', 'images', 'seller_products'];
+        return Object.keys(productData)
+            .filter(key => !commonAttributes.includes(key))
+            .map(key => (
+                <Typography variant="body2" key={key}>
+                    {key.charAt(0).toUpperCase() + key.slice(1)}: {productData[key]}
+                </Typography>
+            ));
     };
 
+    if (loading) {
+        return <CircularProgress />;
+    }
+
+    if (error) {
+        return <Typography color="error">{error}</Typography>;
+    }
     return (
         <Box sx={styles.mainBox}>
             <TopBar showSearchBar={true} showLogoutButton={true} />
-
-
-            <Container component="main" sx={styles.mainContainer}>
-                <Paper elevation={3} sx={styles.paperContainer}>
-                    <Box sx={{ position: 'relative', padding: 2 }}>
-                        <IconButton onClick={handleFavoriteClick} sx={{ position: 'absolute', top: 0, right: 0 }}>
+            <Container sx={styles.mainContainer}>
+                {productData && (
+                    <Paper elevation={3} sx={{ ...styles.paperContainer, position: 'relative' }}>
+                        <IconButton
+                            onClick={handleFavoriteClick}
+                            sx={{ position: 'absolute', top: 8, right: 8, backgroundColor: 'background.paper', borderRadius: '50%' }}
+                        >
                             {isFavorite ? <StarIcon sx={{ color: "#ffcc00" }} /> : <StarBorderIcon />}
                         </IconButton>
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <img src={productData.brand.logo} alt={`${productData.brand.name} Logo`} style={{ width: '50px', height: '50px' }} />
-                            <Typography variant="h6" sx={styles.headerText}>{productData.brand.name}</Typography>
-                        </Box>
-                        <Divider sx={styles.ThickDivider} />
-                        <Grid container spacing={3}>
-                            {/* Imagen y descripción general del Producto */}
-                            <Grid item xs={12} md={6}>
-                                {/* Componente para la galería de imágenes */}
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} md={5} sx={{ display: 'flex', justifyContent: 'center' }}>
+                                <img
+                                    src={productData.images.length > 0 ? productData.images[0].url : '/path/to/default.jpg'}
+                                    alt={productData.name}
+                                    style={styles.imageStyle}
+                                />
                             </Grid>
-                            <Grid item xs={12} md={6}>
-                                <Typography variant="h5" sx={styles.headerText}>
+                            <Grid item xs={12} md={7}>
+                                <Typography variant="h6" color="text.secondary">
+                                    {productData.brand}
+                                </Typography>
+                                <Typography variant="h4" sx={{ mb: 2, fontWeight: 'bold' }}>
                                     {productData.name}
                                 </Typography>
-                                <Typography paragraph>
-                                    {productData.description}
+                                <Rating name="read-only" value={4} readOnly />
+                                <Typography sx={{ mt: 2 }}>{productData.description}</Typography>
+                                <Typography variant="h5" sx={{ my: 2 }}>
+                                    Precio: ${productData.seller_products.length > 0 ? productData.seller_products[0].price : "Consultar"}
                                 </Typography>
-                                <Typography variant="h4" sx={{ mb: 2 }}>
-                                    {productData.price}
-                                </Typography>
-                                <Button variant="contained" sx={styles.registerButton}>
+                                <Button variant="contained" sx={{ mb: 2 }}>
                                     Add to Cart
                                 </Button>
+                                <IconButton
+                                    onClick={handleFavoriteClick}
+                                    sx={{ position: 'absolute', top: 8, right: 8 }}
+                                >
+                                    {isFavorite ? <StarIcon sx={{ color: "#ffcc00" }} /> : <StarBorderIcon />}
+                                </IconButton>
                             </Grid>
                         </Grid>
-                        <Divider sx={styles.ThickDivider} />
-                        <Typography variant="h6" sx={styles.headerText}>Product Characteristics</Typography>
-                        {/* Características del Producto */}
-                        <Divider sx={styles.ThickDivider} />
-                        <Typography variant="h6" sx={styles.headerText}>Similar Products</Typography>
-                        {/* Productos Similares */}
-                    </Box>
-                </Paper>
+                        <Divider sx={{ my: 2 }} />
+                        <Box sx={{ textAlign: 'left' }}>
+                            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                Product characteristics
+                            </Typography>
+                            {renderAdditionalAttributes(productData)}
+                        </Box>
+                        <Divider sx={styles.ThickDivider}></Divider>
+                        <Box sx={{ textAlign: 'left' }}>
+                            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                Similar Products
+                            </Typography>
+                            {SimilarProduct.category}
+                        </Box>
+                    </Paper>
+                )}
             </Container>
             <Footer />
         </Box>
