@@ -1,5 +1,5 @@
-import axiosInstance from '../AxiosInstance'; 
-import {createProductFromApiResponse} from "../../../models/ProductModel"
+import axiosInstance from '../AxiosInstance';
+import { createProductFromApiResponse } from "../../../models/ProductModel"
 const getAllProducts = async () => {
     try {
         console.log("Intentando conseguir todos los productos...");
@@ -34,4 +34,14 @@ const getAllProductsSellerComplete = async () => {
         throw error;
     }
 }
-export {getAllProducts, getAllProductsSeller, getAllProductsSellerComplete}
+const getProduct = async (product_id) => {
+    try {
+        console.log("Intentando conseguir el producto...")
+        const response = await axiosInstance.get(`/products/${product_id}`);
+        console.log("producto conseguido correctamente", response)
+        return response.data;
+    } catch (error) {
+        console.error('Hubo un error al obtener el producto', error.response ? error.response.data : error);
+    }
+}
+export {getProduct,getAllProducts, getAllProductsSeller, getAllProductsSellerComplete}

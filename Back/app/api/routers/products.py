@@ -13,6 +13,9 @@ from app.schemas.game import Game
 from app.schemas.house_utilities import HouseUtilities
 
 router = APIRouter(prefix="/products", tags=["products"])
+class ProductResponse(BaseModel):
+    product: Union[Book, Clothes, Electrodomestics, Electronics, Food, Game, HouseUtilities]
+    category: str
 
 @router.get(
     "/",
@@ -50,6 +53,11 @@ async def read_product(*, product_id: int, product_service: ProductServiceDep):
     """
     Retrieve a product.
     """
+    product =  product_service.get_by_id(product_id)
+    category = product.__class__.__name__
+    return ProductResponse(product=product, category=category)
+    
+
     product =  product_service.get_by_id(product_id)
     category = product.__class__.__name__
 
