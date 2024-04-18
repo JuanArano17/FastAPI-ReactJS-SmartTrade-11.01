@@ -31,7 +31,7 @@ const CartItem = ({ item, setCartItems }) => {
     const removeItem = async () => {
         try {
             await deleteItemService(item.id_seller_product);
-            setCartItems((prevItems) => prevItems.filter((cartItem) => cartItem.id !== item.id_seller_product));
+            setCartItems((prevItems) => prevItems.filter((cartItem) => cartItem.id_seller_product !== item.id_seller_product));
         } catch (error) {
             console.error('Error al eliminar el item:', error);
         }
