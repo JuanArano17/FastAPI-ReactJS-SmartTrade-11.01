@@ -4,15 +4,15 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.service.product import ProductService
-from schemas.book import BookCreate
-from schemas.buyer import BuyerCreate
-from schemas.in_wish_list import InWishListCreate
-from schemas.seller import SellerCreate
-from schemas.seller_product import SellerProductCreate
-from service.buyer import BuyerService
-from service.in_wish_list import InWishListService
-from service.seller import SellerService
-from service.seller_product import SellerProductService
+from app.schemas.book import BookCreate
+from app.schemas.buyer import BuyerCreate
+from app.schemas.in_wish_list import InWishListCreate
+from app.schemas.seller import SellerCreate
+from app.schemas.seller_product import SellerProductCreate
+from app.service.buyer import BuyerService
+from app.service.in_wish_list import InWishListService
+from app.service.seller import SellerService
+from app.service.seller_product import SellerProductService
 
 def fake_buyer():
     return {
@@ -179,7 +179,7 @@ def test_get_wish_list(
     wish_list_item3=InWishListCreate(id_seller_product=seller_product3.id)
     wish_list_item3=wish_list_service.add(buyer.id, wish_list_item=wish_list_item3)
 
-    response = client.get(f"/products/{buyer.id}/wish_list/")
+    response = client.get(f"/buyers/{buyer.id}/wish_list/")
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert len(content) == 3

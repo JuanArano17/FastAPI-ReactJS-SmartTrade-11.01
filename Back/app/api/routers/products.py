@@ -28,8 +28,6 @@ async def read_products(product_service: ProductServiceDep, category: Optional[s
     product_dicts = []
     for product in products:
         product_category = product.__class__.__name__
-        print(category)
-        print(product_category)
         if category is None or category.lower() == product_category.lower():
             product_dict = product.__dict__
             product_dict['category'] = product_category
@@ -53,10 +51,6 @@ async def read_product(*, product_id: int, product_service: ProductServiceDep):
     """
     Retrieve a product.
     """
-    product =  product_service.get_by_id(product_id)
-    category = product.__class__.__name__
-    return ProductResponse(product=product, category=category)
-    
 
     product =  product_service.get_by_id(product_id)
     category = product.__class__.__name__
