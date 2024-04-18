@@ -18,9 +18,7 @@ const LoginPage = () => {
     rememberMe: false,
   });
   const [showPassword, setShowPassword] = useState(false);
-
   const history = useHistory();
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === "checkbox") {
@@ -29,42 +27,31 @@ const LoginPage = () => {
       setFormData((prevData) => ({ ...prevData, [name]: value }));
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(''); 
+    setError('');
     try {
       console.log('Se esta intentando loguear un usuario: ', formData);
       const userResponse = await loginUserService(formData);
       console.log('Se ha logueado un usuario', userResponse);
-      setTimeout(() => {
-        history.push("/");
-      }, 2000);
+      history.push("/catalog");
     } catch (error) {
       console.error('Hubo un error al intentar loguear al usuario:', error);
       const errorMessage = error.response && error.response.data && error.response.data.detail
         ? error.response.data.detail
-        : 'An unexpected error occurred'; 
+        : 'An unexpected error occurred';
       setError(errorMessage);
     }
   };
-  
-
   const handleForgotPasswordClick = () => {
     history.push("/forgotPassword");
   };
-
-  // Validar correo electrónico y contraseña con las mismas validaciones que en buyerregistration
   const isEmailValid = validateEmail(formData.email);
   const isPasswordValid = validatePassword(formData.password);
-
-  // Determinar si los campos de texto están completos y válidos
   const isFormValid = formData.email !== "" && formData.password !== "" && isEmailValid && isPasswordValid;
-
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
-
   return (
     <Box sx={styles.mainBox}>
       <TopBar />
