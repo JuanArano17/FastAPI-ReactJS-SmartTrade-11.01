@@ -5,17 +5,20 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import styles from "../../../styles/styles";
 import imagePlaceholder from "../../../images/img_mundo.png";
-import deleteItemService from "../../../api/services/user/ShoppingCartService";
-const CartItem = ({ item, user_id, setCartItems }) => {
+import { deleteItemService } from '../../../api/services/user/ShoppingCartService';
+
+const CartItem = ({ item, setCartItems }) => {
     const updateQuantity = (quantity) => {
         // Aquí va la lógica de actualización de cantidad
     };
 
     const removeItem = async () => {
         try {
-            const itemResponse = await deleteItemService(user_id, item.id);
+            console.log("item",item);
+            await deleteItemService(item.id_seller_product);
+            setCartItems((prevItems) => prevItems.filter((cartItem) => cartItem.id !== item.id_seller_products));
         } catch (error) {
-
+            console.error('Error al eliminar el item:', error);
         }
     };
 
@@ -54,4 +57,3 @@ const CartItem = ({ item, user_id, setCartItems }) => {
 };
 
 export default CartItem;
-

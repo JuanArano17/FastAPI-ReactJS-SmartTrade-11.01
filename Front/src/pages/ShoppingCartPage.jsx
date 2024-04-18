@@ -5,7 +5,7 @@ import Footer from '../components/footer/Footer';
 import CartItem from '../components/products/shoppingcart/CartItem';
 import CartTotal from '../components/products/shoppingcart/CartTotal';
 import styles from '../styles/styles';
-import ShoppingCartService from '../api/services/user/ShoppingCartService';
+import { getCartItems } from '../api/services/user/ShoppingCartService';
 
 const ShoppingCartPage = () => {
     const [cartItems, setCartItems] = useState([]); 
@@ -13,7 +13,7 @@ const ShoppingCartPage = () => {
     useEffect(() => {
         const fetchCartItems = async () => {
             try {
-                const items = await ShoppingCartService.getCartItems(userId);
+                const items = await getCartItems();
                 console.log("Items recibidos del backend:", items);
                 setCartItems(items);
             } catch (error) {

@@ -1,11 +1,10 @@
 import axiosInstance from '../AxiosInstance'; 
-const deleteItemService = async (user_id,item_id) => {
+const deleteItemService = async (item_id) => {
     const validbuyerid = { 
-        buyer_id:user_id,
         seller_product_id:item_id
     }
     try {
-        const response = await axiosInstance.delete(`/buyers/${validbuyerid.buyer_id}/shopping_cart/${validbuyerid.seller_product_id}`, validbuyerid);
+        const response = await axiosInstance.delete(`/shopping_cart/me/${validbuyerid.seller_product_id}`,validbuyerid.seller_product_id );
         console.log('Se ha eliminado el item con éxito:', response.data);
         return response.data;
     } catch (error) {
@@ -13,13 +12,11 @@ const deleteItemService = async (user_id,item_id) => {
         throw error;
     }
 };
-const getCartItems = async (user_id) => {
-    const validbuyerid = { 
-        buyer_id:user_id,
-    }
+const getCartItems = async () => {
+    
     try {
-        const response = await axiosInstance.get(`/buyers/${validbuyerid.buyer_id}/shopping_cart/`, validbuyerid);
-        console.log('Los productos del carrito son:', response.data);
+        const response = await axiosInstance.get('/shopping_cart/me');
+        console.log('Los productos del carrito son:', response);
         return response.data;
     } catch (error) {
         console.error('Error al recuperar productos del carrito:', error);
@@ -38,4 +35,4 @@ const getSellerProduct = async (productId) => {
 };
 
 
-export default {getSellerProduct, deleteItemService,getCartItems};
+export {getSellerProduct,deleteItemService,getCartItems};

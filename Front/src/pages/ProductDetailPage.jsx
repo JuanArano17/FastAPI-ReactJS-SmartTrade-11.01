@@ -6,18 +6,15 @@ import StarIcon from '@mui/icons-material/Star';
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
 import styles from '../styles/styles';
-import { getProduct, getAllProducts } from '../api/services/products/ProductsService';
-import SimilarProduct from '../components/products/similarProduct/SimilarProduct';
+import { getProduct  } from '../api/services/products/ProductsService';
 
 
 const ProductDetailPage = () => {
     const { id } = useParams();
     const [productData, setProductData] = useState(null);
-    const [productsData, setProductsData] = useState([]);
     const [isFavorite, setIsFavorite] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [similarProducts, setSimilarProducts] = useState(null);
 
 
     useEffect(() => {
@@ -25,22 +22,13 @@ const ProductDetailPage = () => {
             try {
                 setLoading(true);
                 const response = await getProduct(id);
-                const allresponse = await getAllProducts();
     
-                if (response && allresponse) {
-                    setProductData(response);
-                    setProductsData(allresponse);
+                if (response) {
+                    setProductData(response.product);
+
                     setLoading(false);
                     setError(null);
     
-                    // Aplazar el filtrado hasta después de actualizar el estado
-                    setTimeout(() => {
-                        const similarProductsFiltered = allresponse.filter(p =>
-                            p.category === response.category && p.id !== response.id
-                        );
-                        console.log("Productos similares encontrados:", similarProductsFiltered);
-                        setSimilarProducts(similarProductsFiltered);
-                    }, 0);
                 }
             } catch (err) {
                 setError(err.message);
@@ -130,7 +118,6 @@ const ProductDetailPage = () => {
                             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                                 Similar Products
                             </Typography>
-                            {similarProducts}
                         </Box>
                     </Paper>
                 )}
