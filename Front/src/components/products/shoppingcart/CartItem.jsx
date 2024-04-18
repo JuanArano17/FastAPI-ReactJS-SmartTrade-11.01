@@ -5,18 +5,33 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import styles from "../../../styles/styles";
 import imagePlaceholder from "../../../images/img_mundo.png";
-import { deleteItemService } from '../../../api/services/user/ShoppingCartService';
+import { updateProductQuantity, deleteItemService } from '../../../api/services/user/ShoppingCartService';
 
 const CartItem = ({ item, setCartItems }) => {
-    const updateQuantity = (quantity) => {
-        // Aquí va la lógica de actualización de cantidad
+    const updateQuantity = async (newQuantity) => {
+        if (newQuantity >= 0) { // Asegúrate de que la cantidad no sea negativa
+            try {
+                // Actualizar la cantidad del producto en el backend
+                await updateProductQuantity(item.id_seller_product, newQuantity);
+
+                // Actualizar el estado local del carrito
+                setCartItems((prevItems) =>
+                    prevItems.map((cartItem) =>
+                        cartItem.id === item.id
+                            ? { ...cartItem, quantity: newQuantity }
+                            : cartItem
+                    )
+                );
+            } catch (error) {
+                console.error('Error al actualizar la cantidad del producto:', error);
+            }
+        }
     };
 
     const removeItem = async () => {
         try {
-            console.log("item",item);
             await deleteItemService(item.id_seller_product);
-            setCartItems((prevItems) => prevItems.filter((cartItem) => cartItem.id !== item.id_seller_products));
+            setCartItems((prevItems) => prevItems.filter((cartItem) => cartItem.id !== item.id_seller_product));
         } catch (error) {
             console.error('Error al eliminar el item:', error);
         }

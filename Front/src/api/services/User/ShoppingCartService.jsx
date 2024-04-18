@@ -47,4 +47,19 @@ const addProductToCart = async (sellerProductId, quantity) => {
       throw error;
     }
   };
-export {addProductToCart,getSellerProduct,deleteItemService,getCartItems};
+  const updateProductQuantity = async (sellerProductId, quantity) => {
+    const requestBody = {
+      id_seller_product: sellerProductId,
+      quantity: quantity,
+    };
+  
+    try {
+      const response = await axiosInstance.post(`/shopping_cart/me/${requestBody.id_seller_product}`, requestBody);
+      return response.data;
+    } catch (error) {
+      console.error('Error al actualizar la cantidad del producto en el carrito:', error);
+      throw error;
+    }
+  };
+
+export {updateProductQuantity,addProductToCart,getSellerProduct,deleteItemService,getCartItems};
