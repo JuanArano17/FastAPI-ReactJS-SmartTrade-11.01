@@ -17,31 +17,31 @@ const ProductDetailPage = () => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [similarProductsFiltered, setSimilarProducts] = useState(null);
+    const [similarProducts, setSimilarProducts] = useState(null);
 
 
-    // CONSIGUE EL PRODUCTO A DETALLAR EN LA PAGINA
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
                 const response = await getProduct(id);
                 const allresponse = await getAllProducts();
+    
                 if (response && allresponse) {
                     setProductData(response);
                     setProductsData(allresponse);
+                    setLoading(false);
+                    setError(null);
+    
+                    // Aplazar el filtrado hasta después de actualizar el estado
+                    setTimeout(() => {
+                        const similarProductsFiltered = allresponse.filter(p =>
+                            p.category === response.category && p.id !== response.id
+                        );
+                        console.log("Productos similares encontrados:", similarProductsFiltered);
+                        setSimilarProducts(similarProductsFiltered);
+                    }, 0);
                 }
-                
-                const similarProductsFiltered = allresponse.filter(p =>
-                    p.category === response.category && p.id !== response.id
-                );
-
-                setSimilarProducts(similarProductsFiltered);
-                setLoading(false);
-                setError(null); // resetear errores anteriores
-                console.log("hasta aqui todo correcto");
-
-                console.log(similarProductsFiltered);
             } catch (err) {
                 setError(err.message);
                 setLoading(false);
@@ -49,6 +49,7 @@ const ProductDetailPage = () => {
         };
         fetchProducts();
     }, [id]);
+    
 
 
 
@@ -117,7 +118,7 @@ const ProductDetailPage = () => {
                                 </IconButton>
                             </Grid>
                         </Grid>
-                        <Divider sx={{ my: 2 }} />
+                        <Divider sx={styles.ThickDivider}></Divider>
                         <Box sx={{ textAlign: 'left' }}>
                             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                                 Product characteristics
@@ -129,7 +130,7 @@ const ProductDetailPage = () => {
                             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
                                 Similar Products
                             </Typography>
-                            {/*aqui tienen que ir los similar products*/}
+                            {similarProducts}
                         </Box>
                     </Paper>
                 )}
