@@ -1,16 +1,20 @@
 import axiosInstance from '../AxiosInstance';
-import { createProductFromApiResponse } from "../../../models/ProductModel"
+import { createProductFromApiResponse, getDefaultProductModel } from "../../../models/ProductModel"
+
 const getAllProducts = async () => {
     try {
         console.log("Intentando conseguir todos los productos con vendedores...");
         const response = await axiosInstance.get('/products');
         const productsWithSellers = response.data
             .filter(product => product.seller_products && product.seller_products.length > 0)
-            .flatMap(product => 
+            .flatMap(product =>
                 product.seller_products.map(seller => ({
                     ...createProductFromApiResponse(product),
                     price: seller.price,
-                    sellerId: seller.id,
+                    sellerId: seller.id_seller, // Cambio de nombre para claridad
+                    id_seller_product: seller.id, // Cambio de nombre para aclarar que es el ID del producto del vendedor
+                    stock: seller.quantity, // Usar `quantity` para el stock
+                    category: product.category,
                     image: product.images.length > 0 ? product.images[0].url : null
                 }))
             );
@@ -20,6 +24,7 @@ const getAllProducts = async () => {
         throw error;
     }
 };
+
 const getAllProductsSeller = async () => {
     try {
         console.log("Intentando conseguir todos los productos de los vendedores...")

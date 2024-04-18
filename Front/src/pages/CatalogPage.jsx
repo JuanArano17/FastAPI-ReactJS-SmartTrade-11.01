@@ -9,7 +9,6 @@ import styles from '../styles/styles';
 import { getAllProducts } from '../api/services/products/ProductsService';
 
 const CatalogPage = () => {
-    const history = useHistory();
     const { search } = useParams();
     const [searchTerm, setSearchTerm] = useState(search || "");
     const [products, setProducts] = useState([]);
@@ -19,6 +18,8 @@ const CatalogPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const productsPerPage = 12;
 
+    const history = useHistory();
+
     useEffect(() => {
         const token = localStorage.getItem('accessToken');
         if (!token) {
@@ -26,31 +27,42 @@ const CatalogPage = () => {
         }
     }, [history]);
 
+    // Este useEffect actualiza searchTerm cuando el parámetro search de la URL cambia
+    useEffect(() => {
+        setSearchTerm(search || "");
+    }, [search]);
+
+    // Este useEffect maneja la carga de productos cuando searchTerm cambia
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
                 const productsWithSellers = await getAllProducts();
-                setProducts(productsWithSellers); 
+                console.log('productospage', productsWithSellers);
+                setProducts(productsWithSellers);
                 setLoading(false);
             } catch (err) {
                 setError(err.message);
                 setLoading(false);
             }
         };
+
         fetchProducts();
-    }, [search]);
+    }, [searchTerm]); // Ahora también depende de searchTerm
 
     const totalPages = Math.ceil(searchFilteredProducts.length / productsPerPage);
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = searchFilteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+
     const handleChangePage = (event, value) => {
         setCurrentPage(value);
     };
+
     const handleProductClick = (productId) => {
         history.push(`/catalog/product/${productId}`);
     };
+
     if (loading) return <Typography>Cargando...</Typography>;
     if (error) return <Typography>Error: {error}</Typography>;
 
@@ -62,8 +74,8 @@ const CatalogPage = () => {
                 <Paper elevation={3} sx={styles.paperContainer}>
                     <Grid container spacing={3}>
                         {currentProducts && currentProducts.map((product) => (
-                            <Grid item xs={12} sm={4} md={4} lg={4} key={`${product.id}-${product.sellerId}`}>
-                                <Button onClick={() => handleProductClick(product.id)} sx={{ width: '100%', height: '100%', padding: 0 }}>
+                            <Grid item xs={12} sm={4} md={4} lg={4} key={`${product.id_seller_product}-${product.sellerId}`}>
+                                <Button onClick={() => handleProductClick(product.id_seller_product)} sx={{ width: '100%', height: '100%', padding: 0 }}>
                                     <SummarizedProduct product={product} />
                                 </Button>
                             </Grid>

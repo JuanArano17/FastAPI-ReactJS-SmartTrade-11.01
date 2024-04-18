@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Typography, TextField, Button, Container, Grid, Paper, Link, IconButton, InputAdornment } from "@mui/material";
 import { useHistory } from "react-router-dom";
 import { loginUserService } from "../api/services/user/AuthService";
@@ -19,6 +19,12 @@ const LoginPage = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const history = useHistory();
+  useEffect(() => {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+          history.push('/');
+      }
+  }, [history]);
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === "checkbox") {
