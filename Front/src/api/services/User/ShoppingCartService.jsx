@@ -33,6 +33,18 @@ const getSellerProduct = async (productId) => {
         throw error;
     }
 };
-
-
-export {getSellerProduct,deleteItemService,getCartItems};
+const addProductToCart = async (sellerProductId, quantity) => {
+    const requestBody = {
+      id_seller_product: sellerProductId,
+      quantity: quantity,
+    };
+  
+    try {
+      const response = await axiosInstance.post('/shopping_cart/me/', requestBody);
+      return response.data;
+    } catch (error) {
+      console.error('Error al añadir producto al carrito', error);
+      throw error;
+    }
+  };
+export {addProductToCart,getSellerProduct,deleteItemService,getCartItems};

@@ -6,8 +6,8 @@ import StarIcon from '@mui/icons-material/Star';
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
 import styles from '../styles/styles';
-import { getProduct  } from '../api/services/products/ProductsService';
-
+import { getProduct } from '../api/services/products/ProductsService';
+import { addProductToCart } from '../api/services/user/ShoppingCartService';
 
 const ProductDetailPage = () => {
     const { id } = useParams();
@@ -22,13 +22,13 @@ const ProductDetailPage = () => {
             try {
                 setLoading(true);
                 const response = await getProduct(id);
-    
+
                 if (response) {
                     setProductData(response.product);
 
                     setLoading(false);
                     setError(null);
-    
+
                 }
             } catch (err) {
                 setError(err.message);
@@ -37,13 +37,29 @@ const ProductDetailPage = () => {
         };
         fetchProducts();
     }, [id]);
-    
+
 
 
 
     const handleFavoriteClick = () => {
         setIsFavorite(!isFavorite);
     };
+
+
+    const handleAddToCart = async () => {
+        if (productData && productData.seller_products && productData.seller_products.length > 0) {
+            const sellerProductId = productData.seller_products[0].id; // Por ejemplo, elegir el primer producto del vendedor
+            const quantity = 1; // Define cómo quieres manejar la cantidad
+            try {
+                await addProductToCart(sellerProductId, quantity);
+                console.log('Producto añadido al carrito');
+                // Aquí puedes manejar cualquier estado o redirección después de añadir al carrito
+            } catch (error) {
+                console.error('Error al añadir producto al carrito', error);
+            }
+        }
+    };
+
 
     const renderAdditionalAttributes = (productData) => {
         const commonAttributes = ['name', 'description', 'eco_points', 'spec_sheet', 'stock', 'id', 'images', 'seller_products'];
@@ -95,7 +111,7 @@ const ProductDetailPage = () => {
                                 <Typography variant="h5" sx={{ my: 2 }}>
                                     Precio: ${productData.seller_products.length > 0 ? productData.seller_products[0].price : "Consultar"}
                                 </Typography>
-                                <Button variant="contained" sx={{ mb: 2 }}>
+                                <Button variant="contained" sx={{ mb: 2 }} onClick={handleAddToCart}>
                                     Add to Cart
                                 </Button>
                                 <IconButton
