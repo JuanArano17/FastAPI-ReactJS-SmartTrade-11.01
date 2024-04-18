@@ -11,6 +11,21 @@ router = APIRouter(
     prefix="/product/{product_id}/seller_products", tags=["seller-products"]
 )
 
+pure_router = APIRouter(prefix="/seller_products", tags=["seller-products"])
+
+
+@pure_router.get("/{seller_product_id}", response_model=SellerProduct)
+async def read_seller_product_by_id(
+    product_id: int, seller_product_service: SellerProductServiceDep
+):
+    """
+    Retrieve a specific seller product.
+    """
+    seller_product = seller_product_service.get_by_id(product_id)
+    if seller_product is None:
+        raise HTTPException(status_code=404, detail="Seller product not found")
+    return seller_product
+
 
 @router.get("/", response_model=list[SellerProduct])
 async def read_seller_products(
