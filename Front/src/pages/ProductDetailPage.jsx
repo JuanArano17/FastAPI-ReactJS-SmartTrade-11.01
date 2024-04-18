@@ -24,7 +24,7 @@ const ProductDetailPage = () => {
                 const response = await getProduct(id);
 
                 if (response) {
-                    setProductData(response.product);
+                    setProductData(response);
 
                     setLoading(false);
                     setError(null);
@@ -35,6 +35,7 @@ const ProductDetailPage = () => {
                 setLoading(false);
             }
         };
+        
         fetchProducts();
     }, [id]);
 
