@@ -29,7 +29,7 @@ const getSellerProduct = async (productId) => {
         console.log('Los productos del carrito son:', response.data);
         return response.data;
     } catch (error) {
-        console.error('Error al obtener información del producto:', error);
+        console.error('Error al obtener información del productoAAAAAA:', error);
         throw error;
     }
 };
