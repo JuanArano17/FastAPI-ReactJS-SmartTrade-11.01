@@ -25,7 +25,7 @@ const getCartItems = async () => {
 };
 const getSellerProduct = async (productId) => {
     try {
-        const response = await getSellerProduct(productId);
+        const response = await axiosInstance.get(productId);
         console.log('Los productos del carrito son:', response.data);
         return response.data;
     } catch (error) {
