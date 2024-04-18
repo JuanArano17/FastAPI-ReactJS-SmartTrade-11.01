@@ -1,5 +1,6 @@
 import axiosInstance from '../AxiosInstance';
-import { createProductFromApiResponse } from "../../../models/ProductModel"
+import { createProductFromApiResponse, getDefaultProductModel } from "../../../models/ProductModel"
+
 const getAllProducts = async () => {
     try {
         console.log("Intentando conseguir todos los productos con vendedores...");
