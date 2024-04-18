@@ -12,16 +12,14 @@ const CartItem = ({ item, setCartItems }) => {
         if (newQuantity >= 0) { // Asegúrate de que la cantidad no sea negativa
             try {
                 // Actualizar la cantidad del producto en el backend
-                await updateProductQuantity(item.id_seller_product, newQuantity);
-
+                const updatedItem = await updateProductQuantity(item.id_seller_product, newQuantity);
+                
                 // Actualizar el estado local del carrito
-                setCartItems((prevItems) =>
-                    prevItems.map((cartItem) =>
-                        cartItem.id === item.id
-                            ? { ...cartItem, quantity: newQuantity }
-                            : cartItem
-                    )
-                );
+                setCartItems((prevItems) => prevItems.map((cartItem) =>
+                    cartItem.id_seller_product === item.id_seller_product
+                        ? { ...cartItem, quantity: newQuantity } // Asegúrate de que actualizas el campo correcto
+                        : cartItem
+                ));
             } catch (error) {
                 console.error('Error al actualizar la cantidad del producto:', error);
             }

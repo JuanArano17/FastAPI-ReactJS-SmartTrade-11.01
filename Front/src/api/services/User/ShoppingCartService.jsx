@@ -54,7 +54,7 @@ const addProductToCart = async (sellerProductId, quantity) => {
     };
   
     try {
-      const response = await axiosInstance.post(`/shopping_cart/me/${requestBody.id_seller_product}`, requestBody);
+      const response = await axiosInstance.put(`/shopping_cart/me/${requestBody.id_seller_product}`, requestBody);
       return response.data;
     } catch (error) {
       console.error('Error al actualizar la cantidad del producto en el carrito:', error);
