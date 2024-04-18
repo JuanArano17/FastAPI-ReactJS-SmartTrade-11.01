@@ -26,7 +26,7 @@ const CartItem = ({ item, user_id, setCartItems }) => {
                     <DeleteIcon />
                 </IconButton>
                 <Box sx={{ display: 'flex', alignItems: 'center', padding: 2 }}>
-                    <img src={item.imageUrl || imagePlaceholder} alt={item.name} style={styles.productImage} />
+                    <img src={item.imageUrl || imagePlaceholder} alt={item.name} style={styles.imageStyle} />
                     <Box sx={{ flex: '1 1 auto', padding: '0 16px' }}>
                         <Typography variant="subtitle1" noWrap>{item.name}</Typography>
                         <Typography variant="body2" color="textSecondary" noWrap>{item.description || "Seller info"}</Typography>
