@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Container, Grid, Paper, Typography, Button, Pagination } from '@mui/material';
-import { useHistory, useParams } from 'react-router-dom'; 
+import { useHistory, useParams } from 'react-router-dom';
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
 import SummarizedProduct from '../components/products/summarizedProduct/SummarizedProduct';
@@ -10,8 +10,8 @@ import { getAllProducts } from '../api/services/products/ProductsService';
 
 const CatalogPage = () => {
     const history = useHistory();
-    const { search } = useParams(); 
-    const [searchTerm, setSearchTerm] = useState(search || ""); 
+    const { search } = useParams();
+    const [searchTerm, setSearchTerm] = useState(search || "");
     const [products, setProducts] = useState([]);
     const [searchFilteredProducts, setSearchFilteredProducts] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -20,18 +20,19 @@ const CatalogPage = () => {
     const productsPerPage = 12;
 
     useEffect(() => {
-        setSearchTerm(search || "");
-        console.log("search: ", search);
-        console.log("searchTerm: ", searchTerm);
-        console.log("products: ", products);
-        console.log("filtered products: ", searchFilteredProducts);
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            history.push('/');
+        }
+    }, [history]);
+
+    useEffect(() => {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
-                const response = await getAllProducts();
-                setProducts(response);
+                const productsWithSellers = await getAllProducts();
+                setProducts(productsWithSellers); 
                 setLoading(false);
-                setError(null);
             } catch (err) {
                 setError(err.message);
                 setLoading(false);
@@ -61,7 +62,7 @@ const CatalogPage = () => {
                 <Paper elevation={3} sx={styles.paperContainer}>
                     <Grid container spacing={3}>
                         {currentProducts && currentProducts.map((product) => (
-                            <Grid item xs={12} sm={4} md={4} lg={4} key={product.id}>
+                            <Grid item xs={12} sm={4} md={4} lg={4} key={`${product.id}-${product.sellerId}`}>
                                 <Button onClick={() => handleProductClick(product.id)} sx={{ width: '100%', height: '100%', padding: 0 }}>
                                     <SummarizedProduct product={product} />
                                 </Button>

@@ -5,6 +5,7 @@ export const getDefaultProductModel = () => ({
     specSheet: "",
     ecoPoints: 0,
     stock: 0,
+    sellers: [], 
 });
 
 export const createProductFromApiResponse = (apiResponse) => ({
@@ -14,4 +15,5 @@ export const createProductFromApiResponse = (apiResponse) => ({
     specSheet: apiResponse.spec_sheet || getDefaultProductModel().specSheet,
     ecoPoints: apiResponse.eco_points || getDefaultProductModel().ecoPoints,
     stock: apiResponse.stock || getDefaultProductModel().stock,
+    sellers: apiResponse.seller_products || getDefaultProductModel().sellers,
 });

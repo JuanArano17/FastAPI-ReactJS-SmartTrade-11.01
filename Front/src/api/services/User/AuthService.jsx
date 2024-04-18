@@ -56,12 +56,4 @@ const loginUserService = async (userData) => {
         throw error;
     }
 }
-const useLogout = () => {
-    const history = useHistory();
-    const logout = () => {
-        localStorage.removeItem('accessToken');
-        history.push('/');
-    };
-    return logout;
-};
-export {registerUserSellerService, registerUserBuyerService, loginUserService, useLogout};
+export {registerUserSellerService, registerUserBuyerService, loginUserService};

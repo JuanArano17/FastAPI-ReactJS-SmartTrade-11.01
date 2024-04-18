@@ -1,27 +1,32 @@
 import React from 'react';
-import { Card, CardMedia, CardContent, Typography, CardActions, Button } from '@mui/material';
+import { Card, CardMedia, CardContent, Typography, CardActions, Button, Grid } from '@mui/material';
 
 const SummarizedProduct = ({ product }) => {
-    const { id, name, image, price, description } = product; // Asegúrate de que estas propiedades coincidan con la estructura de tus datos
+    const { id, name, image, price, description } = product;
 
     return (
-        <Card sx={{ maxWidth: 500, m: 2 }}>
+        <Card sx={{ maxWidth: 345, m: 2, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 400 }}>
             <CardMedia
                 component="img"
-                height="140"
-                image={image}
+                image={image || 'default-product-image.jpg'} 
                 alt={name}
+                sx={{ height: 140, backgroundSize: 'contain' }} 
             />
             <CardContent>
-                <Typography gutterBottom variant="h5" component="div">
+                <Typography gutterBottom variant="h6" component="div" sx={{ textAlign: 'left' }}>
                     {name}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'left' }}>
                     {description}
                 </Typography>
             </CardContent>
-            <CardActions>
-                <Button size="small">Precio: ${price}</Button>
+            <CardActions sx={{ justifyContent: 'space-between', p: 2 }}>
+                <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'left' }}>
+                    &nbsp;
+                </Typography>
+                <Button size="small" sx={{ textAlign: 'right' }}>
+                    Price $: {price.toFixed(2)}
+                </Button>
             </CardActions>
         </Card>
     );

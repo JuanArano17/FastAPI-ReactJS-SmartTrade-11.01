@@ -2,13 +2,21 @@ import axiosInstance from '../AxiosInstance';
 import { createProductFromApiResponse } from "../../../models/ProductModel"
 const getAllProducts = async () => {
     try {
-        console.log("Intentando conseguir todos los productos...");
+        console.log("Intentando conseguir todos los productos con vendedores...");
         const response = await axiosInstance.get('/products');
-        console.log("respuestaapi", response);
-        const products = response.data.map(product => createProductFromApiResponse(product));
-        return products;
+        const productsWithSellers = response.data
+            .filter(product => product.seller_products && product.seller_products.length > 0)
+            .flatMap(product => 
+                product.seller_products.map(seller => ({
+                    ...createProductFromApiResponse(product),
+                    price: seller.price,
+                    sellerId: seller.id,
+                    image: product.images.length > 0 ? product.images[0].url : null
+                }))
+            );
+        return productsWithSellers;
     } catch (error) {
-        console.error('Hubo un error al obtener productos', error.response ? error.response.data : error);
+        console.error('Hubo un error al obtener los productos con vendedores', error.response ? error.response.data : error);
         throw error;
     }
 };

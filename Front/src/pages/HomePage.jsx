@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
@@ -6,8 +6,17 @@ import Grid from "@mui/material/Grid";
 import Footer from "../components/footer/Footer";
 import TopBar from "../components/topbar/TopBar";
 import styles from "../styles/styles";
+import { useHistory } from "react-router-dom";
 
 const HomePage = () => {
+    const history = useHistory();
+    useEffect(() => {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+            history.push('/catalog');
+        }
+        console.log("token", token)
+    }, [history]);
     return (
         <Box sx={styles.mainBox}>
             <TopBar />

@@ -1,4 +1,3 @@
-// FilterProducts.jsx
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Slider, Select, MenuItem, FormControl, InputLabel, Button, Rating, Grid } from '@mui/material';
 
