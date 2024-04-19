@@ -6,8 +6,9 @@ import StarIcon from '@mui/icons-material/Star';
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
 import styles from '../styles/styles';
-import { getProduct, addToWishList, deleteFromWishList } from '../api/services/products/ProductsService';
-import { addProductToCart } from '../api/services/user/ShoppingCartService';
+import { getProduct } from '../api/services/products/ProductsService';
+import { addToWishList, deleteFromWishList } from '../api/services/products/WishListService';
+import { addCartItem } from '../api/services/products/ShoppingCartService';
 
 const ProductDetailPage = () => {
     const { id } = useParams();
@@ -58,7 +59,7 @@ const ProductDetailPage = () => {
             const sellerProductId = productData.seller_products[0].id; // Por ejemplo, elegir el primer producto del vendedor
             const quantity = 1; // Define cómo quieres manejar la cantidad
             try {
-                await addProductToCart(sellerProductId, quantity);
+                await addCartItem(sellerProductId, quantity);
                 console.log('Producto añadido al carrito');
                 // Aquí puedes manejar cualquier estado o redirección después de añadir al carrito
             } catch (error) {

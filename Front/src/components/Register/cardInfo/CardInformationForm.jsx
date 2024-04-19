@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from 'react';
 import { Box, Grid, TextField, Typography, Button } from '@mui/material';
-import styles from "../../styles/styles";
+import styles from "../../../styles/styles";
 
 const CardInformationForm = ({ cardData, handleChange }) => {
     const [formValidity, setFormValidity] = useState({

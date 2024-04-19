@@ -1,5 +1,5 @@
 import axiosInstance from '../AxiosInstance'; 
-const deleteItemService = async (item_id) => {
+const deleteCartItem = async (item_id) => {
     const validbuyerid = { 
         seller_product_id:item_id
     }
@@ -33,7 +33,7 @@ const getSellerProduct = async (productId) => {
         throw error;
     }
 };
-const addProductToCart = async (sellerProductId, quantity) => {
+const addCartItem = async (sellerProductId, quantity) => {
     const requestBody = {
       id_seller_product: sellerProductId,
       quantity: quantity,
@@ -47,7 +47,7 @@ const addProductToCart = async (sellerProductId, quantity) => {
       throw error;
     }
   };
-  const updateProductQuantity = async (sellerProductId, quantity) => {
+  const updateCartItemQuantity = async (sellerProductId, quantity) => {
     const requestBody = {
       id_seller_product: sellerProductId,
       quantity: quantity,
@@ -62,4 +62,4 @@ const addProductToCart = async (sellerProductId, quantity) => {
     }
   };
 
-export {updateProductQuantity,addProductToCart,getSellerProduct,deleteItemService,getCartItems};
+export {updateCartItemQuantity,addCartItem,deleteCartItem,getCartItems};

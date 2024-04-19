@@ -5,13 +5,13 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import styles from "../../../styles/styles";
 import imagePlaceholder from "../../../images/img_mundo.png";
-import { updateProductQuantity, deleteItemService } from '../../../api/services/user/ShoppingCartService';
+import { updateCartItemQuantity, deleteCartItem } from '../../../api/services/products/ShoppingCartService';
 
 const CartItem = ({ item, setCartItems }) => {
     const updateQuantity = async (newQuantity) => {
         if (newQuantity > 0 && newQuantity <= item.stock) {
             try {
-                await updateProductQuantity(item.id_seller_product, newQuantity);
+                await updateCartItemQuantity(item.id_seller_product, newQuantity);
                 setCartItems((prevItems) => prevItems.map((cartItem) =>
                     cartItem.id_seller_product === item.id_seller_product
                         ? { ...cartItem, quantity: newQuantity }
@@ -25,7 +25,7 @@ const CartItem = ({ item, setCartItems }) => {
 
     const removeItem = async () => {
         try {
-            await deleteItemService(item.id_seller_product);
+            await deleteCartItem(item.id_seller_product);
             setCartItems((prevItems) => prevItems.filter((cartItem) => cartItem.id_seller_product !== item.id_seller_product));
         } catch (error) {
             console.error('Error al eliminar el item:', error);

@@ -5,7 +5,9 @@ import TopBar from '../components/topbar/TopBar';
 import WishListItem from '../components/products/wishlist/WishListItem';
 import Footer from '../components/footer/Footer';
 import styles from '../styles/styles';
-import { getAllProducts, getWishItems } from '../api/services/products/ProductsService';
+import { getAllProducts } from '../api/services/products/ProductsService';
+import { getWishItems } from '../api/services/products/WishListService';
+
 
 const WishListPage = () => {
     const [wishItems, setWishItems] = useState([]);

@@ -3,13 +3,13 @@ import { useHistory } from 'react-router-dom';
 import { Box, Typography, TextField, Button, Container, Grid, Paper, IconButton, InputAdornment, Snackbar} from "@mui/material";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import CardInformationForm from '../cardInfo/CardInformationForm';
 import { getDefaultRegisterBuyerModel } from "../../models/RegisterBuyerModel";
 import { getDefaultCardInformationModel } from "../../models/CardInformationModel";
 import { validateEmail, validatePassword, validateAge, validateDNI } from "../../utils/registerFormValidations";
 import styles from "../../styles/styles";
 import { registerUserBuyerService } from "../../api/services/user/AuthService";
 import registerCardService from "../../api/services/user/BuyerService";
+import CardInformationForm from "./cardInfo/CardInformationForm";
 
 const formFields = [
     { id: "name", name: "Name", placeholder: "Patricio*", autoComplete: "fname", autoFocus: true },

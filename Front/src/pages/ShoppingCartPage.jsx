@@ -6,7 +6,7 @@ import Footer from '../components/footer/Footer';
 import CartItem from '../components/products/shoppingcart/CartItem';
 import CartTotal from '../components/products/shoppingcart/CartTotal';
 import styles from '../styles/styles';
-import { getCartItems } from '../api/services/user/ShoppingCartService';
+import { getCartItems } from '../api/services/products/ShoppingCartService';
 import { getAllProducts } from '../api/services/products/ProductsService';
 
 const ShoppingCartPage = () => {
