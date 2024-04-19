@@ -6,7 +6,7 @@ const CardInformationForm = ({ cardData, handleChange }) => {
     const [formValidity, setFormValidity] = useState({
         CardNumber: false,
         ExpiryDate: false,
-        CVV: false
+        Cvv: false
     });
 
     const handleFieldValidation = (fieldId, value) => {
@@ -34,7 +34,7 @@ const CardInformationForm = ({ cardData, handleChange }) => {
         setFormValidity({
             CardNumber: handleFieldValidation("CardNumber", cardData.CardNumber),
             ExpiryDate: handleFieldValidation("ExpiryDate", cardData.ExpiryDate),
-            CVV: handleFieldValidation("Cvv", cardData.Cvv)
+            Cvv: handleFieldValidation("Cvv", cardData.Cvv)
         });
     }, []); 
     const handleInputChange = (e) => {
@@ -55,7 +55,7 @@ const CardInformationForm = ({ cardData, handleChange }) => {
             case "ExpiryDate":
                 return formValidity.ExpiryDate ? '' : 'Insert a valid Date';
             case "Cvv":
-                return formValidity.CVV ? '' : 'CVV must be 3 digits';
+                return formValidity.Cvv ? '' : 'CVV must be 3 digits';
             default:
                 return '';
         }
