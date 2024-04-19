@@ -6,7 +6,7 @@ import StarIcon from '@mui/icons-material/Star';
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
 import styles from '../styles/styles';
-import { getProduct } from '../api/services/products/ProductsService';
+import { getProduct, addToWishList, deleteFromWishList } from '../api/services/products/ProductsService';
 import { addProductToCart } from '../api/services/user/ShoppingCartService';
 
 const ProductDetailPage = () => {
@@ -16,37 +16,43 @@ const ProductDetailPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
                 const response = await getProduct(id);
-
                 if (response) {
                     setProductData(response);
-
                     setLoading(false);
                     setError(null);
-
                 }
             } catch (err) {
                 setError(err.message);
                 setLoading(false);
             }
         };
-        
         fetchProducts();
     }, [id]);
 
-
-
-
-    const handleFavoriteClick = () => {
+    const handleFavoriteClick = async () => {
         setIsFavorite(!isFavorite);
+        try {
+            // Seleccionar el ID del producto del vendedor desde el objeto de datos del producto
+            const sellerProductId = productData.seller_products[0].id;
+
+            // Llama a la función addToWishList pasando el ID necesario
+            if (!isFavorite) {
+                const response = await addToWishList(sellerProductId);
+                console.log('Añadido a la lista de deseos:', response);
+            } else {
+                // Aquí se asume que tienes una función para eliminar de la lista de deseos
+                const response = await deleteFromWishList(sellerProductId);
+                console.log('Removido de la lista de deseos:', response);
+            }
+        } catch (error) {
+            console.error('Error al actualizar la lista de deseos', error);
+        }
     };
-
-
     const handleAddToCart = async () => {
         if (productData && productData.seller_products && productData.seller_products.length > 0) {
             const sellerProductId = productData.seller_products[0].id; // Por ejemplo, elegir el primer producto del vendedor
@@ -60,8 +66,6 @@ const ProductDetailPage = () => {
             }
         }
     };
-
-
     const renderAdditionalAttributes = (productData) => {
         const commonAttributes = ['name', 'description', 'eco_points', 'spec_sheet', 'stock', 'id', 'images', 'seller_products'];
         return Object.keys(productData)
@@ -94,11 +98,13 @@ const ProductDetailPage = () => {
                         </IconButton>
                         <Grid container spacing={2}>
                             <Grid item xs={12} md={5} sx={{ display: 'flex', justifyContent: 'center' }}>
-                                <img
-                                    src={productData.images.length > 0 ? productData.images[0].url : '/path/to/default.jpg'}
-                                    alt={productData.name}
-                                    style={styles.imageStyle}
-                                />
+                                <Box sx={{ width: '100%', height: 300, display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
+                                    <img
+                                        src={productData.images.length > 0 ? productData.images[0].url : '/path/to/default.jpg'}
+                                        alt={productData.name}
+                                        style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }}
+                                    />
+                                </Box>
                             </Grid>
                             <Grid item xs={12} md={7}>
                                 <Typography variant="h6" color="text.secondary">

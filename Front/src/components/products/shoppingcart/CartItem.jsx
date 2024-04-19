@@ -9,15 +9,12 @@ import { updateProductQuantity, deleteItemService } from '../../../api/services/
 
 const CartItem = ({ item, setCartItems }) => {
     const updateQuantity = async (newQuantity) => {
-        if (newQuantity >= 0) { // Asegúrate de que la cantidad no sea negativa
+        if (newQuantity > 0 && newQuantity <= item.stock) {
             try {
-                // Actualizar la cantidad del producto en el backend
-                const updatedItem = await updateProductQuantity(item.id_seller_product, newQuantity);
-                
-                // Actualizar el estado local del carrito
+                await updateProductQuantity(item.id_seller_product, newQuantity);
                 setCartItems((prevItems) => prevItems.map((cartItem) =>
                     cartItem.id_seller_product === item.id_seller_product
-                        ? { ...cartItem, quantity: newQuantity } // Asegúrate de que actualizas el campo correcto
+                        ? { ...cartItem, quantity: newQuantity }
                         : cartItem
                 ));
             } catch (error) {
@@ -37,17 +34,17 @@ const CartItem = ({ item, setCartItems }) => {
 
     return (
         <Grid item xs={12} sx={styles.cartItem}>
-            <Paper elevation={3} sx={{ ...styles.cartItemPaper, position: 'relative' }}>
+            <Paper elevation={3} sx={{ ...styles.cartItemPaper, position: 'relative', display: 'flex' }}>
                 <IconButton onClick={removeItem} sx={{ ...styles.deleteButton, position: 'absolute', top: 8, right: 8 }}>
                     <DeleteIcon />
                 </IconButton>
-                <Box sx={{ display: 'flex', alignItems: 'center', padding: 2 }}>
-                    <img src={item.imageUrl || imagePlaceholder} alt={item.name} style={styles.imageStyle} />
-                    <Box sx={{ flex: '1 1 auto', padding: '0 16px' }}>
-                        <Typography variant="subtitle1" noWrap>{item.name}</Typography>
-                        <Typography variant="body2" color="textSecondary" noWrap>{item.description || "Seller info"}</Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Box sx={{ minWidth: '160px', maxWidth: '160px', minHeight: '160px', maxHeight: '160px', overflow: 'hidden', marginRight: '16px' }}>
+                    <img src={item.image || imagePlaceholder} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', justifyContent: 'space-between', textAlign: 'left' }}>
+                    <Typography variant="subtitle1" noWrap>{item.name}</Typography>
+                    <Typography variant="body2" color="textSecondary" noWrap>{item.description}</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 'auto' }}>
                         <IconButton onClick={() => updateQuantity(item.quantity - 1)} disabled={item.quantity <= 1}>
                             <RemoveIcon />
                         </IconButton>
@@ -55,13 +52,13 @@ const CartItem = ({ item, setCartItems }) => {
                             value={item.quantity}
                             onChange={(e) => updateQuantity(parseInt(e.target.value, 10))}
                             type="number"
-                            inputProps={{ min: 1 }}
-                            sx={{ width: '4em', mx: 1 }}
+                            inputProps={{ min: 1, max: item.stock }}
+                            sx={{ mx: 1 }}
                         />
-                        <IconButton onClick={() => updateQuantity(item.quantity + 1)}>
+                        <IconButton onClick={() => updateQuantity(item.quantity + 1)} disabled={item.quantity >= item.stock}>
                             <AddIcon />
                         </IconButton>
-                        <Typography variant="body2" sx={{ ml: 2 }}>Subtotal: {item.price * item.quantity}</Typography>
+                        <Typography variant="body2" sx={{ ml: 2 }}>Subtotal: ${(item.price * item.quantity).toFixed(2)}</Typography>
                     </Box>
                 </Box>
             </Paper>

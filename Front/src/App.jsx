@@ -7,6 +7,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import CatalogPage from './pages/CatalogPage';
 import ShoppingCartPage from './pages/ShoppingCartPage';
+import WishListPage from './pages/WishListPage';
 
 
 function App() {
@@ -21,7 +22,8 @@ function App() {
           <Route path="/catalog/:search" component={CatalogPage} />
           <Route path="/catalog" component={CatalogPage} />
           <Route path="/forgotPassword" component={ForgotPasswordPage} />
-          <Route path="/shoppingCart" component={ShoppingCartPage} />
+          <Route path="/shopping-cart" component={ShoppingCartPage} />
+          <Route path="/wish-list" component={WishListPage} />
           <Route exact path="/" component={HomePage} />
         </Switch>
       </Router>

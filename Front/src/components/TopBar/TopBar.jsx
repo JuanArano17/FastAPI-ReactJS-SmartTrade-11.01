@@ -2,6 +2,8 @@ import React from "react";
 import { AppBar, Toolbar, Typography, Button, IconButton, Box } from "@mui/material";
 import RecyclingIcon from "@mui/icons-material/Recycling";
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import { Link, useHistory } from "react-router-dom";
 import SearchBar from "./searchbar/SearchBar"
 import { useLogout } from "../../utils/hooks/useLogout";
@@ -13,6 +15,12 @@ const TopBar = () => {
   const handleLogoClick = () => {
     history.push("/");
   };
+  const handleShoppingCart = () => {
+    history.push("/shopping-cart")
+  }
+  const handleWishList = () => {
+    history.push("/wish-list")
+  }
 
   return (
     <AppBar position="static" color="default" elevation={0}>
@@ -32,11 +40,23 @@ const TopBar = () => {
             <Button
               startIcon={<ExitToAppIcon />}
               variant="contained"
-              sx={{ color: '#ffffff', bgcolor: '#444444', borderRadius: 32}}
+              sx={{ color: '#ffffff', bgcolor: '#444444', borderRadius: 32 }}
               onClick={logout}
             >
               Logout
             </Button>
+            <Button
+              startIcon={< AddShoppingCartIcon />}
+              variant="contained"
+              sx={{ bgcolor: '#444444', borderRadius: 90 }}
+              onClick={handleShoppingCart}
+            ></Button>
+            <Button
+              startIcon={< StarBorderIcon />}
+              variant="contained"
+              sx={{ bgcolor: '#444444', borderRadius: 90 }}
+              onClick={handleWishList}
+            ></Button>
           </>
         ) : (
           <>
