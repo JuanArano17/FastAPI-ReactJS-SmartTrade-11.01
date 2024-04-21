@@ -55,73 +55,55 @@ class SellerProductService:
         seller_product_obj = self.seller_product_repo.add(seller_product_obj)
         return seller_product_obj
 
-    def get_by_id(self, seller_product_id) -> SellerProductRead:
+    def map_seller_product_to_read_schema(self, seller_product: SellerProduct) -> SellerProductRead:
+        product = self.product_service.get_by_id(seller_product.id_product)
+        return SellerProductRead(
+            quantity=seller_product.quantity,
+            price=seller_product.price,
+            shipping_costs=seller_product.shipping_costs,
+            id=seller_product.id,
+            id_product=product.id,
+            id_seller=seller_product.id_seller,
+            category=product.category,
+            name=product.name,
+            description=product.description,
+            eco_points=product.eco_points,
+            spec_sheet=product.spec_sheet,
+            stock=product.stock,
+            images=[image.url for image in product.images],  
+            author=product.author if hasattr(product, 'author') else None,  
+            pages=product.pages if hasattr(product, 'pages') else None,  
+            size= product.size if hasattr(product, 'size') else None,
+            materials= product.materials if hasattr(product, 'materials') else None,
+            type = product.type if hasattr(product, 'type') else None,
+            brand = product.brand if hasattr(product, 'brand') else None,
+            capacity = product.capacity if hasattr(product, 'capacity') else None,
+            power_source = product.power_source if hasattr(product, 'power_source') else None,
+            ingredients = product.ingredients if hasattr(product, 'ingredients') else None,
+            publisher = product.publisher if hasattr(product, 'publisher') else None,
+            platform = product.platform if hasattr(product, 'platform') else None,
+        )
+
+    def get_by_id(self, seller_product_id) -> SellerProduct:
         if seller_product := self.seller_product_repo.get_by_id(seller_product_id):
-            product=self.product_service.get_by_id(seller_product.id_product)
-            seller_product_info = SellerProductRead(
-                quantity=seller_product.quantity,
-                price=seller_product.price,
-                shipping_costs=seller_product.shipping_costs,
-                id=seller_product.id,
-                id_product=product.id,
-                id_seller=seller_product.id_seller,
-                category=product.category,
-                name=product.name,
-                description=product.description,
-                eco_points=product.eco_points,
-                spec_sheet=product.spec_sheet,
-                stock=product.stock,
-                images=[image.url for image in product.images],  
-                author=product.author if hasattr(product, 'author') else None,  
-                pages=product.pages if hasattr(product, 'pages') else None,  
-                size= product.size if hasattr(product, 'size') else None,
-                materials= product.materials if hasattr(product, 'materials') else None,
-                type = product.type if hasattr(product, 'type') else None,
-                brand = product.brand if hasattr(product, 'brand') else None,
-                capacity = product.capacity if hasattr(product, 'capacity') else None,
-                power_source = product.power_source if hasattr(product, 'power_source') else None,
-                ingredients = product.ingredients if hasattr(product, 'ingredients') else None,
-                publisher = product.publisher if hasattr(product, 'publisher') else None,
-                platform = product.platform if hasattr(product, 'platform') else None,
-            )
-            return seller_product_info
+            return seller_product
 
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Seller product with id {seller_product_id} not found.",
         )
+    
+
+    def get_by_id_full(self, seller_product_id) -> SellerProductRead:
+            seller_product=self.get_by_id(seller_product_id)
+            return self.map_seller_product_to_read_schema(seller_product)
+
 
     def get_all(self) -> list[SellerProductRead]:
         seller_products=self.seller_product_repo.get_all()
         complete_seller_products=[]
         for seller_product in seller_products:
-            product=self.product_service.get_by_id(seller_product.id_product)
-            seller_product_info = SellerProductRead(
-                quantity=seller_product.quantity,
-                price=seller_product.price,
-                shipping_costs=seller_product.shipping_costs,
-                id=seller_product.id,
-                id_product=product.id,
-                id_seller=seller_product.id_seller,
-                category=product.category,
-                name=product.name,
-                description=product.description,
-                eco_points=product.eco_points,
-                spec_sheet=product.spec_sheet,
-                stock=product.stock,
-                images=[image.url for image in product.images],  
-                author=product.author if hasattr(product, 'author') else None,  
-                pages=product.pages if hasattr(product, 'pages') else None,  
-                size= product.size if hasattr(product, 'size') else None,
-                materials= product.materials if hasattr(product, 'materials') else None,
-                type = product.type if hasattr(product, 'type') else None,
-                brand = product.brand if hasattr(product, 'brand') else None,
-                capacity = product.capacity if hasattr(product, 'capacity') else None,
-                power_source = product.power_source if hasattr(product, 'power_source') else None,
-                ingredients = product.ingredients if hasattr(product, 'ingredients') else None,
-                publisher = product.publisher if hasattr(product, 'publisher') else None,
-                platform = product.platform if hasattr(product, 'platform') else None,
-            )
+            seller_product_info=self.map_seller_product_to_read_schema(seller_product)
             complete_seller_products.append(seller_product_info)
         return complete_seller_products
 
@@ -153,33 +135,7 @@ class SellerProductService:
         seller_products = self.seller_product_repo.get_by_id_product(id_product=id_product)
         complete_seller_products=[]
         for seller_product in seller_products:
-            product=self.product_service.get_by_id(seller_product.id_product)
-            seller_product_info = SellerProductRead(
-                quantity=seller_product.quantity,
-                price=seller_product.price,
-                shipping_costs=seller_product.shipping_costs,
-                id=seller_product.id,
-                id_product=product.id,
-                id_seller=seller_product.id_seller,
-                category=product.category,
-                name=product.name,
-                description=product.description,
-                eco_points=product.eco_points,
-                spec_sheet=product.spec_sheet,
-                stock=product.stock,
-                images=[image.url for image in product.images],  
-                author=product.author if hasattr(product, 'author') else None,  
-                pages=product.pages if hasattr(product, 'pages') else None,  
-                size= product.size if hasattr(product, 'size') else None,
-                materials= product.materials if hasattr(product, 'materials') else None,
-                type = product.type if hasattr(product, 'type') else None,
-                brand = product.brand if hasattr(product, 'brand') else None,
-                capacity = product.capacity if hasattr(product, 'capacity') else None,
-                power_source = product.power_source if hasattr(product, 'power_source') else None,
-                ingredients = product.ingredients if hasattr(product, 'ingredients') else None,
-                publisher = product.publisher if hasattr(product, 'publisher') else None,
-                platform = product.platform if hasattr(product, 'platform') else None,
-            )
+            seller_product_info=self.map_seller_product_to_read_schema(seller_product)
             complete_seller_products.append(seller_product_info)
         return complete_seller_products
     
