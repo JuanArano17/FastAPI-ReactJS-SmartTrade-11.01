@@ -18,9 +18,19 @@ async def read_seller_products(
     *, product_id: int, seller_product_service: SellerProductServiceDep
 ):
     """
-    Retrieve seller products.
+    Retrieve seller products from product.
     """
     return seller_product_service.get_by_id_product(id_product=product_id)
+
+
+@router.delete("/")
+async def delete_seller_products(
+    product_id: int, seller_product_service: SellerProductServiceDep
+):
+    """
+    Delete all seller products.
+    """
+    return seller_product_service.delete_by_id_product(id_product=product_id)
 
 
 seller_prod_router = APIRouter(
@@ -63,16 +73,6 @@ async def create_seller_product(
     return seller_product_service.add(
         id_seller=seller_id, seller_product=seller_product
     )
-
-
-@seller_prod_router.delete("/")
-async def delete_seller_products(
-    product_id: int, seller_product_service: SellerProductServiceDep
-):
-    """
-    Delete all seller products.
-    """
-    return seller_product_service.delete_by_id_product(id_product=product_id)
 
 
 @seller_prod_router.delete("/{seller_product_id}")
