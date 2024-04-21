@@ -13,27 +13,14 @@ router = APIRouter(
 )
 
 
-@router.get("/{seller_product_id}", response_model=SellerProduct)
-async def read_seller_product_by_id(
-    product_id: int, seller_product_service: SellerProductServiceDep
+@router.get("/", response_model=list[SellerProductRead], response_model_exclude_none=True)
+async def read_seller_products(
+    *, product_id: int, seller_product_service: SellerProductServiceDep
 ):
     """
-    Retrieve a specific seller product.
+    Retrieve seller products.
     """
-    seller_product = seller_product_service.get_by_id(product_id)
-    if seller_product is None:
-        raise HTTPException(status_code=404, detail="Seller product not found")
-    return seller_product
-
-
-#@router.get("/", response_model=list[SellerProduct])
-#async def read_seller_products(
-#    *, product_id: int, seller_product_service: SellerProductServiceDep
-#):
-#    """
-#    Retrieve seller products.
-#    """
-#    return seller_product_service.get_by_id_product(id_product=product_id)
+    return seller_product_service.get_by_id_product(id_product=product_id)
 
 
 @router.post("/", response_model=SellerProduct)
@@ -143,3 +130,15 @@ async def read_seller_products(
     Retrieve seller products.
     """
     return seller_product_service.get_all()
+
+@seller_prod_router.get("/{seller_product_id}", response_model=SellerProductRead, response_model_exclude_none=True)
+async def read_seller_product_by_id(
+    seller_product_id: int, seller_product_service: SellerProductServiceDep
+):
+    """
+    Retrieve a specific seller product.
+    """
+    seller_product = seller_product_service.get_by_id(seller_product_id)
+    if seller_product is None:
+        raise HTTPException(status_code=404, detail="Seller product not found")
+    return seller_product

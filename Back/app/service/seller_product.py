@@ -55,9 +55,36 @@ class SellerProductService:
         seller_product_obj = self.seller_product_repo.add(seller_product_obj)
         return seller_product_obj
 
-    def get_by_id(self, seller_product_id) -> SellerProduct:
+    def get_by_id(self, seller_product_id) -> SellerProductRead:
         if seller_product := self.seller_product_repo.get_by_id(seller_product_id):
-            return seller_product
+            product=self.product_service.get_by_id(seller_product.id_product)
+            seller_product_info = SellerProductRead(
+                quantity=seller_product.quantity,
+                price=seller_product.price,
+                shipping_costs=seller_product.shipping_costs,
+                id=seller_product.id,
+                id_product=product.id,
+                id_seller=seller_product.id_seller,
+                category=product.category,
+                name=product.name,
+                description=product.description,
+                eco_points=product.eco_points,
+                spec_sheet=product.spec_sheet,
+                stock=product.stock,
+                images=[image.url for image in product.images],  
+                author=product.author if hasattr(product, 'author') else None,  
+                pages=product.pages if hasattr(product, 'pages') else None,  
+                size= product.size if hasattr(product, 'size') else None,
+                materials= product.materials if hasattr(product, 'materials') else None,
+                type = product.type if hasattr(product, 'type') else None,
+                brand = product.brand if hasattr(product, 'brand') else None,
+                capacity = product.capacity if hasattr(product, 'capacity') else None,
+                power_source = product.power_source if hasattr(product, 'power_source') else None,
+                ingredients = product.ingredients if hasattr(product, 'ingredients') else None,
+                publisher = product.publisher if hasattr(product, 'publisher') else None,
+                platform = product.platform if hasattr(product, 'platform') else None,
+            )
+            return seller_product_info
 
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -96,7 +123,6 @@ class SellerProductService:
                 platform = product.platform if hasattr(product, 'platform') else None,
             )
             complete_seller_products.append(seller_product_info)
-        print(complete_seller_products)
         return complete_seller_products
 
 
@@ -124,7 +150,38 @@ class SellerProductService:
         self.seller_product_repo.delete_all()
     
     def get_by_id_product(self, id_product)-> list[SellerProduct]:
-        return self.seller_product_repo.get_by_id_product(id_product=id_product)
+        seller_products = self.seller_product_repo.get_by_id_product(id_product=id_product)
+        complete_seller_products=[]
+        for seller_product in seller_products:
+            product=self.product_service.get_by_id(seller_product.id_product)
+            seller_product_info = SellerProductRead(
+                quantity=seller_product.quantity,
+                price=seller_product.price,
+                shipping_costs=seller_product.shipping_costs,
+                id=seller_product.id,
+                id_product=product.id,
+                id_seller=seller_product.id_seller,
+                category=product.category,
+                name=product.name,
+                description=product.description,
+                eco_points=product.eco_points,
+                spec_sheet=product.spec_sheet,
+                stock=product.stock,
+                images=[image.url for image in product.images],  
+                author=product.author if hasattr(product, 'author') else None,  
+                pages=product.pages if hasattr(product, 'pages') else None,  
+                size= product.size if hasattr(product, 'size') else None,
+                materials= product.materials if hasattr(product, 'materials') else None,
+                type = product.type if hasattr(product, 'type') else None,
+                brand = product.brand if hasattr(product, 'brand') else None,
+                capacity = product.capacity if hasattr(product, 'capacity') else None,
+                power_source = product.power_source if hasattr(product, 'power_source') else None,
+                ingredients = product.ingredients if hasattr(product, 'ingredients') else None,
+                publisher = product.publisher if hasattr(product, 'publisher') else None,
+                platform = product.platform if hasattr(product, 'platform') else None,
+            )
+            complete_seller_products.append(seller_product_info)
+        return complete_seller_products
     
     def delete_by_id_product(self, id_product):
         return self.seller_product_repo.delete_by_id_product(id_product=id_product)
