@@ -1,12 +1,11 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from app.schemas.seller_product import SellerProductCreate, SellerProductUpdate
+from app.schemas.seller_product import SellerProductCreate, SellerProductRead, SellerProductUpdate
 from app.service.seller import SellerService
 from app.models.products.seller_product import SellerProduct
 from app.crud_repository import CRUDRepository
 from app.service.product import ProductService
-
 
 class SellerProductRepository(CRUDRepository):
     def __init__(self, session: Session):
@@ -15,15 +14,11 @@ class SellerProductRepository(CRUDRepository):
 
     def get_by_id_product(self, id_product) -> list[SellerProduct]:
         return (
-            self._db.query(self._model)
-            .filter(self._model.id_product == id_product)
-            .all()
+            self._db.query(self._model).filter(self._model.id_product == id_product).all()
         )
-
+    
     def delete_by_id_product(self, id_product):
-        self._db.query(self._model).filter(
-            self._model.id_product == id_product
-        ).delete()  # type: ignore
+        self._db.query(self._model).filter(self._model.id_product == id_product).delete()  # type: ignore
         self._db.commit()
 
 
@@ -69,8 +64,41 @@ class SellerProductService:
             detail=f"Seller product with id {seller_product_id} not found.",
         )
 
-    def get_all(self) -> list[SellerProduct]:
-        return self.seller_product_repo.get_all()
+    def get_all(self) -> list[SellerProductRead]:
+        seller_products=self.seller_product_repo.get_all()
+        complete_seller_products=[]
+        for seller_product in seller_products:
+            product=self.product_service.get_by_id(seller_product.id_product)
+            seller_product_info = SellerProductRead(
+                quantity=seller_product.quantity,
+                price=seller_product.price,
+                shipping_costs=seller_product.shipping_costs,
+                id=seller_product.id,
+                id_product=product.id,
+                id_seller=seller_product.id_seller,
+                category=product.category,
+                name=product.name,
+                description=product.description,
+                eco_points=product.eco_points,
+                spec_sheet=product.spec_sheet,
+                stock=product.stock,
+                images=[image.url for image in product.images],  
+                author=product.author if hasattr(product, 'author') else None,  
+                pages=product.pages if hasattr(product, 'pages') else None,  
+                size= product.size if hasattr(product, 'size') else None,
+                materials= product.materials if hasattr(product, 'materials') else None,
+                type = product.type if hasattr(product, 'type') else None,
+                brand = product.brand if hasattr(product, 'brand') else None,
+                capacity = product.capacity if hasattr(product, 'capacity') else None,
+                power_source = product.power_source if hasattr(product, 'power_source') else None,
+                ingredients = product.ingredients if hasattr(product, 'ingredients') else None,
+                publisher = product.publisher if hasattr(product, 'publisher') else None,
+                platform = product.platform if hasattr(product, 'platform') else None,
+            )
+            complete_seller_products.append(seller_product_info)
+        print(complete_seller_products)
+        return complete_seller_products
+
 
     def update(self, seller_product_id, new_data: SellerProductUpdate) -> SellerProduct:
         seller_product = self.get_by_id(seller_product_id)
@@ -94,9 +122,9 @@ class SellerProductService:
             product = self.product_service.get_by_id(seller_product.id_product)
             product.stock -= seller_product.quantity  # type: ignore
         self.seller_product_repo.delete_all()
-
-    def get_by_id_product(self, id_product) -> list[SellerProduct]:
+    
+    def get_by_id_product(self, id_product)-> list[SellerProduct]:
         return self.seller_product_repo.get_by_id_product(id_product=id_product)
-
+    
     def delete_by_id_product(self, id_product):
         return self.seller_product_repo.delete_by_id_product(id_product=id_product)

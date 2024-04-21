@@ -1,9 +1,10 @@
 from fastapi import APIRouter, HTTPException
 
-from app.api.deps import SellerProductServiceDep
+from app.api.deps import ProductServiceDep, SellerProductServiceDep
 from app.schemas.seller_product import (
     SellerProduct,
     SellerProductCreate,
+    SellerProductRead,
     SellerProductUpdate,
 )
 
@@ -11,10 +12,8 @@ router = APIRouter(
     prefix="/product/{product_id}/seller_products", tags=["seller-products"]
 )
 
-pure_router = APIRouter(prefix="/seller_products", tags=["seller-products"])
 
-
-@pure_router.get("/{seller_product_id}", response_model=SellerProduct)
+@router.get("/{seller_product_id}", response_model=SellerProduct)
 async def read_seller_product_by_id(
     product_id: int, seller_product_service: SellerProductServiceDep
 ):
@@ -27,14 +26,14 @@ async def read_seller_product_by_id(
     return seller_product
 
 
-@router.get("/", response_model=list[SellerProduct])
-async def read_seller_products(
-    *, product_id: int, seller_product_service: SellerProductServiceDep
-):
-    """
-    Retrieve seller products.
-    """
-    return seller_product_service.get_by_id_product(id_product=product_id)
+#@router.get("/", response_model=list[SellerProduct])
+#async def read_seller_products(
+#    *, product_id: int, seller_product_service: SellerProductServiceDep
+#):
+#    """
+#    Retrieve seller products.
+#    """
+#    return seller_product_service.get_by_id_product(id_product=product_id)
 
 
 @router.post("/", response_model=SellerProduct)
@@ -129,3 +128,18 @@ async def delete_seller_product(
         raise HTTPException(status_code=404, detail="Seller product not found")
 
     return seller_product_service.delete_by_id(seller_product_id)
+
+
+seller_prod_router = APIRouter(
+    prefix="/seller_products", tags=["seller-products"]
+)
+
+
+@seller_prod_router.get("/", response_model=list[SellerProductRead], response_model_exclude_none=True)
+async def read_seller_products(
+    *, seller_product_service: SellerProductServiceDep
+):
+    """
+    Retrieve seller products.
+    """
+    return seller_product_service.get_all()
