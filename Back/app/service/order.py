@@ -5,7 +5,7 @@ from app.service.card import CardService
 from app.service.address import AddressService
 from app.service.buyer import BuyerService
 from app.schemas.order import OrderCreate, OrderUpdate
-from app.models.order import Order
+from app.models.orders.order import Order
 from app.crud_repository import CRUDRepository
 
 

@@ -4,15 +4,15 @@ from fastapi import HTTPException, status
 from sqlalchemy.exc import ProgrammingError
 from sqlalchemy import select
 
-from app.models.product import Product
+from app.models.products.product import Product
 from app.crud_repository import CRUDRepository
-from app.models.book import Book
-from app.models.game import Game
-from app.models.electronics import Electronics
-from app.models.clothes import Clothes
-from app.models.food import Food
-from app.models.house_utilities import HouseUtilities
-from app.models.electrodomestics import Electrodomestics
+from app.models.products.categories.book import Book
+from app.models.products.categories.game import Game
+from app.models.products.categories.electronics import Electronics
+from app.models.products.categories.clothes import Clothes
+from app.models.products.categories.food import Food
+from app.models.products.categories.house_utilities import HouseUtilities
+from app.models.products.categories.electrodomestics import Electrodomestics
 from app.schemas.book import BookCreate, BookUpdate
 from app.schemas.clothes import ClothesCreate, ClothesUpdate
 from app.schemas.electrodomestics import ElectrodomesticsCreate, ElectrodomesticsUpdate

@@ -5,20 +5,20 @@ from sqlalchemy_utils import database_exists, create_database
 from dotenv import load_dotenv
 
 # Base = declarative_base()
-from app.models.user import User
-from app.models.admin import Admin
-from app.models.buyer import Buyer
-from app.models.address import Address
-from app.models.product import Product
-from app.models.image import Image
-from app.models.card import Card
-from app.models.seller import Seller
-from app.models.order import Order
-from app.models.product_line import ProductLine
-from app.models.seller_product import SellerProduct
-from app.models.in_shopping_cart import InShoppingCart
-from app.models.in_wish_list import InWishList
-from app.models.refund_product import RefundProduct
+from app.models.users.types.user import User
+from app.models.users.types.admin import Admin
+from app.models.users.types.buyer import Buyer
+from app.models.users.address import Address
+from app.models.products.product import Product
+from app.models.products.image import Image
+from app.models.users.card import Card
+from app.models.users.types.seller import Seller
+from app.models.orders.order import Order
+from app.models.orders.product_line import ProductLine
+from app.models.products.seller_product import SellerProduct
+from app.models.users.in_shopping_cart import InShoppingCart
+from app.models.users.in_wish_list import InWishList
+from app.models.orders.refund_product import RefundProduct
 
 load_dotenv()
 

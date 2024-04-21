@@ -3,9 +3,10 @@ from fastapi import HTTPException, status
 
 from app.schemas.seller_product import SellerProductCreate, SellerProductUpdate
 from app.service.seller import SellerService
-from app.models.seller_product import SellerProduct
+from app.models.products.seller_product import SellerProduct
 from app.crud_repository import CRUDRepository
 from app.service.product import ProductService
+
 
 class SellerProductRepository(CRUDRepository):
     def __init__(self, session: Session):
@@ -14,11 +15,15 @@ class SellerProductRepository(CRUDRepository):
 
     def get_by_id_product(self, id_product) -> list[SellerProduct]:
         return (
-            self._db.query(self._model).filter(self._model.id_product == id_product).all()
+            self._db.query(self._model)
+            .filter(self._model.id_product == id_product)
+            .all()
         )
-    
+
     def delete_by_id_product(self, id_product):
-        self._db.query(self._model).filter(self._model.id_product == id_product).delete()  # type: ignore
+        self._db.query(self._model).filter(
+            self._model.id_product == id_product
+        ).delete()  # type: ignore
         self._db.commit()
 
 
@@ -89,9 +94,9 @@ class SellerProductService:
             product = self.product_service.get_by_id(seller_product.id_product)
             product.stock -= seller_product.quantity  # type: ignore
         self.seller_product_repo.delete_all()
-    
-    def get_by_id_product(self, id_product)-> list[SellerProduct]:
+
+    def get_by_id_product(self, id_product) -> list[SellerProduct]:
         return self.seller_product_repo.get_by_id_product(id_product=id_product)
-    
+
     def delete_by_id_product(self, id_product):
         return self.seller_product_repo.delete_by_id_product(id_product=id_product)

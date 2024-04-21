@@ -3,7 +3,7 @@ from fastapi import HTTPException, status
 
 from app.service.buyer import BuyerService
 from app.schemas.in_shopping_cart import InShoppingCartCreate, InShoppingCartUpdate
-from app.models.in_shopping_cart import InShoppingCart
+from app.models.users.in_shopping_cart import InShoppingCart
 from app.crud_repository import CRUDRepository
 from app.service.seller_product import SellerProductService
 
@@ -29,26 +29,24 @@ class InShoppingCartRepository(CRUDRepository):
             )
             .first()
         )
-    
+
     def get_by_id_buyer(self, *, id_buyer) -> list[InShoppingCart]:
         return (
-            self._db.query(self._model)
-            .filter(
-                self._model.id_buyer == id_buyer
-            )
-            .all()
+            self._db.query(self._model).filter(self._model.id_buyer == id_buyer).all()
         )
-    
+
     def delete_by_id_buyer(self, *, id_buyer):
-            self._db.query(self._model).filter(
-                self._model.id_buyer == id_buyer).delete()
-            self._db.commit()
-    
+        self._db.query(self._model).filter(self._model.id_buyer == id_buyer).delete()
+        self._db.commit()
+
     def update(self, entity, new_entity, exclude_defaults: bool = True):
         data = new_entity.model_dump(
             exclude_unset=True, exclude_defaults=exclude_defaults
         )
-        self._db.query(self._model).filter(self._model.id_buyer == entity.id_buyer, self._model.id_seller_product == entity.id_seller_product).update({**data})  # type: ignore
+        self._db.query(self._model).filter(
+            self._model.id_buyer == entity.id_buyer,
+            self._model.id_seller_product == entity.id_seller_product,
+        ).update({**data})  # type: ignore
         self._db.commit()
         self._db.refresh(entity)
         return entity
@@ -69,12 +67,15 @@ class InShoppingCartService:
     def add(
         self, id_buyer, shopping_cart_product: InShoppingCartCreate
     ) -> InShoppingCart:
-        buyer = self.buyer_service.get_by_id(id_buyer)
+        self.buyer_service.get_by_id(id_buyer)
         seller_product = self.seller_product_service.get_by_id(
             shopping_cart_product.id_seller_product
         )
 
-        if self.cart_repo.get_where(InShoppingCart.id_buyer==id_buyer, InShoppingCart.id_seller_product==shopping_cart_product.id_seller_product):
+        if self.cart_repo.get_where(
+            InShoppingCart.id_buyer == id_buyer,
+            InShoppingCart.id_seller_product == shopping_cart_product.id_seller_product,
+        ):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Product already in shopping cart",
@@ -126,8 +127,8 @@ class InShoppingCartService:
     def delete_all(self):
         self.cart_repo.delete_all()
 
-    def get_by_id_buyer(self, id_buyer)-> list[InShoppingCart]:
+    def get_by_id_buyer(self, id_buyer) -> list[InShoppingCart]:
         return self.cart_repo.get_by_id_buyer(id_buyer=id_buyer)
-    
+
     def delete_by_id_buyer(self, id_buyer):
         return self.cart_repo.delete_by_id_buyer(id_buyer=id_buyer)

@@ -2,9 +2,10 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
 from app.schemas.image import ImageCreate, ImageUpdate
-from app.models.image import Image
+from app.models.products.image import Image
 from app.crud_repository import CRUDRepository
 from app.service.product import ProductService
+
 
 class ImageRepository(CRUDRepository):
     def __init__(self, session: Session):
@@ -13,13 +14,16 @@ class ImageRepository(CRUDRepository):
 
     def get_by_id_product(self, id_product) -> list[Image]:
         return (
-            self._db.query(self._model).filter(self._model.id_product == id_product).all()
+            self._db.query(self._model)
+            .filter(self._model.id_product == id_product)
+            .all()
         )
-    
-    def delete_by_id_product(self, id_product):
-        self._db.query(self._model).filter(self._model.id_product == id_product).delete()  # type: ignore
-        self._db.commit()
 
+    def delete_by_id_product(self, id_product):
+        self._db.query(self._model).filter(
+            self._model.id_product == id_product
+        ).delete()  # type: ignore
+        self._db.commit()
 
 
 class ImageService:
@@ -57,10 +61,8 @@ class ImageService:
     def delete_all(self):
         self.image_repo.delete_all()
 
-    def get_by_id_product(self, id_product)-> list[Image]:
+    def get_by_id_product(self, id_product) -> list[Image]:
         return self.image_repo.get_by_id_product(id_product=id_product)
-    
-    def delete_by_id_product(self, id_product)-> list[Image]:
+
+    def delete_by_id_product(self, id_product) -> list[Image]:
         return self.image_repo.delete_by_id_product(id_product=id_product)
-    
-    

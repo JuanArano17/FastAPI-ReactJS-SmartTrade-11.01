@@ -4,7 +4,7 @@ from fastapi import status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models.card import Card
+from app.models.users.card import Card
 from app.schemas.buyer import BuyerCreate
 from app.schemas.card import CardCreate
 from app.service.buyer import BuyerService

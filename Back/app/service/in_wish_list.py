@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 from app.service.seller_product import SellerProductService
 from app.service.buyer import BuyerService
 from app.schemas.in_wish_list import InWishListCreate
-from app.models.in_wish_list import InWishList
+from app.models.users.in_wish_list import InWishList
 from app.crud_repository import CRUDRepository
 
 
@@ -29,20 +29,15 @@ class InWishListRepository(CRUDRepository):
             )
             .first()
         )
-    
+
     def get_by_id_buyer(self, *, id_buyer) -> list[InWishList]:
         return (
-            self._db.query(self._model)
-            .filter(
-                self._model.id_buyer == id_buyer
-            )
-            .all()
+            self._db.query(self._model).filter(self._model.id_buyer == id_buyer).all()
         )
-    
+
     def delete_by_id_buyer(self, *, id_buyer):
-            self._db.query(self._model).filter(
-                self._model.id_buyer == id_buyer).delete()
-            self._db.commit()
+        self._db.query(self._model).filter(self._model.id_buyer == id_buyer).delete()
+        self._db.commit()
 
 
 class InWishListService:
@@ -58,7 +53,10 @@ class InWishListService:
         self.buyer_service = buyer_service
 
     def add(self, id_buyer, wish_list_item: InWishListCreate) -> InWishList:
-        if self.wishlist_repo.get_where(InWishList.id_buyer==id_buyer, InWishList.id_seller_product==wish_list_item.id_seller_product):
+        if self.wishlist_repo.get_where(
+            InWishList.id_buyer == id_buyer,
+            InWishList.id_seller_product == wish_list_item.id_seller_product,
+        ):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Product already in wish list",
@@ -95,9 +93,9 @@ class InWishListService:
     # We probably will never use this
     def delete_all(self):
         self.wishlist_repo.delete_all()
-    
-    def get_by_id_buyer(self, id_buyer)-> list[InWishList]:
+
+    def get_by_id_buyer(self, id_buyer) -> list[InWishList]:
         return self.wishlist_repo.get_by_id_buyer(id_buyer=id_buyer)
-    
+
     def delete_by_id_buyer(self, id_buyer):
         return self.wishlist_repo.delete_by_id_buyer(id_buyer=id_buyer)

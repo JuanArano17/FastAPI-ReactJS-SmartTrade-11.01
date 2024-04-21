@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
 from app.schemas.address import AddressCreate, AddressUpdate
-from app.models.address import Address
+from app.models.users.address import Address
 from app.crud_repository import CRUDRepository
 from app.service.buyer import BuyerService
 
@@ -16,14 +16,16 @@ class AddressRepository(CRUDRepository):
         return (
             self._db.query(self._model).filter(self._model.id_buyer == id_buyer).all()
         )
-    
+
     def delete_by_id_buyer(self, id_buyer):
         self._db.query(self._model).filter(self._model.id_buyer == id_buyer).delete()  # type: ignore
         self._db.commit()
 
     def get_default(self, id_buyer) -> list[Address]:
         return (
-            self._db.query(self._model).filter(self._model.id_buyer == id_buyer, self._model.default==True).first()
+            self._db.query(self._model)
+            .filter(self._model.id_buyer == id_buyer, self._model.default == True)
+            .first()
         )
 
 
@@ -77,12 +79,11 @@ class AddressService:
     def delete_all(self):
         self.address_repo.delete_all()
 
-    def get_by_id_buyer(self, id_buyer)-> list[Address]:
+    def get_by_id_buyer(self, id_buyer) -> list[Address]:
         return self.address_repo.get_by_id_buyer(id_buyer=id_buyer)
-    
-    def delete_by_id_buyer(self, id_buyer)-> list[Address]:
-        return self.address_repo.delete_by_id_buyer(id_buyer=id_buyer)
-    
-    def get_default(self, id_buyer)-> list[Address]:
-        return self.address_repo.get_default(id_buyer=id_buyer)
 
+    def delete_by_id_buyer(self, id_buyer) -> list[Address]:
+        return self.address_repo.delete_by_id_buyer(id_buyer=id_buyer)
+
+    def get_default(self, id_buyer) -> list[Address]:
+        return self.address_repo.get_default(id_buyer=id_buyer)

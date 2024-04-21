@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 from sqlalchemy import delete
 
-from app.models.user import User
+from app.models.users.types.user import User
 from app.service.buyer import BuyerService
 from app.service.seller import SellerService
 from app.service.user import UserService
@@ -63,22 +63,37 @@ def address_service(db, buyer_service):
 def card_service(db, buyer_service):
     return CardService(session=db, buyer_service=buyer_service)
 
+
 @pytest.fixture(scope="module")
 def product_service(db):
     return ProductService(session=db)
+
 
 @pytest.fixture(scope="module")
 def image_service(db, product_service):
     return ImageService(session=db, product_service=product_service)
 
+
 @pytest.fixture(scope="module")
 def seller_product_service(db, seller_service, product_service):
-    return SellerProductService(session=db, seller_service=seller_service, product_service=product_service)
+    return SellerProductService(
+        session=db, seller_service=seller_service, product_service=product_service
+    )
+
 
 @pytest.fixture(scope="module")
 def wish_list_service(db, seller_product_service, buyer_service):
-    return InWishListService(session=db, seller_product_service=seller_product_service, buyer_service=buyer_service)
+    return InWishListService(
+        session=db,
+        seller_product_service=seller_product_service,
+        buyer_service=buyer_service,
+    )
+
 
 @pytest.fixture(scope="module")
 def shopping_cart_service(db, seller_product_service, buyer_service):
-    return InShoppingCartService(session=db, buyer_service=buyer_service, seller_product_service=seller_product_service)
+    return InShoppingCartService(
+        session=db,
+        buyer_service=buyer_service,
+        seller_product_service=seller_product_service,
+    )

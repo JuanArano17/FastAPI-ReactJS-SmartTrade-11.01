@@ -3,7 +3,7 @@ from fastapi import HTTPException, status
 
 from app.schemas.product_line import ProductLineCreate
 from app.service.buyer import BuyerService
-from app.models.product_line import ProductLine
+from app.models.orders.product_line import ProductLine
 from app.service.order import OrderService
 from app.service.seller_product import SellerProductService
 from app.crud_repository import CRUDRepository

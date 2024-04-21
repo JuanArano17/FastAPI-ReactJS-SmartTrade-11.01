@@ -1,7 +1,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Float
 from sqlalchemy.orm import relationship
 
-from app.models.user import User
+from app.models.users.types.user import User
 
 
 class Buyer(User):

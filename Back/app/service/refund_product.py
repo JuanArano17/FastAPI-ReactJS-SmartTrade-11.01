@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 
 from app.service.buyer import BuyerService
 from app.schemas.refund_product import RefundProductCreate
-from app.models.refund_product import RefundProduct
+from app.models.orders.refund_product import RefundProduct
 from app.service.order import OrderService
 from app.service.product_line import ProductLineService
 from app.crud_repository import CRUDRepository

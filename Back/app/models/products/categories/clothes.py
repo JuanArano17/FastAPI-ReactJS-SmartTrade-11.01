@@ -1,5 +1,5 @@
 from sqlalchemy import Column, ForeignKey, Integer, String
-from app.models.product import Product
+from app.models.products.product import Product
 
 
 class Clothes(Product):
@@ -8,7 +8,8 @@ class Clothes(Product):
     id = Column(
         Integer,
         ForeignKey("Product.id", ondelete="CASCADE", name="fk_product_id"),
-        nullable=False, primary_key=True
+        nullable=False,
+        primary_key=True,
     )
     size = Column(String(255), nullable=False)
     materials = Column(String(255), nullable=False)

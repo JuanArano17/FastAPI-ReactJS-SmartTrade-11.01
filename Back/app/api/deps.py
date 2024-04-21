@@ -6,10 +6,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectin_polymorphic
 from pydantic import ValidationError
 
-from app.models.admin import Admin
-from app.models.buyer import Buyer
-from app.models.seller import Seller
-from app.models.user import User
+from app.models.users.types.admin import Admin
+from app.models.users.types.buyer import Buyer
+from app.models.users.types.seller import Seller
+from app.models.users.types.user import User
 from app.database import get_db
 from app.schemas.token import TokenPayload
 from app.core.security import SECRET_KEY, ALGORITHM

@@ -4,9 +4,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.schemas.image import ImageCreate
-from app.models.image import Image
+from app.models.products.image import Image
 from app.service.image import ImageService
-from app.schemas.product import ProductCreate
 from app.service.product import ProductService
 
 
@@ -33,7 +32,7 @@ def test_create_image(
     db: Session,
 ):
     data = fake_product()
-    product=product_service.add("book",data)
+    product = product_service.add("book", data)
 
     data = fake_image()
     image = image_service.add(product.id, ImageCreate(**data))
@@ -52,9 +51,9 @@ def test_create_image(
 
 def test_create_image_invalid_data(client: TestClient, product_service: ProductService):
     data = fake_product()
-    product = product_service.add("book",data)
+    product = product_service.add("book", data)
 
-    data =  {"name":"e"} # Invalid field
+    data = {"name": "e"}  # Invalid field
 
     response = client.post(f"/products/{product.id}/images", json=data)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -64,11 +63,11 @@ def test_create_image_invalid_data(client: TestClient, product_service: ProductS
 def test_get_image_by_id(
     client: TestClient,
     image_service: ImageService,
-    product_service:ProductService,
+    product_service: ProductService,
     db: Session,
 ):
     data = fake_product()
-    product = product_service.add("book",data)
+    product = product_service.add("book", data)
 
     data = fake_image()
     image = image_service.add(product.id, ImageCreate(**data))
@@ -101,44 +100,40 @@ def test_get_images(
     image_service: ImageService,
     db: Session,
 ):
-    book = product_service.add("book",
-            {
-        "name": "Dune",
-        "spec_sheet": "Specs...",
-        "eco_points": 10,
-        "author": "Frank Herbert",
-        "pages": 900,
-            }
-    )
-    game = product_service.add("game",
+    book = product_service.add(
+        "book",
         {
-        "name": "gta6",
-        "spec_sheet": "Specs...",
-        "eco_points": 10,
-        "publisher": "Rockstar",
-        "platform": "ps5",
-        "size":"100GB",
-    }
+            "name": "Dune",
+            "spec_sheet": "Specs...",
+            "eco_points": 10,
+            "author": "Frank Herbert",
+            "pages": 900,
+        },
+    )
+    game = product_service.add(
+        "game",
+        {
+            "name": "gta6",
+            "spec_sheet": "Specs...",
+            "eco_points": 10,
+            "publisher": "Rockstar",
+            "platform": "ps5",
+            "size": "100GB",
+        },
     )
 
     image1 = image_service.add(
         book.id,
-        ImageCreate(
-            url ="https://dummyimage.com/780x968"
-        ),
+        ImageCreate(url="https://dummyimage.com/780x968"),
     )
 
     image2 = image_service.add(
         book.id,
-        ImageCreate(
-            url ="https://dummyimage2.com/800x968"
-        ),
+        ImageCreate(url="https://dummyimage2.com/800x968"),
     )
     image3 = image_service.add(
         game.id,
-        ImageCreate(
-            url ="https://dummyimage3.com/800x968"
-        ),
+        ImageCreate(url="https://dummyimage3.com/800x968"),
     )
 
     response = client.get(f"/products/{game.id}/images/")
@@ -161,14 +156,12 @@ def test_update_image(
     db: Session,
 ):
     data = fake_product()
-    product = product_service.add("book",data)
+    product = product_service.add("book", data)
 
     data = fake_image()
     image = image_service.add(product.id, ImageCreate(**data))
     # new_data = data.copy()
-    new_data = {
-        "url":"https://dummyimage2.com/800x968"
-    }
+    new_data = {"url": "https://dummyimage2.com/800x968"}
     response = client.put(f"/products/{product.id}/images/{image.id}", json=new_data)  # type: ignore
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
@@ -177,6 +170,7 @@ def test_update_image(
     assert "id_product" in content
     assert content["id_product"] == product.id
 
+
 def test_update_image_invalid_data(
     client: TestClient,
     image_service: ImageService,
@@ -184,7 +178,7 @@ def test_update_image_invalid_data(
     db: Session,
 ):
     data = fake_product()
-    product = product_service.add("book",data)
+    product = product_service.add("book", data)
 
     data = fake_image()
     image = image_service.add(product.id, ImageCreate(**data))
@@ -202,7 +196,7 @@ def test_delete_image(
     db: Session,
 ):
     data = fake_product()
-    product = product_service.add("book",data)
+    product = product_service.add("book", data)
     data = fake_image()
     image = image_service.add(product.id, ImageCreate(**data))
 
@@ -211,15 +205,13 @@ def test_delete_image(
     content = response.json()
     assert content is None or content == {}
 
-    image = db.execute(
-        select(Image).where(Image.id == image.id)
-    ).scalar_one_or_none()  # type: ignore
+    image = db.execute(select(Image).where(Image.id == image.id)).scalar_one_or_none()  # type: ignore
     assert image is None
 
 
 def test_delete_image_not_found(client: TestClient, product_service: ProductService):
     data = fake_product()
-    product = product_service.add("book",data)
+    product = product_service.add("book", data)
     response = client.delete(f"/products/{product.id}/images/999")
     assert response.status_code == status.HTTP_404_NOT_FOUND
     content = response.json()
@@ -232,34 +224,30 @@ def test_delete_images(
     product_service: ProductService,
     db: Session,
 ):
-    book = product_service.add("book",
-            {
-        "name": "Dune",
-        "spec_sheet": "Specs...",
-        "eco_points": 10,
-        "author": "Frank Herbert",
-        "pages": 900,
-            }
+    book = product_service.add(
+        "book",
+        {
+            "name": "Dune",
+            "spec_sheet": "Specs...",
+            "eco_points": 10,
+            "author": "Frank Herbert",
+            "pages": 900,
+        },
     )
 
-    image1 = image_service.add(
+    image_service.add(
         book.id,
-        ImageCreate(
-            url ="https://dummyimage.com/780x968"
-        ),
+        ImageCreate(url="https://dummyimage.com/780x968"),
     )
 
-    image2 = image_service.add(
+    image_service.add(
         book.id,
-        ImageCreate(
-            url ="https://dummyimage2.com/800x968"
-        ),
+        ImageCreate(url="https://dummyimage2.com/800x968"),
     )
-    image3 = image_service.add(
+
+    image_service.add(
         book.id,
-        ImageCreate(
-            url ="https://dummyimage3.com/800x968"
-        ),
+        ImageCreate(url="https://dummyimage3.com/800x968"),
     )
 
     response = client.delete(f"/products/{book.id}/images")

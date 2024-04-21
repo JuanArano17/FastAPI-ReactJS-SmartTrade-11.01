@@ -1,5 +1,5 @@
 from sqlalchemy import Column, ForeignKey, Integer, String
-from app.models.product import Product
+from app.models.products.product import Product
 
 
 class Food(Product):
@@ -8,11 +8,12 @@ class Food(Product):
     id = Column(
         Integer,
         ForeignKey("Product.id", ondelete="CASCADE", name="fk_product_id"),
-        nullable=False, primary_key=True
+        nullable=False,
+        primary_key=True,
     )
     brand = Column(String(255), nullable=False)
     type = Column(String(255), nullable=False)
-    ingredients= Column(String(255), nullable=False)
+    ingredients = Column(String(255), nullable=False)
 
     __mapper_args__ = {
         "polymorphic_identity": "Food",

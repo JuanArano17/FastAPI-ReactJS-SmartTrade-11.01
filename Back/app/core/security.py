@@ -4,7 +4,7 @@ from passlib.context import CryptContext
 from jose import jwt
 
 from app.service.user import UserService
-from app.models.user import User
+from app.models.users.types.user import User
 
 # Temporary secret key for testing purposes
 # This key should be replaced with a secure key in production

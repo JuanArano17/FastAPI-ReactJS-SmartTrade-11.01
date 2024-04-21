@@ -13,7 +13,11 @@ class ProductLine(Base):
     )
     id_seller_product = Column(
         Integer,
-        ForeignKey("SellerProduct.id", ondelete="CASCADE", name="fk_product_line_seller_product_id"),
+        ForeignKey(
+            "SellerProduct.id",
+            ondelete="CASCADE",
+            name="fk_product_line_seller_product_id",
+        ),
     )
     quantity = Column(Integer, nullable=False)
     subtotal = Column(Float, nullable=False)

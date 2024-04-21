@@ -22,7 +22,7 @@ class InWishList(Base):
         primary_key=True,
         index=True,
     )
-    
+
     buyer = relationship("Buyer", back_populates="in_wish_lists")
     seller_product = relationship("SellerProduct", back_populates="in_wish_lists")
 

@@ -1,6 +1,6 @@
 from sqlalchemy import Column, ForeignKey, Integer
 
-from app.models.user import User
+from app.models.users.types.user import User
 
 
 class Admin(User):

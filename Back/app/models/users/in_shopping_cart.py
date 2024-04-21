@@ -27,5 +27,3 @@ class InShoppingCart(Base):
 
     def __repr__(self):
         return f"InShoppingCart(id_seller_product={self.id_seller_product}, id_buyer={self.id_buyer}, quantity={self.quantity})"
-        
-    

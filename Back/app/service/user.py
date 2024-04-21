@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
 from app.crud_repository import CRUDRepository
-from app.models.user import User
+from app.models.users.types.user import User
 
 
 class UserRepository(CRUDRepository):

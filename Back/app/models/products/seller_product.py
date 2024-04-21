@@ -1,7 +1,7 @@
 from sqlalchemy import Float, ForeignKey, Integer, Column
 from sqlalchemy.orm import relationship
 from app.base import Base
-from sqlalchemy import event
+
 
 class SellerProduct(Base):
     __tablename__ = "SellerProduct"
@@ -30,7 +30,7 @@ class SellerProduct(Base):
     def __repr__(self):
         return f"SellerProduct(id={self.id}, id_product={self.id_product}, id_seller={self.id_seller}, quantity={self.quantity}, price={self.price}, shipping_costs={self.shipping_costs})"
 
-    def notify_observers(self, new_quantity:int):
+    def notify_observers(self, new_quantity: int):
         for cart_item in self.in_shopping_carts:
             if cart_item.quantity > new_quantity:
                 cart_item.quantity = new_quantity
