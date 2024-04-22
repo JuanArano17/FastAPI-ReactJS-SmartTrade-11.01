@@ -1,14 +1,17 @@
 from fastapi import APIRouter
 
 from app.api.deps import CurrentUserDep, ShoppingCartServiceDep
-from app.schemas.in_shopping_cart import (
+from app.schemas.users.in_shopping_cart import (
     InShoppingCart,
     InShoppingCartCreate,
     InShoppingCartUpdate,
 )
 
 
-cart_token_router = APIRouter(prefix="/shopping_cart/me", tags=["shopping_cart_with_token"])
+cart_token_router = APIRouter(
+    prefix="/shopping_cart/me", tags=["shopping_cart_with_token"]
+)
+
 
 @cart_token_router.get("/", response_model=list[InShoppingCart])
 async def read_cart_items(

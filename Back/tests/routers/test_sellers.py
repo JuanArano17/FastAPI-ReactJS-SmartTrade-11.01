@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.users.types.seller import Seller
-from app.schemas.seller import SellerCreate
+from app.schemas.users.types.seller import SellerCreate
 from app.service.seller import SellerService
 from app.models.users.types.user import User
 

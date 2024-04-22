@@ -1,10 +1,10 @@
 from pydantic import BaseModel, ConfigDict, Field, EmailStr, NonNegativeFloat
 from typing import List, Optional
-from app.schemas.card import Card
-from app.schemas.address import Address
-from app.schemas.in_shopping_cart import InShoppingCart
-from app.schemas.in_wish_list import InWishList
-from app.schemas.order import Order
+from app.schemas.users.card import Card
+from app.schemas.users.address import Address
+from app.schemas.users.in_shopping_cart import InShoppingCart
+from app.schemas.users.in_wish_list import InWishList
+from app.schemas.orders.order import Order
 
 
 class BuyerBase(BaseModel):
@@ -15,7 +15,7 @@ class BuyerBase(BaseModel):
     # TODO: change it later for a more formal validation
     dni: str = Field(min_length=9, max_length=9, pattern=r"^\d{8}[a-zA-Z]$")
     billing_address: str = Field(min_length=1, max_length=100)
-    payment_method: str = Field(default="Credit Card",min_length=1, max_length=20)
+    payment_method: str = Field(default="Credit Card", min_length=1, max_length=20)
 
 
 class BuyerCreate(BuyerBase):

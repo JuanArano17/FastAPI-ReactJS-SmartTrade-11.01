@@ -13,14 +13,23 @@ from app.models.products.categories.clothes import Clothes
 from app.models.products.categories.food import Food
 from app.models.products.categories.house_utilities import HouseUtilities
 from app.models.products.categories.electrodomestics import Electrodomestics
-from app.schemas.book import BookCreate, BookUpdate
-from app.schemas.clothes import ClothesCreate, ClothesUpdate
-from app.schemas.electrodomestics import ElectrodomesticsCreate, ElectrodomesticsUpdate
-from app.schemas.electronics import ElectronicsCreate, ElectronicsUpdate
-from app.schemas.food import FoodCreate, FoodUpdate
-from app.schemas.game import GameCreate, GameUpdate
-from app.schemas.house_utilities import HouseUtilitiesCreate, HouseUtilitiesUpdate
-from app.schemas.product import ProductUpdate
+from app.schemas.products.categories.book import BookCreate, BookUpdate
+from app.schemas.products.categories.clothes import ClothesCreate, ClothesUpdate
+from app.schemas.products.categories.electrodomestics import (
+    ElectrodomesticsCreate,
+    ElectrodomesticsUpdate,
+)
+from app.schemas.products.categories.electronics import (
+    ElectronicsCreate,
+    ElectronicsUpdate,
+)
+from app.schemas.products.categories.food import FoodCreate, FoodUpdate
+from app.schemas.products.categories.game import GameCreate, GameUpdate
+from app.schemas.products.categories.house_utilities import (
+    HouseUtilitiesCreate,
+    HouseUtilitiesUpdate,
+)
+from app.schemas.products.product import ProductUpdate
 
 
 class ProductService:
@@ -44,14 +53,21 @@ class ProductService:
         return self.product_factory.create_product(
             category=category, product=product_data
         )
-    
+
     def _get_product_dict(self, product: Product):
         category = product.__class__.__name__
         product_dict = product.__dict__
-        product_dict['category'] = category
-        product_dict.update({column: getattr(product, column) for column in product.__table__.columns.keys()})
-        product_dict['seller_products'] = [seller_product.__dict__ for seller_product in product.seller_products]
-        product_dict['images'] = [image.__dict__ for image in product.images]
+        product_dict["category"] = category
+        product_dict.update(
+            {
+                column: getattr(product, column)
+                for column in product.__table__.columns.keys()
+            }
+        )
+        product_dict["seller_products"] = [
+            seller_product.__dict__ for seller_product in product.seller_products
+        ]
+        product_dict["images"] = [image.__dict__ for image in product.images]
         return product_dict
 
     def get_by_id(self, product_id):
@@ -64,12 +80,12 @@ class ProductService:
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Product with id {product_id} not found.",
         )
-    
+
     def get_by_id_full(self, product_id: int):
         product = self.get_by_id(product_id)
         return self._get_product_dict(product)
 
-    def get_all_full(self,category):
+    def get_all_full(self, category):
         products = self.get_all()
         product_dicts = []
         for product in products:
@@ -77,7 +93,6 @@ class ProductService:
             if category is None or category.lower() == product_category:
                 product_dicts.append(self._get_product_dict(product))
         return product_dicts
-    
 
     def get_all(self) -> list[Product]:
         load_opt = selectin_polymorphic(
@@ -229,5 +244,3 @@ class ProductFactory:
             "electrodomestics": electrodomestics,
         }
         return products
-    
-    

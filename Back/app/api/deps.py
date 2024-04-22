@@ -11,7 +11,7 @@ from app.models.users.types.buyer import Buyer
 from app.models.users.types.seller import Seller
 from app.models.users.types.user import User
 from app.database import get_db
-from app.schemas.token import TokenPayload
+from app.schemas.users.token import TokenPayload
 from app.core.security import SECRET_KEY, ALGORITHM
 
 from app.service.user import UserService

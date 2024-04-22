@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict, NonNegativeFloat, NonNegativeInt
-from app.schemas.refund_product import RefundProduct
+from app.schemas.orders.refund_product import RefundProduct
 
 
 class ProductLineBase(BaseModel):

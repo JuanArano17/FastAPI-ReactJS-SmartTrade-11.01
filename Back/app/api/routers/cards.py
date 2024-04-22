@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from app.api.deps import CardServiceDep
-from app.schemas.card import Card, CardCreate, CardUpdate
+from app.schemas.users.card import Card, CardCreate, CardUpdate
 
 router = APIRouter(prefix="/buyers/{buyer_id}/cards", tags=["cards"])
 
@@ -13,10 +13,9 @@ async def read_cards(*, buyer_id: int, card_service: CardServiceDep):
     """
     return card_service.get_by_id_buyer(id_buyer=buyer_id)
 
+
 @router.post("/", response_model=Card)
-async def create_card(
-    *, buyer_id: int, card: CardCreate, card_service: CardServiceDep
-):
+async def create_card(*, buyer_id: int, card: CardCreate, card_service: CardServiceDep):
     """
     Create a new card for the buyer.
     """
@@ -32,9 +31,7 @@ async def delete_cards(buyer_id: int, card_service: CardServiceDep):
 
 
 @router.get("/{card_id}", response_model=Card)
-async def read_card(
-    *, buyer_id: int, card_id: int, card_service: CardServiceDep
-):
+async def read_card(*, buyer_id: int, card_id: int, card_service: CardServiceDep):
     """
     Retrieve a specific buyer card.
     """
@@ -67,9 +64,7 @@ async def update_card(
 
 
 @router.delete("/{card_id}")
-async def delete_card(
-    *, buyer_id=int, card_id: int, card_service: CardServiceDep
-):
+async def delete_card(*, buyer_id=int, card_id: int, card_service: CardServiceDep):
     """
     Delete a card.
     """

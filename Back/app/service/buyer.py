@@ -2,11 +2,11 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.service.user import UserService
-from app.schemas.buyer import BuyerCreate, BuyerUpdate
+from app.schemas.users.types.buyer import BuyerCreate, BuyerUpdate
 from app.models.users.types.buyer import Buyer
 from app.crud_repository import CRUDRepository
 from app.core.security import get_password_hash
-from app.schemas.user import UserUpdate
+from app.schemas.users.types.user import UserUpdate
 
 
 class BuyerRepository(CRUDRepository):

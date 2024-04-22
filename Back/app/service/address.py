@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from app.schemas.address import AddressCreate, AddressUpdate
+from app.schemas.users.address import AddressCreate, AddressUpdate
 from app.models.users.address import Address
 from app.crud_repository import CRUDRepository
 from app.service.buyer import BuyerService

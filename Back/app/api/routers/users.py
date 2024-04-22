@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.schemas.user import User
+from app.schemas.users.types.user import User
 from app.api.deps import UserServiceDep
 from pydantic import EmailStr
 

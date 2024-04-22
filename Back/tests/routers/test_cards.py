@@ -5,8 +5,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models.users.card import Card
-from app.schemas.buyer import BuyerCreate
-from app.schemas.card import CardCreate
+from app.schemas.users.types.buyer import BuyerCreate
+from app.schemas.users.card import CardCreate
 from app.service.buyer import BuyerService
 from app.service.card import CardService
 

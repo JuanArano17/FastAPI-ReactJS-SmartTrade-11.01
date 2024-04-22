@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from app.schemas.image import ImageCreate, ImageUpdate
+from app.schemas.products.image import ImageCreate, ImageUpdate
 from app.models.products.image import Image
 from app.crud_repository import CRUDRepository
 from app.service.product import ProductService

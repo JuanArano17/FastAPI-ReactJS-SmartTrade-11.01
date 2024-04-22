@@ -1,9 +1,9 @@
 from typing import Optional
 from pydantic import BaseModel, ConfigDict, NonNegativeFloat, NonNegativeInt
 
-from app.schemas.product_line import ProductLine
-from app.schemas.in_shopping_cart import InShoppingCart
-from app.schemas.in_wish_list import InWishList
+from app.schemas.orders.product_line import ProductLine
+from app.schemas.users.in_shopping_cart import InShoppingCart
+from app.schemas.users.in_wish_list import InWishList
 
 
 class SellerProductBase(BaseModel):
@@ -32,8 +32,8 @@ class SellerProduct(SellerProductBase):
     wish_list_products: list[InWishList] = []
     product_lines: list[ProductLine] = []
 
-class SellerProductRead(BaseModel):
 
+class SellerProductRead(BaseModel):
     id: int
     id_product: int
     id_seller: int
@@ -47,20 +47,17 @@ class SellerProductRead(BaseModel):
     spec_sheet: str
     quantity: int
     stock: int
-    author: Optional[str]=None
-    pages: Optional[int]=None
-    size: Optional[str]=None
-    materials: Optional[str]=None
-    type: Optional[str]=None
-    brand: Optional[str]=None 
-    capacity: Optional[str]=None
-    power_source: Optional[str]=None
-    ingredients: Optional[str]=None
-    publisher: Optional[str]=None 
-    platform: Optional[str]=None
-    #shopping_cart_products: list[InShoppingCart] = []
-    #wish_list_products: list[InWishList] = []
-    #product_lines: list[ProductLine] = []
-
-    
-    
+    author: Optional[str] = None
+    pages: Optional[int] = None
+    size: Optional[str] = None
+    materials: Optional[str] = None
+    type: Optional[str] = None
+    brand: Optional[str] = None
+    capacity: Optional[str] = None
+    power_source: Optional[str] = None
+    ingredients: Optional[str] = None
+    publisher: Optional[str] = None
+    platform: Optional[str] = None
+    # shopping_cart_products: list[InShoppingCart] = []
+    # wish_list_products: list[InWishList] = []
+    # product_lines: list[ProductLine] = []

@@ -2,14 +2,14 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field, NonNegativeFloat, validator
 from typing import List, Optional
 
-from app.schemas.product_line import ProductLine
+from app.schemas.orders.product_line import ProductLine
 
 
 class OrderBase(BaseModel):
     order_date: datetime = Field(default_factory=datetime.now)
     id_card: int
     id_address: int
-    total: NonNegativeFloat =Field(default=0)
+    total: NonNegativeFloat = Field(default=0)
 
     @validator("order_date")
     @classmethod

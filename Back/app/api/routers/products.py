@@ -1,42 +1,46 @@
-from typing import Any, Optional, Union
+from typing import Optional, Union
 from fastapi import APIRouter
 from pydantic import BaseModel
 
 from app.api.deps import ProductServiceDep
-from app.schemas.product import Product
-from app.schemas.book import Book
-from app.schemas.clothes import Clothes
-from app.schemas.electrodomestics import Electrodomestics
-from app.schemas.electronics import Electronics
-from app.schemas.food import Food
-from app.schemas.game import Game
-from app.schemas.house_utilities import HouseUtilities
+from app.schemas.products.categories.book import Book
+from app.schemas.products.categories.clothes import Clothes
+from app.schemas.products.categories.electrodomestics import Electrodomestics
+from app.schemas.products.categories.electronics import Electronics
+from app.schemas.products.categories.food import Food
+from app.schemas.products.categories.game import Game
+from app.schemas.products.categories.house_utilities import HouseUtilities
 
 router = APIRouter(prefix="/products", tags=["products"])
+
+
 class ProductResponse(BaseModel):
-    product: Union[Book, Clothes, Electrodomestics, Electronics, Food, Game, HouseUtilities]
+    product: Union[
+        Book, Clothes, Electrodomestics, Electronics, Food, Game, HouseUtilities
+    ]
     category: str
+
 
 @router.get(
     "/",
 )
-async def read_products(product_service: ProductServiceDep, category: Optional[str] = None):
+async def read_products(
+    product_service: ProductServiceDep, category: Optional[str] = None
+):
     """
     Retrieve products.
     """
     return product_service.get_all_full(category)
 
 
-@router.get(
-    "/{product_id}"
-)
+@router.get("/{product_id}")
 async def read_product(*, product_id: int, product_service: ProductServiceDep):
     """
     Retrieve a product.
     """
 
     return product_service.get_by_id_full(product_id)
-    
+
 
 @router.post(
     "/",

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from app.schemas.card import CardCreate, CardUpdate
+from app.schemas.users.card import CardCreate, CardUpdate
 from app.service.buyer import BuyerService
 from app.models.users.card import Card
 from app.crud_repository import CRUDRepository

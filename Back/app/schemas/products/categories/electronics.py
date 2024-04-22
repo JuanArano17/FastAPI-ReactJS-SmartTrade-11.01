@@ -1,10 +1,11 @@
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, Field, NonNegativeFloat, NonNegativeInt
 
-from app.schemas.image import Image
-from app.schemas.seller_product import SellerProduct
+from app.schemas.products.image import Image
+from app.schemas.products.seller_product import SellerProduct
 
-class ElectrodomesticsBase(BaseModel):
+
+class ElectronicsBase(BaseModel):
     name: str = Field(min_length=1, max_length=40)
     description: Optional[str] = None
     eco_points: NonNegativeFloat
@@ -12,12 +13,14 @@ class ElectrodomesticsBase(BaseModel):
     stock: NonNegativeInt = Field(default=0)
     brand: str = Field(min_length=1, max_length=40)
     type: str = Field(min_length=1, max_length=20)
-    power_source: str = Field(min_length=1, max_length=20)
+    capacity: str = Field(max_length=9, pattern=r"^(\d+(\.\d+)?)(\s*[GgMmKk][Bb])?$")
 
-class ElectrodomesticsCreate(ElectrodomesticsBase):
+
+class ElectronicsCreate(ElectronicsBase):
     pass
 
-class ElectrodomesticsUpdate(ElectrodomesticsBase):
+
+class ElectronicsUpdate(ElectronicsBase):
     name: Optional[str] = Field(default=None, min_length=1, max_length=40)
     description: Optional[str] = None
     eco_points: Optional[NonNegativeFloat] = None
@@ -25,9 +28,12 @@ class ElectrodomesticsUpdate(ElectrodomesticsBase):
     stock: Optional[NonNegativeInt] = None
     brand: Optional[str] = Field(default=None, min_length=1, max_length=40)
     type: Optional[str] = Field(default=None, min_length=1, max_length=20)
-    power_source: Optional[str] = Field(default=None, min_length=1, max_length=20)
+    capacity: Optional[str] = Field(
+        default=None, max_length=9, pattern=r"^(\d+(\.\d+)?)(\s*[GgMmKk][Bb])?$"
+    )
 
-class Electrodomestics(ElectrodomesticsBase):
+
+class Electronics(ElectronicsBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

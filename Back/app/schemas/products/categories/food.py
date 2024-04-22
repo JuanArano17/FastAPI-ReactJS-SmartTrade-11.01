@@ -1,8 +1,9 @@
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, Field, NonNegativeFloat, NonNegativeInt
 
-from app.schemas.image import Image
-from app.schemas.seller_product import SellerProduct
+from app.schemas.products.image import Image
+from app.schemas.products.seller_product import SellerProduct
+
 
 class FoodBase(BaseModel):
     name: str = Field(min_length=1, max_length=40)
@@ -13,9 +14,11 @@ class FoodBase(BaseModel):
     brand: str = Field(min_length=1, max_length=40)
     type: str = Field(min_length=1, max_length=20)
     ingredients: str = Field(min_length=1, max_length=60)
-    
+
+
 class FoodCreate(FoodBase):
     pass
+
 
 class FoodUpdate(FoodBase):
     name: Optional[str] = Field(default=None, min_length=1, max_length=40)
@@ -26,6 +29,7 @@ class FoodUpdate(FoodBase):
     brand: Optional[str] = Field(default=None, min_length=1, max_length=40)
     type: Optional[str] = Field(default=None, min_length=1, max_length=20)
     ingredients: Optional[str] = Field(default=None, min_length=1, max_length=60)
+
 
 class Food(FoodBase):
     model_config = ConfigDict(from_attributes=True)

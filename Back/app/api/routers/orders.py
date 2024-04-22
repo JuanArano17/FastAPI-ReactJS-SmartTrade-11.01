@@ -1,4 +1,4 @@
-from app.schemas.order import Order, OrderCreate, OrderUpdate
+from app.schemas.orders.order import Order, OrderCreate, OrderUpdate
 from fastapi import APIRouter
 
 from app.api.deps import OrderServiceDep

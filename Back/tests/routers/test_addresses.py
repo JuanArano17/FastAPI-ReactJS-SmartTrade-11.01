@@ -3,10 +3,10 @@ from fastapi import status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.schemas.address import AddressCreate
+from app.schemas.users.address import AddressCreate
 from app.models.users.address import Address
 from app.service.address import AddressService
-from app.schemas.buyer import BuyerCreate
+from app.schemas.users.types.buyer import BuyerCreate
 from app.service.buyer import BuyerService
 
 

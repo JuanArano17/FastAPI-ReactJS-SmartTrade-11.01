@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
-from app.api.deps import ProductServiceDep, SellerProductServiceDep
-from app.schemas.seller_product import (
+from app.api.deps import SellerProductServiceDep
+from app.schemas.products.seller_product import (
     SellerProduct,
     SellerProductCreate,
     SellerProductRead,
@@ -13,7 +13,9 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=list[SellerProductRead], response_model_exclude_none=True)
+@router.get(
+    "/", response_model=list[SellerProductRead], response_model_exclude_none=True
+)
 async def read_seller_products(
     *, product_id: int, seller_product_service: SellerProductServiceDep
 ):
@@ -33,21 +35,24 @@ async def delete_seller_products(
     return seller_product_service.delete_by_id_product(id_product=product_id)
 
 
-seller_prod_router = APIRouter(
-    prefix="/seller_products", tags=["seller-products"]
+seller_prod_router = APIRouter(prefix="/seller_products", tags=["seller-products"])
+
+
+@seller_prod_router.get(
+    "/", response_model=list[SellerProductRead], response_model_exclude_none=True
 )
-
-
-@seller_prod_router.get("/", response_model=list[SellerProductRead], response_model_exclude_none=True)
-async def read_seller_products(
-    *, seller_product_service: SellerProductServiceDep
-):
+async def read_seller_products_pure(*, seller_product_service: SellerProductServiceDep):
     """
     Retrieve seller products.
     """
     return seller_product_service.get_all()
 
-@seller_prod_router.get("/{seller_product_id}", response_model=SellerProductRead, response_model_exclude_none=True)
+
+@seller_prod_router.get(
+    "/{seller_product_id}",
+    response_model=SellerProductRead,
+    response_model_exclude_none=True,
+)
 async def read_seller_product_by_id(
     seller_product_id: int, seller_product_service: SellerProductServiceDep
 ):

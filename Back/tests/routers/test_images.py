@@ -3,7 +3,7 @@ from fastapi import status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.schemas.image import ImageCreate
+from app.schemas.products.image import ImageCreate
 from app.models.products.image import Image
 from app.service.image import ImageService
 from app.service.product import ProductService

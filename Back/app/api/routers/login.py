@@ -2,9 +2,9 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app.schemas.seller import Seller
-from app.schemas.buyer import Buyer
-from app.schemas.token import Token
+from app.schemas.users.types.seller import Seller
+from app.schemas.users.types.buyer import Buyer
+from app.schemas.users.token import Token
 from app.api.deps import CurrentUserDep, UserServiceDep
 from app.core.security import create_access_token, authenticate_user
 

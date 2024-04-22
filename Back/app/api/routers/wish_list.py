@@ -1,13 +1,15 @@
 from fastapi import APIRouter
 
 from app.api.deps import CurrentUserDep, WishListServiceDep
-from app.schemas.in_wish_list import InWishList, InWishListCreate
+from app.schemas.users.in_wish_list import InWishList, InWishListCreate
 
 list_token_router = APIRouter(prefix="/wish_list/me", tags=["wish_list_with_token"])
 
 
 @list_token_router.get("/", response_model=list[InWishList])
-async def read_list_items(*, user_dep: CurrentUserDep, wish_list_service: WishListServiceDep):
+async def read_list_items(
+    *, user_dep: CurrentUserDep, wish_list_service: WishListServiceDep
+):
     """
     Retrieve list items from buyer.
     """
@@ -38,7 +40,10 @@ async def delete_list(wish_list_service: WishListServiceDep, user_dep: CurrentUs
 
 @list_token_router.delete("/{seller_product_id}")
 async def delete_list_item(
-    *, seller_product_id: int, wish_list_service: WishListServiceDep, user_dep: CurrentUserDep
+    *,
+    seller_product_id: int,
+    wish_list_service: WishListServiceDep,
+    user_dep: CurrentUserDep,
 ):
     """
     Delete an item from a wish list.

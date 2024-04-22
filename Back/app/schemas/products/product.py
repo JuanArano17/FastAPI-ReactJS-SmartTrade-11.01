@@ -1,8 +1,8 @@
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, Field, NonNegativeFloat, NonNegativeInt
 
-from app.schemas.image import Image
-from app.schemas.seller_product import SellerProduct
+from app.schemas.products.image import Image
+from app.schemas.products.seller_product import SellerProduct
 
 
 class ProductBase(BaseModel):

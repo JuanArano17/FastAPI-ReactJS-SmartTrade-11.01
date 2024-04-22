@@ -1,10 +1,11 @@
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, Field, NonNegativeFloat, NonNegativeInt
 
-from app.schemas.image import Image
-from app.schemas.seller_product import SellerProduct
+from app.schemas.products.image import Image
+from app.schemas.products.seller_product import SellerProduct
 
-class HouseUtilitiesBase(BaseModel):
+
+class ElectrodomesticsBase(BaseModel):
     name: str = Field(min_length=1, max_length=40)
     description: Optional[str] = None
     eco_points: NonNegativeFloat
@@ -12,11 +13,14 @@ class HouseUtilitiesBase(BaseModel):
     stock: NonNegativeInt = Field(default=0)
     brand: str = Field(min_length=1, max_length=40)
     type: str = Field(min_length=1, max_length=20)
+    power_source: str = Field(min_length=1, max_length=20)
 
-class HouseUtilitiesCreate(HouseUtilitiesBase):
+
+class ElectrodomesticsCreate(ElectrodomesticsBase):
     pass
 
-class HouseUtilitiesUpdate(HouseUtilitiesBase):
+
+class ElectrodomesticsUpdate(ElectrodomesticsBase):
     name: Optional[str] = Field(default=None, min_length=1, max_length=40)
     description: Optional[str] = None
     eco_points: Optional[NonNegativeFloat] = None
@@ -24,8 +28,10 @@ class HouseUtilitiesUpdate(HouseUtilitiesBase):
     stock: Optional[NonNegativeInt] = None
     brand: Optional[str] = Field(default=None, min_length=1, max_length=40)
     type: Optional[str] = Field(default=None, min_length=1, max_length=20)
+    power_source: Optional[str] = Field(default=None, min_length=1, max_length=20)
 
-class HouseUtilities(HouseUtilitiesBase):
+
+class Electrodomestics(ElectrodomesticsBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int

@@ -1,13 +1,13 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from app.schemas.product_line import ProductLineCreate
+from app.schemas.orders.product_line import ProductLineCreate
 from app.service.buyer import BuyerService
 from app.models.orders.product_line import ProductLine
 from app.service.order import OrderService
 from app.service.seller_product import SellerProductService
 from app.crud_repository import CRUDRepository
-from app.schemas.seller_product import SellerProductUpdate
+from app.schemas.products.seller_product import SellerProductUpdate
 
 
 class ProductLineService:

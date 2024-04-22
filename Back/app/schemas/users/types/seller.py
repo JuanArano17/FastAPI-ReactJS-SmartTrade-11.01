@@ -1,7 +1,7 @@
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
-from app.schemas.seller_product import SellerProduct
+from app.schemas.products.seller_product import SellerProduct
 
 
 class SellerBase(BaseModel):
@@ -23,9 +23,7 @@ class SellerUpdate(SellerBase):
     surname: Optional[str] = Field(default=None, min_length=1, max_length=40)
     bank_data: Optional[str] = Field(default=None, min_length=10, max_length=140)
     # TODO: change it later for a more formal validation
-    cif: Optional[str] = Field(
-        default=None, pattern=r"^[A-Z][0-9]{8}$"
-    )
+    cif: Optional[str] = Field(default=None, pattern=r"^[A-Z][0-9]{8}$")
     password: Optional[str] = None
 
 
