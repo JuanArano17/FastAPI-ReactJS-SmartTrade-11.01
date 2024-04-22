@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.models.users.types.user import User
 from app.schemas.users.types.buyer import BuyerCreate
 from app.models.users.types.buyer import Buyer
-from app.service.buyer import BuyerService
+from app.service.users.types.buyer import BuyerService
 
 
 def fake_buyer():

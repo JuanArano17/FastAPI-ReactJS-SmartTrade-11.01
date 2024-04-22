@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models.products.product import Product
 from app.models.products.categories.food import Food
-from app.service.product import ProductService
+from app.service.products.product import ProductService
 
 
 def fake_book():

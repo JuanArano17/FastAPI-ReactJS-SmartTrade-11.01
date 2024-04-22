@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from app.service.seller_product import SellerProductService
-from app.service.buyer import BuyerService
+from app.service.products.seller_product import SellerProductService
+from app.service.users.types.buyer import BuyerService
 from app.schemas.users.in_wish_list import InWishListCreate
 from app.models.users.in_wish_list import InWishList
 from app.crud_repository import CRUDRepository

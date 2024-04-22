@@ -3,7 +3,7 @@ from typing import Any
 from passlib.context import CryptContext
 from jose import jwt
 
-from app.service.user import UserService
+from app.service.users.types.user import UserService
 from app.models.users.types.user import User
 
 # Temporary secret key for testing purposes

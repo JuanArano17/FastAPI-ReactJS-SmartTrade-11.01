@@ -5,8 +5,8 @@ from sqlalchemy.orm import Session
 
 from app.schemas.products.image import ImageCreate
 from app.models.products.image import Image
-from app.service.image import ImageService
-from app.service.product import ProductService
+from app.service.products.image import ImageService
+from app.service.products.product import ProductService
 
 
 def fake_image():

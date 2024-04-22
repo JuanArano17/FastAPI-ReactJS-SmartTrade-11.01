@@ -1,14 +1,14 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from app.service.buyer import BuyerService
+from app.service.users.types.buyer import BuyerService
 from app.schemas.users.in_shopping_cart import (
     InShoppingCartCreate,
     InShoppingCartUpdate,
 )
 from app.models.users.in_shopping_cart import InShoppingCart
 from app.crud_repository import CRUDRepository
-from app.service.seller_product import SellerProductService
+from app.service.products.seller_product import SellerProductService
 
 
 class InShoppingCartRepository(CRUDRepository):

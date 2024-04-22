@@ -14,19 +14,19 @@ from app.database import get_db
 from app.schemas.users.token import TokenPayload
 from app.core.security import SECRET_KEY, ALGORITHM
 
-from app.service.user import UserService
-from app.service.buyer import BuyerService
-from app.service.seller import SellerService
-from app.service.address import AddressService
-from app.service.card import CardService
-from app.service.product import ProductService
-from app.service.order import OrderService
-from app.service.product_line import ProductLineService
-from app.service.seller_product import SellerProductService
-from app.service.refund_product import RefundProductService
-from app.service.image import ImageService
-from app.service.in_shopping_cart import InShoppingCartService
-from app.service.in_wish_list import InWishListService
+from app.service.users.types.user import UserService
+from app.service.users.types.buyer import BuyerService
+from app.service.users.types.seller import SellerService
+from app.service.users.address import AddressService
+from app.service.users.card import CardService
+from app.service.products.product import ProductService
+from app.service.orders.order import OrderService
+from app.service.orders.product_line import ProductLineService
+from app.service.products.seller_product import SellerProductService
+from app.service.orders.refund_product import RefundProductService
+from app.service.products.image import ImageService
+from app.service.users.in_shopping_cart import InShoppingCartService
+from app.service.users.in_wish_list import InWishListService
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login/access-token")

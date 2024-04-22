@@ -6,10 +6,10 @@ from app.schemas.products.seller_product import (
     SellerProductRead,
     SellerProductUpdate,
 )
-from app.service.seller import SellerService
+from app.service.users.types.seller import SellerService
 from app.models.products.seller_product import SellerProduct
 from app.crud_repository import CRUDRepository
-from app.service.product import ProductService
+from app.service.products.product import ProductService
 
 
 class SellerProductRepository(CRUDRepository):

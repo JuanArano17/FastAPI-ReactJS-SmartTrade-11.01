@@ -2,15 +2,15 @@ from fastapi.testclient import TestClient
 from fastapi import status
 from sqlalchemy.orm import Session
 
-from app.service.product import ProductService
+from app.service.products.product import ProductService
 from app.schemas.users.types.buyer import BuyerCreate
 from app.schemas.users.in_wish_list import InWishListCreate
 from app.schemas.users.types.seller import SellerCreate
 from app.schemas.products.seller_product import SellerProductCreate
-from app.service.buyer import BuyerService
-from app.service.in_wish_list import InWishListService
-from app.service.seller import SellerService
-from app.service.seller_product import SellerProductService
+from app.service.users.types.buyer import BuyerService
+from app.service.users.in_wish_list import InWishListService
+from app.service.users.types.seller import SellerService
+from app.service.products.seller_product import SellerProductService
 
 
 def fake_buyer():

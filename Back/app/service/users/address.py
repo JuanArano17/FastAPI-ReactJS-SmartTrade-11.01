@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 from app.schemas.users.address import AddressCreate, AddressUpdate
 from app.models.users.address import Address
 from app.crud_repository import CRUDRepository
-from app.service.buyer import BuyerService
+from app.service.users.types.buyer import BuyerService
 
 
 class AddressRepository(CRUDRepository):

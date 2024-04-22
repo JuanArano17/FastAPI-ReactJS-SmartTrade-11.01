@@ -5,15 +5,15 @@ from sqlalchemy.orm import Session
 from sqlalchemy import delete
 
 from app.models.users.types.user import User
-from app.service.buyer import BuyerService
-from app.service.seller import SellerService
-from app.service.user import UserService
+from app.service.users.types.buyer import BuyerService
+from app.service.users.types.seller import SellerService
+from app.service.users.types.user import UserService
 from app.database import engine
 from app.main import app
-from app.service.address import AddressService
-from app.service.card import CardService
-from app.service.image import ImageService
-from app.service.product import ProductService
+from app.service.users.address import AddressService
+from app.service.users.card import CardService
+from app.service.products.image import ImageService
+from app.service.products.product import ProductService
 from service.in_shopping_cart import InShoppingCartService
 from service.in_wish_list import InWishListService
 from service.seller_product import SellerProductService

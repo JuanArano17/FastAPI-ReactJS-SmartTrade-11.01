@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from app.service.card import CardService
-from app.service.address import AddressService
-from app.service.buyer import BuyerService
+from app.service.users.card import CardService
+from app.service.users.address import AddressService
+from app.service.users.types.buyer import BuyerService
 from app.schemas.orders.order import OrderCreate, OrderUpdate
 from app.models.orders.order import Order
 from app.crud_repository import CRUDRepository

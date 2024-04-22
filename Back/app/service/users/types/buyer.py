@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.service.user import UserService
+from app.service.users.types.user import UserService
 from app.schemas.users.types.buyer import BuyerCreate, BuyerUpdate
 from app.models.users.types.buyer import Buyer
 from app.crud_repository import CRUDRepository

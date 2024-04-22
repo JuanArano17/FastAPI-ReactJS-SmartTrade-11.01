@@ -2,13 +2,13 @@ from datetime import timedelta
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from app.service.buyer import BuyerService
+from app.service.users.types.buyer import BuyerService
 from app.schemas.orders.refund_product import RefundProductCreate
 from app.models.orders.refund_product import RefundProduct
-from app.service.order import OrderService
-from app.service.product_line import ProductLineService
+from app.service.orders.order import OrderService
+from app.service.orders.product_line import ProductLineService
 from app.crud_repository import CRUDRepository
-from app.service.seller_product import SellerProductService
+from app.service.products.seller_product import SellerProductService
 
 
 class RefundProductService:
