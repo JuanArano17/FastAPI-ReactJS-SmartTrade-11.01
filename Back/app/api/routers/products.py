@@ -24,24 +24,7 @@ async def read_products(product_service: ProductServiceDep, category: Optional[s
     """
     Retrieve products.
     """
-    products = product_service.get_all()
-    product_dicts = []
-    for product in products:
-        product_category = product.__class__.__name__
-        if category is None or category.lower() == product_category.lower():
-            product_dict = product.__dict__
-            product_dict['category'] = product_category
-            
-            # Get the list of seller products for the current product
-            seller_products = [seller_product.__dict__ for seller_product in product.seller_products]
-            product_dict['seller_products'] = seller_products
-            
-            # Get the list of images
-            images = [image.__dict__ for image in product.images]
-            product_dict['images'] = images
-            
-            product_dicts.append(product_dict)
-    return product_dicts
+    return product_service.get_all_full(category)
 
 
 @router.get(
@@ -52,23 +35,7 @@ async def read_product(*, product_id: int, product_service: ProductServiceDep):
     Retrieve a product.
     """
 
-    product =  product_service.get_by_id(product_id)
-    category = product.__class__.__name__
-
-     # Get attributes of the base class
-    product_dict = product.__dict__
-
-    # Add category to the product dictionary
-    product_dict['category'] = category
-    # Get attributes of the product that are specific to the category
-    # Get attributes of the product as a dictionary
-    product_dict.update({column: getattr(product, column) for column in product.__table__.columns.keys()})
-    # Get the list of seller products
-    seller_products = [seller_product.__dict__ for seller_product in product.seller_products]
-    images = [image.__dict__ for image in product.images]
-    product_dict['seller_products'] = seller_products
-    product_dict['images'] = images
-    return product_dict
+    return product_service.get_by_id_full(product_id)
     
 
 @router.post(

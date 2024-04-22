@@ -44,6 +44,15 @@ class ProductService:
         return self.product_factory.create_product(
             category=category, product=product_data
         )
+    
+    def _get_product_dict(self, product: Product):
+        category = product.__class__.__name__
+        product_dict = product.__dict__
+        product_dict['category'] = category
+        product_dict.update({column: getattr(product, column) for column in product.__table__.columns.keys()})
+        product_dict['seller_products'] = [seller_product.__dict__ for seller_product in product.seller_products]
+        product_dict['images'] = [image.__dict__ for image in product.images]
+        return product_dict
 
     def get_by_id(self, product_id):
         # if product := self.product_repo.get_by_id(product_id):
@@ -55,6 +64,20 @@ class ProductService:
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Product with id {product_id} not found.",
         )
+    
+    def get_by_id_full(self, product_id: int):
+        product = self.get_by_id(product_id)
+        return self._get_product_dict(product)
+
+    def get_all_full(self,category):
+        products = self.get_all()
+        product_dicts = []
+        for product in products:
+            product_category = product.__class__.__name__.lower()
+            if category is None or category.lower() == product_category:
+                product_dicts.append(self._get_product_dict(product))
+        return product_dicts
+    
 
     def get_all(self) -> list[Product]:
         load_opt = selectin_polymorphic(
@@ -206,3 +229,5 @@ class ProductFactory:
             "electrodomestics": electrodomestics,
         }
         return products
+    
+    
