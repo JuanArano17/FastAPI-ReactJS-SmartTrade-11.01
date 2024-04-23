@@ -31,4 +31,5 @@ class Seller(SellerBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    type: str
     seller_products: List[SellerProduct] = []

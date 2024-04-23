@@ -40,6 +40,7 @@ class Buyer(BuyerBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    type: str
     addresses: List[Address] = []
     in_shopping_cart: List[InShoppingCart] = []
     in_wish_list: List[InWishList] = []
