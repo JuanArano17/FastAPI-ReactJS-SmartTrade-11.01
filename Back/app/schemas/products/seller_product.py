@@ -1,10 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel, ConfigDict, NonNegativeFloat, NonNegativeInt
 
-from app.schemas.orders.product_line import ProductLine
-from app.schemas.users.in_shopping_cart import InShoppingCart
-from app.schemas.users.in_wish_list import InWishList
-
 
 class SellerProductBase(BaseModel):
     quantity: NonNegativeInt
@@ -28,9 +24,6 @@ class SellerProduct(SellerProductBase):
     id: int
     id_product: int
     id_seller: int
-    shopping_cart_products: list[InShoppingCart] = []
-    wish_list_products: list[InWishList] = []
-    product_lines: list[ProductLine] = []
 
 
 class SellerProductRead(BaseModel):
