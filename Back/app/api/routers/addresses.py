@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from app.api.deps import AddressServiceDep
-from app.schemas.address import Address, AddressCreate, AddressUpdate
+from app.schemas.users.address import Address, AddressCreate, AddressUpdate
 
 router = APIRouter(prefix="/buyers/{buyer_id}/addresses", tags=["addresses"])
 
