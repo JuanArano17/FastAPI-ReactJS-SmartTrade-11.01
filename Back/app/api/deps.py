@@ -121,23 +121,6 @@ def get_image_service(session: SessionDep, product_service: ProductServiceDep):
 ImageServiceDep = Annotated[ImageService, Depends(get_image_service)]
 
 
-def get_order_service(
-    session: SessionDep,
-    buyer_service: BuyerServiceDep,
-    card_service: CardServiceDep,
-    address_service: AddressServiceDep,
-):
-    return OrderService(
-        session=session,
-        buyer_service=buyer_service,
-        card_service=card_service,
-        address_service=address_service,
-    )
-
-
-OrderServiceDep = Annotated[OrderService, Depends(get_order_service)]
-
-
 def get_seller_product_service(
     session: SessionDep,
     seller_service: SellerServiceDep,
@@ -151,6 +134,27 @@ def get_seller_product_service(
 SellerProductServiceDep = Annotated[
     SellerProductService, Depends(get_seller_product_service)
 ]
+
+
+def get_order_service(
+    session: SessionDep,
+    buyer_service: BuyerServiceDep,
+    card_service: CardServiceDep,
+    address_service: AddressServiceDep,
+    product_service: ProductServiceDep,
+    seller_product_service: SellerProductServiceDep,
+):
+    return OrderService(
+        session=session,
+        buyer_service=buyer_service,
+        card_service=card_service,
+        address_service=address_service,
+        product_service=product_service,
+        seller_product_service=seller_product_service,
+    )
+
+
+OrderServiceDep = Annotated[OrderService, Depends(get_order_service)]
 
 
 def get_shopping_cart_service(
