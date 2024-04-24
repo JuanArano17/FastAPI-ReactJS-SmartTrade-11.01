@@ -22,7 +22,7 @@ async def read_user(user_id: int, user_service: UserServiceDep):
     return user_service.get_by_id(user_id)
 
 
-@router.get("/me", response_model=User)
+@router.get("/me/", response_model=User)
 async def read_user_me(current_user: CurrentUserDep) -> Buyer | Seller:
     """ "
     Return current user
