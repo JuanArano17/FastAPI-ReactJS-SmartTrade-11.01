@@ -1,8 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from pydantic import BaseModel, ConfigDict, Field, NonNegativeFloat, validator
 from typing import List, Optional
 
-from app.schemas.orders.product_line import ProductLine
+from app.schemas.orders.product_line import ProductLine, CompleteProductLine
 
 
 class OrderBase(BaseModel):
@@ -13,8 +13,8 @@ class OrderBase(BaseModel):
 
     @validator("order_date")
     @classmethod
-    def validate_date(cls, v):
-        if v > datetime.now():
+    def validate_date(cls, v: datetime):
+        if v.astimezone(timezone.utc) > datetime.now(tz=timezone.utc):
             raise ValueError("The order date must be in the past")
         return v
 
@@ -34,3 +34,11 @@ class Order(OrderBase):
     id: int
     id_buyer: int
     product_lines: List[ProductLine]
+
+
+class CompleteOrder(OrderBase):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    id_buyer: int
+    product_lines: list[CompleteProductLine]
