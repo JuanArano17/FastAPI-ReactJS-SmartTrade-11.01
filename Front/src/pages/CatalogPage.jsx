@@ -6,7 +6,7 @@ import Footer from '../components/footer/Footer';
 import SummarizedProduct from '../components/products/summarizedProduct/SummarizedProduct';
 import FilterProducts from '../components/products/filterProducts/FilterProducts';
 import styles from '../styles/styles';
-import { getAllProducts } from '../api/services/products/ProductsService';
+import { getAllProductsSeller } from '../api/services/products/ProductsService';
 
 const CatalogPage = () => {
     const { search } = useParams();
@@ -27,17 +27,15 @@ const CatalogPage = () => {
         }
     }, [history]);
 
-    // Este useEffect actualiza searchTerm cuando el parámetro search de la URL cambia
     useEffect(() => {
         setSearchTerm(search || "");
     }, [search]);
 
-    // Este useEffect maneja la carga de productos cuando searchTerm cambia
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
-                const productsWithSellers = await getAllProducts();
+                const productsWithSellers = await getAllProductsSeller();
                 console.log('productospage', productsWithSellers);
                 setProducts(productsWithSellers);
                 setLoading(false);
@@ -74,8 +72,8 @@ const CatalogPage = () => {
                 <Paper elevation={3} sx={styles.paperContainer}>
                     <Grid container spacing={3}>
                         {currentProducts && currentProducts.map((product) => (
-                            <Grid item xs={12} sm={4} md={4} lg={4} key={`${product.id_seller_product}-${product.sellerId}`}>
-                                <Button onClick={() => handleProductClick(product.id_seller_product)} sx={{ width: '100%', height: '100%', padding: 0 }}>
+                            <Grid item xs={12} sm={4} md={4} lg={4} key={`${product.id}`}>
+                                <Button onClick={() => handleProductClick(product.id)} sx={{ width: '100%', height: '100%', padding: 0 }}>
                                     <SummarizedProduct product={product} />
                                 </Button>
                             </Grid>

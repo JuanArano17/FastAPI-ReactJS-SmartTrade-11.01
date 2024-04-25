@@ -2,13 +2,14 @@ import React from 'react';
 import { Card, CardMedia, CardContent, Typography, CardActions, Button, Grid } from '@mui/material';
 
 const SummarizedProduct = ({ product }) => {
-    const { id, name, image, price, description } = product;
+    const { idProduct, name, images, price, description } = product;
+    const image = images.length > 0 ? images[0] : 'default-product-image.jpg'; // Toma la primera imagen si existe, sino usa una imagen por defecto
 
     return (
         <Card sx={{ maxWidth: 345, m: 2, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: 400 }}>
             <CardMedia
                 component="img"
-                image={image || 'default-product-image.jpg'} 
+                image={image}
                 alt={name}
                 sx={{ height: 140, backgroundSize: 'contain' }} 
             />

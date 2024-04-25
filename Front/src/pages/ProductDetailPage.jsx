@@ -6,7 +6,7 @@ import StarIcon from '@mui/icons-material/Star';
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
 import styles from '../styles/styles';
-import { getProduct } from '../api/services/products/ProductsService';
+import { getProductSellerById } from '../api/services/products/ProductsService';
 import { addToWishList, deleteFromWishList } from '../api/services/products/WishListService';
 import { addCartItem } from '../api/services/products/ShoppingCartService';
 
@@ -21,7 +21,7 @@ const ProductDetailPage = () => {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
-                const response = await getProduct(id);
+                const response = await getProductSellerById(id);
                 if (response) {
                     setProductData(response);
                     setLoading(false);
@@ -38,16 +38,11 @@ const ProductDetailPage = () => {
     const handleFavoriteClick = async () => {
         setIsFavorite(!isFavorite);
         try {
-            // Seleccionar el ID del producto del vendedor desde el objeto de datos del producto
-            const sellerProductId = productData.seller_products[0].id;
-
-            // Llama a la función addToWishList pasando el ID necesario
             if (!isFavorite) {
-                const response = await addToWishList(sellerProductId);
+                const response = await addToWishList(productData.id);
                 console.log('Añadido a la lista de deseos:', response);
             } else {
-                // Aquí se asume que tienes una función para eliminar de la lista de deseos
-                const response = await deleteFromWishList(sellerProductId);
+                const response = await deleteFromWishList(productData.id);
                 console.log('Removido de la lista de deseos:', response);
             }
         } catch (error) {
@@ -55,16 +50,12 @@ const ProductDetailPage = () => {
         }
     };
     const handleAddToCart = async () => {
-        if (productData && productData.seller_products && productData.seller_products.length > 0) {
-            const sellerProductId = productData.seller_products[0].id; // Por ejemplo, elegir el primer producto del vendedor
-            const quantity = 1; // Define cómo quieres manejar la cantidad
-            try {
-                await addCartItem(sellerProductId, quantity);
-                console.log('Producto añadido al carrito');
-                // Aquí puedes manejar cualquier estado o redirección después de añadir al carrito
-            } catch (error) {
-                console.error('Error al añadir producto al carrito', error);
-            }
+        const quantity = 1;
+        try {
+            await addCartItem(productData.id, quantity);
+            console.log('Producto añadido al carrito');
+        } catch (error) {
+            console.error('Error al añadir producto al carrito', error);
         }
     };
     const renderAdditionalAttributes = (productData) => {
@@ -117,7 +108,7 @@ const ProductDetailPage = () => {
                                 <Rating name="read-only" value={4} readOnly />
                                 <Typography sx={{ mt: 2 }}>{productData.description}</Typography>
                                 <Typography variant="h5" sx={{ my: 2 }}>
-                                    Precio: ${productData.seller_products.length > 0 ? productData.seller_products[0].price : "Consultar"}
+                                    Precio: ${productData.price}
                                 </Typography>
                                 <Button variant="contained" sx={{ mb: 2 }} onClick={handleAddToCart}>
                                     Add to Cart
