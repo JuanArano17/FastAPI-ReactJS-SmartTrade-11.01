@@ -1,11 +1,18 @@
+from enum import Enum
 from typing import Optional
 from pydantic import BaseModel, ConfigDict, NonNegativeFloat, NonNegativeInt
 
+
+class ProductState(str, Enum):
+    Approved = "Approved"
+    Rejected = "Rejected"
+    Pending = "Pending"
 
 class SellerProductBase(BaseModel):
     quantity: NonNegativeInt
     price: NonNegativeFloat
     shipping_costs: NonNegativeFloat
+    state: ProductState
 
 
 class SellerProductCreate(SellerProductBase):
@@ -16,6 +23,7 @@ class SellerProductUpdate(SellerProductBase):
     quantity: Optional[NonNegativeInt] = None
     price: Optional[NonNegativeFloat] = None
     shipping_costs: Optional[NonNegativeFloat] = None
+    state: Optional[ProductState] = None 
 
 
 class SellerProduct(SellerProductBase):
@@ -31,6 +39,7 @@ class SellerProductRead(BaseModel):
     id_product: int
     id_seller: int
     category: str
+    state: str
     name: str
     description: Optional[str] = ""
     eco_points: float

@@ -577,6 +577,7 @@ for _ in range(num_seller_products):
         quantity=quantity,
         price=price,
         shipping_costs=shipping_costs,
+        state="Approved",
         id_product=id_product,
     )
 

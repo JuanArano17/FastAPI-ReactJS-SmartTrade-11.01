@@ -76,6 +76,7 @@ class SellerProductService:
             id_product=product.id,
             id_seller=seller_product.id_seller,
             category=product.category,
+            state=seller_product.state,
             name=product.name,
             description=product.description,
             eco_points=product.eco_points,
