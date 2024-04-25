@@ -14,7 +14,7 @@ from app.schemas.users.in_shopping_cart import InShoppingCartCreate
 from app.schemas.users.in_wish_list import InWishListCreate
 from app.schemas.orders.product_line import ProductLineCreate
 from app.schemas.users.types.seller import SellerCreate
-from app.schemas.products.seller_product import SellerProductCreate
+from app.schemas.products.seller_product import SellerProductCreate, SellerProductUpdate
 from app.service.products.image import ImageService
 from app.service.products.product import ProductService
 from app.service.users.address import AddressService
@@ -74,19 +74,21 @@ Faker.seed(42)  # Set the seed to any value you prefer
 num_buyers = 100
 num_sellers = 100
 num_cards = 100
-num_books = 15
-num_games = 15
-num_electronics = 15
-num_electrodomestics = 15
-num_foods = 15
-num_clothes = 15
-num_house_utilities = 15
+num_books = 20
+num_games = 20
+num_electronics = 20
+num_electrodomestics = 20
+num_foods = 20
+num_clothes = 20
+num_house_utilities = 20
 num_addresses = 100
-num_seller_products = 100
+num_seller_products = 140
 num_cart_items = 100
 num_list_items = 100
 num_orders = 40
 num_product_lines_per_order = 2
+num_rejected=20
+num_approved=100
 
 
 # # Initialize SQLAlchemy session
@@ -577,7 +579,7 @@ for _ in range(num_seller_products):
         quantity=quantity,
         price=price,
         shipping_costs=shipping_costs,
-        state="Approved",
+        state="Pending",
         id_product=id_product,
     )
 
@@ -587,6 +589,28 @@ for _ in range(num_seller_products):
     )
 
 seller_product_ids = seller_product_serv.seller_product_repo.get_id_list()
+
+for i in range(num_rejected):
+    # Create a SellerProduct object
+    seller_product = SellerProductUpdate(
+        state="Rejected"
+    )
+
+    # Add the seller product to the session
+    seller_product_serv.update(
+        seller_product_id=seller_product_ids[i], new_data=seller_product
+    )
+
+for i in range(num_approved):
+    # Create a SellerProduct object
+    seller_product = SellerProductUpdate(
+        state="Approved"
+    )
+
+    # Add the seller product to the session
+    seller_product_serv.update(
+        seller_product_id=seller_product_ids[i+1+num_rejected], new_data=seller_product
+    )
 
 for _ in range(num_cart_items):
     # Generate random data for each in shopping cart item

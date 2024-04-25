@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import Optional
-from pydantic import BaseModel, ConfigDict, NonNegativeFloat, NonNegativeInt
+from pydantic import BaseModel, ConfigDict, Field, NonNegativeFloat, NonNegativeInt
 
 
 class ProductState(str, Enum):
@@ -13,6 +13,7 @@ class SellerProductBase(BaseModel):
     price: NonNegativeFloat
     shipping_costs: NonNegativeFloat
     state: ProductState = "Pending"
+    justification: Optional[str] = Field(default=None, min_length=1, max_length=50)
 
 
 class SellerProductCreate(SellerProductBase):
@@ -24,6 +25,7 @@ class SellerProductUpdate(SellerProductBase):
     price: Optional[NonNegativeFloat] = None
     shipping_costs: Optional[NonNegativeFloat] = None
     state: Optional[ProductState] = None 
+    justification: Optional[str] = Field(default=None, min_length=1, max_length=50)
 
 
 class SellerProduct(SellerProductBase):
@@ -47,6 +49,7 @@ class SellerProductRead(BaseModel):
     price: float
     shipping_costs: float
     spec_sheet: str
+    justification: Optional[str] = None
     quantity: int
     stock: int
     author: Optional[str] = None

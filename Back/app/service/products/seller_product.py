@@ -81,6 +81,7 @@ class SellerProductService:
             description=product.description,
             eco_points=product.eco_points,
             spec_sheet=product.spec_sheet,
+            justification=seller_product.justification,
             stock=product.stock,
             images=[image.url for image in product.images],
             author=product.author if hasattr(product, "author") else None,
