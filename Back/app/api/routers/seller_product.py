@@ -9,7 +9,7 @@ from app.schemas.products.seller_product import (
 )
 
 router = APIRouter(
-    prefix="/product/{product_id}/seller_products", tags=["seller-products"]
+    prefix="/product/{product_id}/seller_products", tags=["Seller Products"]
 )
 
 
@@ -35,7 +35,7 @@ async def delete_seller_products(
     return seller_product_service.delete_by_id_product(id_product=product_id)
 
 
-seller_prod_router = APIRouter(prefix="/seller_products", tags=["seller-products"])
+seller_prod_router = APIRouter(prefix="/seller_products", tags=["Seller Products"])
 
 
 @seller_prod_router.get(

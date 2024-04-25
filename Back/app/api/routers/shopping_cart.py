@@ -8,9 +8,7 @@ from app.schemas.users.in_shopping_cart import (
 )
 
 
-cart_token_router = APIRouter(
-    prefix="/shopping_cart/me", tags=["shopping_cart_with_token"]
-)
+cart_token_router = APIRouter(prefix="/shopping_cart/me", tags=["Shopping Carts"])
 
 
 @cart_token_router.get("/", response_model=list[InShoppingCart])

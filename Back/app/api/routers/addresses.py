@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException
 from app.api.deps import AddressServiceDep
 from app.schemas.users.address import Address, AddressCreate, AddressUpdate
 
-router = APIRouter(prefix="/buyers/{buyer_id}/addresses", tags=["addresses"])
+router = APIRouter(prefix="/buyers/{buyer_id}/addresses", tags=["Addresses"])
 
 
 @router.get("/", response_model=list[Address])

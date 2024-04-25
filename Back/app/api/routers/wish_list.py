@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from app.api.deps import CurrentUserDep, WishListServiceDep
 from app.schemas.users.in_wish_list import InWishList, InWishListCreate
 
-list_token_router = APIRouter(prefix="/wish_list/me", tags=["wish_list_with_token"])
+list_token_router = APIRouter(prefix="/wish_list/me", tags=["Wish Lists"])
 
 
 @list_token_router.get("/", response_model=list[InWishList])

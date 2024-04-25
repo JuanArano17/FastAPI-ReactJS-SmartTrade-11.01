@@ -5,7 +5,7 @@ from app.api.deps import CurrentUserDep, OrderServiceDep
 
 # router = APIRouter(prefix="/buyers/{buyer_id}/orders", tags=["order"])
 
-orders = APIRouter(prefix="/orders/me", tags=["Order"])
+orders = APIRouter(prefix="/orders/me", tags=["Orders"])
 
 
 @orders.get("/", response_model=list[CompleteOrder])
@@ -110,7 +110,7 @@ async def delete_all_current_user_orders(
 #     return order_service.delete_all_by_buyer_id(buyer_id)
 
 
-orders_router = APIRouter(prefix="/orders", tags=["Order"])
+orders_router = APIRouter(prefix="/orders", tags=["Orders"])
 
 
 @orders_router.get("/", response_model=list[Order])

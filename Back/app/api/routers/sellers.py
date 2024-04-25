@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from app.api.deps import SellerServiceDep
 from app.schemas.users.types.seller import Seller, SellerCreate, SellerUpdate
 
-router = APIRouter(prefix="/sellers", tags=["sellers"])
+router = APIRouter(prefix="/sellers", tags=["Sellers"])
 
 
 @router.get("/", response_model=list[Seller])
