@@ -14,7 +14,6 @@ def fake_book():
         "description": None,
         "spec_sheet": "Specs...",
         "stock": 0,
-        "eco_points": 10,
         "author": "Frank Herbert",
         "pages": 900,
     }
@@ -26,7 +25,6 @@ def fake_game():
         "description": None,
         "spec_sheet": "Specs...",
         "stock": 0,
-        "eco_points": 10,
         "publisher": "Rockstar",
         "platform": "ps5",
         "size": "100GB",
@@ -39,7 +37,6 @@ def fake_electronics():
         "description": None,
         "spec_sheet": "Specs...",
         "stock": 0,
-        "eco_points": 9,
         "brand": "HP",
         "type": "PC",
         "capacity": "1000GB",
@@ -52,7 +49,6 @@ def fake_electrodomestics():
         "description": None,
         "spec_sheet": "Specs...",
         "stock": 0,
-        "eco_points": 19,
         "brand": "Bosch",
         "type": "kitchen electro",
         "power_source": "batteries",
@@ -65,7 +61,6 @@ def fake_food():
         "description": None,
         "spec_sheet": "Specs...",
         "stock": 0,
-        "eco_points": 19,
         "brand": "Kellogs",
         "type": "cereal",
         "ingredients": "carbs 500g, protein 300g",
@@ -78,7 +73,6 @@ def fake_house_utilities():
         "description": None,
         "spec_sheet": "Specs...",
         "stock": 0,
-        "eco_points": 19,
         "brand": "fork s.a",
         "type": "forks",
     }
@@ -90,7 +84,6 @@ def fake_clothes():
         "description": None,
         "spec_sheet": "Specs...",
         "stock": 0,
-        "eco_points": 19,
         "materials": "cotton, wool",
         "type": "T-shirt",
         "size": "M",
@@ -107,7 +100,6 @@ def test_create_book(client: TestClient, product_service: ProductService, db: Se
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
     assert content["description"] == data["description"]
-    assert content["eco_points"] == data["eco_points"]
     assert content["author"] == data["author"]
     assert content["pages"] == data["pages"]
     assert "id" in content
@@ -126,7 +118,6 @@ def test_create_game(client: TestClient, product_service: ProductService, db: Se
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
     assert content["description"] == data["description"]
-    assert content["eco_points"] == data["eco_points"]
     assert content["publisher"] == data["publisher"]
     assert content["platform"] == data["platform"]
     assert content["size"] == data["size"]
@@ -148,7 +139,6 @@ def test_create_electronics(
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
     assert content["description"] == data["description"]
-    assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["brand"] == data["brand"]
     assert "capacity" in content
@@ -171,7 +161,6 @@ def test_create_electrodomestics(
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
     assert content["description"] == data["description"]
-    assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["brand"] == data["brand"]
     assert content["power_source"] == data["power_source"]
@@ -191,7 +180,6 @@ def test_create_food(client: TestClient, product_service: ProductService, db: Se
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
     assert content["description"] == data["description"]
-    assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["brand"] == data["brand"]
     assert content["ingredients"] == data["ingredients"]
@@ -213,7 +201,6 @@ def test_create_house_utilities(
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
     assert content["description"] == data["description"]
-    assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["brand"] == data["brand"]
     assert "id" in content
@@ -234,7 +221,6 @@ def test_create_clothes(
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
     assert content["description"] == data["description"]
-    assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["size"] == data["size"]
     assert content["materials"] == data["materials"]
@@ -282,7 +268,6 @@ def test_get_book_by_id(
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
     assert content["description"] == data["description"]
-    assert content["eco_points"] == data["eco_points"]
     assert content["author"] == data["author"]
     assert content["pages"] == data["pages"]
     assert "id" in content
@@ -302,7 +287,6 @@ def test_get_game_by_id(
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
     assert content["description"] == data["description"]
-    assert content["eco_points"] == data["eco_points"]
     assert content["publisher"] == data["publisher"]
     assert content["platform"] == data["platform"]
     assert content["size"] == data["size"]
@@ -323,7 +307,6 @@ def test_get_electronics_by_id(
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
     assert content["description"] == data["description"]
-    assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["brand"] == data["brand"]
     assert content["capacity"] == data["capacity"]
@@ -344,7 +327,6 @@ def test_get_electrodomestics_by_id(
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
     assert content["description"] == data["description"]
-    assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["brand"] == data["brand"]
     assert content["power_source"] == data["power_source"]
@@ -365,7 +347,6 @@ def test_get_house_utilities_by_id(
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
     assert content["description"] == data["description"]
-    assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["brand"] == data["brand"]
     assert "id" in content
@@ -385,7 +366,6 @@ def test_get_food_by_id(
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
     assert content["description"] == data["description"]
-    assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["brand"] == data["brand"]
     assert content["ingredients"] == data["ingredients"]
@@ -406,7 +386,6 @@ def test_get_clothes_by_id(
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
     assert content["description"] == data["description"]
-    assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["size"] == data["size"]
     assert content["materials"] == data["materials"]
@@ -494,7 +473,6 @@ def test_update_product_invalid_data(
     new_data["name"] = "New Name"
     new_data["description"] = "New Desc"
     new_data["spec_sheet"] = "123"
-    new_data["eco_points"] = 100
     new_data["author"] = "Me"
     new_data["pages"] = "x"  # invalid page number
 

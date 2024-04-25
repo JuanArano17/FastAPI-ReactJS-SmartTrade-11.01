@@ -59,7 +59,7 @@ class SellerProductService:
         product.stock += seller_product.quantity  # type: ignore
 
         seller_product_obj = SellerProduct(
-            **seller_product.model_dump(), id_seller=id_seller
+            **seller_product.model_dump(), id_seller=id_seller, state="Pending", eco_points=0
         )
         seller_product_obj = self.seller_product_repo.add(seller_product_obj)
         return seller_product_obj
@@ -76,10 +76,12 @@ class SellerProductService:
             id_product=product.id,
             id_seller=seller_product.id_seller,
             category=product.category,
+            state=seller_product.state,
             name=product.name,
             description=product.description,
-            eco_points=product.eco_points,
+            eco_points=seller_product.eco_points,
             spec_sheet=product.spec_sheet,
+            justification=seller_product.justification,
             stock=product.stock,
             images=[image.url for image in product.images],
             author=product.author if hasattr(product, "author") else None,
@@ -119,6 +121,15 @@ class SellerProductService:
             seller_product_info = self.map_seller_product_to_read_schema(seller_product)
             complete_seller_products.append(seller_product_info)
         return complete_seller_products
+    
+    def get_all_by_state(self,state) -> list[SellerProductRead]:
+        seller_products = self.seller_product_repo.get_all()
+        complete_seller_products = []
+        for seller_product in seller_products:
+            if(seller_product.state==state):
+                seller_product_info = self.map_seller_product_to_read_schema(seller_product)
+                complete_seller_products.append(seller_product_info)
+        return complete_seller_products
 
     def update(self, seller_product_id, new_data: SellerProductUpdate) -> SellerProduct:
         seller_product = self.get_by_id(seller_product_id)
@@ -128,6 +139,20 @@ class SellerProductService:
             product.stock += new_data.quantity - seller_product.quantity  # type: ignore
             seller_product.notify_observers(new_data.quantity)
 
+        if new_data.state and new_data.state=="Rejected" and (not new_data.justification or len(new_data.justification)<1):
+            raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="Rejected products require a justification",
+                )
+        
+        if new_data.state and new_data.state=="Approved":
+            if not new_data.eco_points:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="Eco-points must be assigned to approved products",
+                )
+            new_data.justification=""
+            
         return self.seller_product_repo.update(seller_product, new_data)
 
     def delete_by_id(self, seller_product_id):

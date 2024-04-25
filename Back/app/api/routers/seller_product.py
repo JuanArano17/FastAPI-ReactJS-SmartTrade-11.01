@@ -45,7 +45,7 @@ async def read_seller_products_pure(*, seller_product_service: SellerProductServ
     """
     Retrieve seller products.
     """
-    return seller_product_service.get_all()
+    return seller_product_service.get_all_by_state("Approved")
 
 
 @seller_prod_router.get(

@@ -14,9 +14,9 @@ from app.service.users.address import AddressService
 from app.service.users.card import CardService
 from app.service.products.image import ImageService
 from app.service.products.product import ProductService
-from service.in_shopping_cart import InShoppingCartService
-from service.in_wish_list import InWishListService
-from service.seller_product import SellerProductService
+from app.service.users.in_shopping_cart import InShoppingCartService
+from app.service.users.in_wish_list import InWishListService
+from app.service.products.seller_product import SellerProductService
 
 
 @pytest.fixture(scope="session", autouse=True)

@@ -14,7 +14,7 @@ from app.schemas.users.in_shopping_cart import InShoppingCartCreate
 from app.schemas.users.in_wish_list import InWishListCreate
 from app.schemas.orders.product_line import ProductLineCreate
 from app.schemas.users.types.seller import SellerCreate
-from app.schemas.products.seller_product import SellerProductCreate
+from app.schemas.products.seller_product import SellerProductCreate, SellerProductUpdate
 from app.service.products.image import ImageService
 from app.service.products.product import ProductService
 from app.service.users.address import AddressService
@@ -27,6 +27,9 @@ from app.schemas.orders.refund_product import RefundProductCreate
 from app.schemas.orders.order import OrderCreate
 from app.service.users.types.user import UserService
 from faker import Faker
+
+from schemas.users.types.admin import AdminCreate
+from service.users.types.admin import AdminService
 
 
 session = get_db()
@@ -63,6 +66,8 @@ refund_product_service = RefundProductService(
     product_line_service=product_line_service,
 )
 
+admin_service= AdminService(session=session, user_service=UserService)
+
 
 # Initialize Faker with a specific seed (for consistency)
 faker = Faker()
@@ -74,25 +79,29 @@ Faker.seed(42)  # Set the seed to any value you prefer
 num_buyers = 100
 num_sellers = 100
 num_cards = 100
-num_books = 15
-num_games = 15
-num_electronics = 15
-num_electrodomestics = 15
-num_foods = 15
-num_clothes = 15
-num_house_utilities = 15
+num_books = 20
+num_games = 20
+num_electronics = 20
+num_electrodomestics = 20
+num_foods = 20
+num_clothes = 20
+num_house_utilities = 20
 num_addresses = 100
-num_seller_products = 100
+num_seller_products = 140
 num_cart_items = 100
 num_list_items = 100
 num_orders = 40
 num_product_lines_per_order = 2
+num_rejected=20
+num_approved=100
 
 
 # # Initialize SQLAlchemy session
 # engine = get_engine()
 # Session = sessionmaker(bind=engine)
 # session = Session()
+
+admin_service.add(AdminCreate(email="admin@example.com", name="Robert", surname="House", password="admin"))
 
 used_emails = []
 used_dnis = []
@@ -233,7 +242,6 @@ for _ in range(num_books):
     name = faker.catch_phrase()  # Generate a random product name
     name = name[:39]
     description = faker.sentence()  # Generate a random product description
-    eco_points = round(random.uniform(0, 100), 2)  # Generate a random eco points value
     spec_sheet = faker.text(max_nb_chars=200)  # Generate a random specification sheet
     stock = 0
     pages = random.randint(100, 1500)
@@ -242,7 +250,6 @@ for _ in range(num_books):
     product = {
         "name": name,
         "description": description,
-        "eco_points": eco_points,
         "spec_sheet": spec_sheet,
         "stock": stock,
         "pages": pages,
@@ -252,9 +259,12 @@ for _ in range(num_books):
     # Add the product to the session
     created_product = product_service.add(category="book", product_data=product)
 
-    url = faker.image_url()
-    image_create = ImageCreate(url=url)
-    image_service.add(id_product=created_product.id, image=image_create)
+    num_iterations = random.randint(1, 5)
+
+    for _ in range(num_iterations):
+        url = faker.image_url()
+        image_create = ImageCreate(url=url)
+        image_service.add(id_product=created_product.id, image=image_create)
 
     # Assuming session is your SQLAlchemy session object
 
@@ -264,7 +274,6 @@ for _ in range(num_games):
     name = faker.catch_phrase()  # Generate a random product name
     name = name[:39]
     description = faker.sentence()  # Generate a random product description
-    eco_points = round(random.uniform(0, 100), 2)  # Generate a random eco points value
     spec_sheet = faker.text(max_nb_chars=200)  # Generate a random specification sheet
     stock = 0
     publisher = faker.company()
@@ -287,7 +296,6 @@ for _ in range(num_games):
     product = {
         "name": name,
         "description": description,
-        "eco_points": eco_points,
         "spec_sheet": spec_sheet,
         "stock": stock,
         "publisher": publisher,
@@ -298,9 +306,12 @@ for _ in range(num_games):
     # Add the product to the session
     created_product = product_service.add(category="game", product_data=product)
 
-    url = faker.image_url()
-    image_create = ImageCreate(url=url)
-    image_service.add(id_product=created_product.id, image=image_create)
+    num_iterations = random.randint(1, 5)
+
+    for _ in range(num_iterations):
+        url = faker.image_url()
+        image_create = ImageCreate(url=url)
+        image_service.add(id_product=created_product.id, image=image_create)
 
     # Assuming session is your SQLAlchemy session object
 
@@ -309,7 +320,6 @@ for _ in range(num_clothes):
     # Generate random data for each product
     name = faker.word()  # Generate a random product name
     description = faker.sentence()  # Generate a random product description
-    eco_points = round(random.uniform(0, 100), 2)  # Generate a random eco points value
     spec_sheet = faker.text(max_nb_chars=200)  # Generate a random specification sheet
     stock = 0
     materials = random.choice(
@@ -345,7 +355,6 @@ for _ in range(num_clothes):
     product = {
         "name": name,
         "description": description,
-        "eco_points": eco_points,
         "spec_sheet": spec_sheet,
         "stock": stock,
         "materials": materials,
@@ -356,9 +365,12 @@ for _ in range(num_clothes):
     # Add the product to the session
     created_product = product_service.add(category="clothes", product_data=product)
 
-    url = faker.image_url()
-    image_create = ImageCreate(url=url)
-    image_service.add(id_product=created_product.id, image=image_create)
+    num_iterations = random.randint(1, 5)
+
+    for _ in range(num_iterations):
+        url = faker.image_url()
+        image_create = ImageCreate(url=url)
+        image_service.add(id_product=created_product.id, image=image_create)
 
     # Assuming session is your SQLAlchemy session object
 
@@ -367,7 +379,6 @@ for _ in range(num_electronics):
     # Generate random data for each product
     name = faker.word()  # Generate a random product name
     description = faker.sentence()  # Generate a random product description
-    eco_points = round(random.uniform(0, 100), 2)  # Generate a random eco points value
     spec_sheet = faker.text(max_nb_chars=200)  # Generate a random specification sheet
     stock = 0
     brand = faker.company()
@@ -390,7 +401,6 @@ for _ in range(num_electronics):
     product = {
         "name": name,
         "description": description,
-        "eco_points": eco_points,
         "spec_sheet": spec_sheet,
         "stock": stock,
         "brand": brand,
@@ -401,9 +411,12 @@ for _ in range(num_electronics):
     # Add the product to the session
     created_product = product_service.add(category="electronics", product_data=product)
 
-    url = faker.image_url()
-    image_create = ImageCreate(url=url)
-    image_service.add(id_product=created_product.id, image=image_create)
+    num_iterations = random.randint(1, 5)
+
+    for _ in range(num_iterations):
+        url = faker.image_url()
+        image_create = ImageCreate(url=url)
+        image_service.add(id_product=created_product.id, image=image_create)
 
     # Assuming session is your SQLAlchemy session object
 
@@ -412,7 +425,6 @@ for _ in range(num_electrodomestics):
     # Generate random data for each product
     name = faker.word()  # Generate a random product name
     description = faker.sentence()  # Generate a random product description
-    eco_points = round(random.uniform(0, 100), 2)  # Generate a random eco points value
     spec_sheet = faker.text(max_nb_chars=200)  # Generate a random specification sheet
     stock = 0
     brand = faker.company()
@@ -435,7 +447,6 @@ for _ in range(num_electrodomestics):
     product = {
         "name": name,
         "description": description,
-        "eco_points": eco_points,
         "spec_sheet": spec_sheet,
         "stock": stock,
         "brand": brand,
@@ -448,9 +459,12 @@ for _ in range(num_electrodomestics):
         category="electrodomestics", product_data=product
     )
 
-    url = faker.image_url()
-    image_create = ImageCreate(url=url)
-    image_service.add(id_product=created_product.id, image=image_create)
+    num_iterations = random.randint(1, 5)
+
+    for _ in range(num_iterations):
+        url = faker.image_url()
+        image_create = ImageCreate(url=url)
+        image_service.add(id_product=created_product.id, image=image_create)
 
     # Assuming session is your SQLAlchemy session object
 
@@ -459,7 +473,6 @@ for _ in range(num_house_utilities):
     # Generate random data for each product
     name = faker.word()  # Generate a random product name
     description = faker.sentence()  # Generate a random product description
-    eco_points = round(random.uniform(0, 100), 2)  # Generate a random eco points value
     spec_sheet = faker.text(max_nb_chars=200)  # Generate a random specification sheet
     stock = 0
     brand = faker.company()
@@ -487,7 +500,6 @@ for _ in range(num_house_utilities):
     product = {
         "name": name,
         "description": description,
-        "eco_points": eco_points,
         "spec_sheet": spec_sheet,
         "stock": stock,
         "brand": brand,
@@ -499,9 +511,12 @@ for _ in range(num_house_utilities):
         category="houseutilities", product_data=product
     )
 
-    url = faker.image_url()
-    image_create = ImageCreate(url=url)
-    image_service.add(id_product=created_product.id, image=image_create)
+    num_iterations = random.randint(1, 5)
+
+    for _ in range(num_iterations):
+        url = faker.image_url()
+        image_create = ImageCreate(url=url)
+        image_service.add(id_product=created_product.id, image=image_create)
 
     # Assuming session is your SQLAlchemy session object
 
@@ -510,7 +525,6 @@ for _ in range(num_foods):
     # Generate random data for each product
     name = faker.word()  # Generate a random product name
     description = faker.sentence()  # Generate a random product description
-    eco_points = round(random.uniform(0, 100), 2)  # Generate a random eco points value
     spec_sheet = faker.text(max_nb_chars=200)  # Generate a random specification sheet
     stock = 0
     brand = faker.company()
@@ -539,7 +553,6 @@ for _ in range(num_foods):
     product = {
         "name": name,
         "description": description,
-        "eco_points": eco_points,
         "spec_sheet": spec_sheet,
         "stock": stock,
         "brand": brand,
@@ -549,10 +562,15 @@ for _ in range(num_foods):
 
     # Add the product to the session
     created_product = product_service.add(category="food", product_data=product)
+    
 
-    url = faker.image_url()
-    image_create = ImageCreate(url=url)
-    image_service.add(id_product=created_product.id, image=image_create)
+
+    num_iterations = random.randint(1, 5)
+
+    for _ in range(num_iterations):
+        url = faker.image_url()
+        image_create = ImageCreate(url=url)
+        image_service.add(id_product=created_product.id, image=image_create)
 
     # Assuming session is your SQLAlchemy session object
 
@@ -586,6 +604,30 @@ for _ in range(num_seller_products):
     )
 
 seller_product_ids = seller_product_serv.seller_product_repo.get_id_list()
+
+for i in range(num_rejected):
+    # Create a SellerProduct object
+    seller_product = SellerProductUpdate(
+        state="Rejected",
+        justification=faker.text(max_nb_chars=49)
+    )
+
+    # Add the seller product to the session
+    seller_product_serv.update(
+        seller_product_id=seller_product_ids[i], new_data=seller_product
+    )
+
+for i in range(num_approved):
+    # Create a SellerProduct object
+    seller_product = SellerProductUpdate(
+        state="Approved",
+        eco_points = round(random.uniform(0, 100), 2)  # Generate a random eco points value
+    )
+
+    # Add the seller product to the session
+    seller_product_serv.update(
+        seller_product_id=seller_product_ids[i+1+num_rejected], new_data=seller_product
+    )
 
 for _ in range(num_cart_items):
     # Generate random data for each in shopping cart item

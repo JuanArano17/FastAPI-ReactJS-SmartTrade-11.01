@@ -170,7 +170,7 @@ class ProductFactory:
         # Extract common attributes from update_data
         # Extract common attributes from new_data
         common_attributes = {}
-        for key in ["name", "description", "stock", "eco_points", "spec_sheet"]:
+        for key in ["name", "description", "stock", "spec_sheet"]:
             if key in new_data:
                 common_attributes[key] = new_data.pop(key)
         try:

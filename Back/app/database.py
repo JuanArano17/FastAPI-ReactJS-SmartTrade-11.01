@@ -8,6 +8,13 @@ from dotenv import load_dotenv
 from app.models.users.types.user import User
 from app.models.users.types.admin import Admin
 from app.models.users.types.buyer import Buyer
+from app.models.products.categories.book import Book
+from app.models.products.categories.game import Game
+from app.models.products.categories.electronics import Electronics
+from app.models.products.categories.electrodomestics import Electrodomestics
+from app.models.products.categories.house_utilities import HouseUtilities
+from app.models.products.categories.clothes import Clothes
+from app.models.products.categories.food import Food
 from app.models.users.address import Address
 from app.models.products.product import Product
 from app.models.products.image import Image
