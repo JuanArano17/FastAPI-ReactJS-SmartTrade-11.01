@@ -9,7 +9,6 @@ import CatalogPage from './pages/CatalogPage';
 import ShoppingCartPage from './pages/ShoppingCartPage';
 import WishListPage from './pages/WishListPage';
 
-
 function App() {
   return (
     <div className="App">
