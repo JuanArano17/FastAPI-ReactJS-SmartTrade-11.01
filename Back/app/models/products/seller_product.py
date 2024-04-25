@@ -22,6 +22,7 @@ class SellerProduct(Base):
     shipping_costs = Column(Float, nullable=False)
     state = Column(String, nullable=False)
     justification = Column(String)
+    eco_points = Column(Float, nullable=False)
 
     product = relationship("Product", back_populates="seller_products")
     in_wish_lists = relationship("InWishList", back_populates="seller_product")
@@ -30,7 +31,7 @@ class SellerProduct(Base):
     product_lines = relationship("ProductLine", back_populates="seller_product")
 
     def __repr__(self):
-        return f"SellerProduct(id={self.id}, id_product={self.id_product}, id_seller={self.id_seller}, quantity={self.quantity}, price={self.price}, shipping_costs={self.shipping_costs}, state={self.state}, justification={self.justification})"
+        return f"SellerProduct(id={self.id}, id_product={self.id_product}, id_seller={self.id_seller}, quantity={self.quantity}, price={self.price}, shipping_costs={self.shipping_costs}, state={self.state}, justification={self.justification}, eco_points={self.eco_points})"
 
     def notify_observers(self, new_quantity: int):
         for cart_item in self.in_shopping_carts:

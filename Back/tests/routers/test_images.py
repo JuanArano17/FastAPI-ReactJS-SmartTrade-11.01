@@ -19,7 +19,6 @@ def fake_product():
     return {
         "name": "Dune",
         "spec_sheet": "Specs...",
-        "eco_points": 10,
         "author": "Frank Herbert",
         "pages": 900,
     }
@@ -105,7 +104,6 @@ def test_get_images(
         {
             "name": "Dune",
             "spec_sheet": "Specs...",
-            "eco_points": 10,
             "author": "Frank Herbert",
             "pages": 900,
         },
@@ -115,7 +113,6 @@ def test_get_images(
         {
             "name": "gta6",
             "spec_sheet": "Specs...",
-            "eco_points": 10,
             "publisher": "Rockstar",
             "platform": "ps5",
             "size": "100GB",
@@ -229,7 +226,6 @@ def test_delete_images(
         {
             "name": "Dune",
             "spec_sheet": "Specs...",
-            "eco_points": 10,
             "author": "Frank Herbert",
             "pages": 900,
         },

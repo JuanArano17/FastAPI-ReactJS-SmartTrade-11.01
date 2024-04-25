@@ -235,7 +235,6 @@ for _ in range(num_books):
     name = faker.catch_phrase()  # Generate a random product name
     name = name[:39]
     description = faker.sentence()  # Generate a random product description
-    eco_points = round(random.uniform(0, 100), 2)  # Generate a random eco points value
     spec_sheet = faker.text(max_nb_chars=200)  # Generate a random specification sheet
     stock = 0
     pages = random.randint(100, 1500)
@@ -244,7 +243,6 @@ for _ in range(num_books):
     product = {
         "name": name,
         "description": description,
-        "eco_points": eco_points,
         "spec_sheet": spec_sheet,
         "stock": stock,
         "pages": pages,
@@ -269,7 +267,6 @@ for _ in range(num_games):
     name = faker.catch_phrase()  # Generate a random product name
     name = name[:39]
     description = faker.sentence()  # Generate a random product description
-    eco_points = round(random.uniform(0, 100), 2)  # Generate a random eco points value
     spec_sheet = faker.text(max_nb_chars=200)  # Generate a random specification sheet
     stock = 0
     publisher = faker.company()
@@ -292,7 +289,6 @@ for _ in range(num_games):
     product = {
         "name": name,
         "description": description,
-        "eco_points": eco_points,
         "spec_sheet": spec_sheet,
         "stock": stock,
         "publisher": publisher,
@@ -317,7 +313,6 @@ for _ in range(num_clothes):
     # Generate random data for each product
     name = faker.word()  # Generate a random product name
     description = faker.sentence()  # Generate a random product description
-    eco_points = round(random.uniform(0, 100), 2)  # Generate a random eco points value
     spec_sheet = faker.text(max_nb_chars=200)  # Generate a random specification sheet
     stock = 0
     materials = random.choice(
@@ -353,7 +348,6 @@ for _ in range(num_clothes):
     product = {
         "name": name,
         "description": description,
-        "eco_points": eco_points,
         "spec_sheet": spec_sheet,
         "stock": stock,
         "materials": materials,
@@ -378,7 +372,6 @@ for _ in range(num_electronics):
     # Generate random data for each product
     name = faker.word()  # Generate a random product name
     description = faker.sentence()  # Generate a random product description
-    eco_points = round(random.uniform(0, 100), 2)  # Generate a random eco points value
     spec_sheet = faker.text(max_nb_chars=200)  # Generate a random specification sheet
     stock = 0
     brand = faker.company()
@@ -401,7 +394,6 @@ for _ in range(num_electronics):
     product = {
         "name": name,
         "description": description,
-        "eco_points": eco_points,
         "spec_sheet": spec_sheet,
         "stock": stock,
         "brand": brand,
@@ -426,7 +418,6 @@ for _ in range(num_electrodomestics):
     # Generate random data for each product
     name = faker.word()  # Generate a random product name
     description = faker.sentence()  # Generate a random product description
-    eco_points = round(random.uniform(0, 100), 2)  # Generate a random eco points value
     spec_sheet = faker.text(max_nb_chars=200)  # Generate a random specification sheet
     stock = 0
     brand = faker.company()
@@ -449,7 +440,6 @@ for _ in range(num_electrodomestics):
     product = {
         "name": name,
         "description": description,
-        "eco_points": eco_points,
         "spec_sheet": spec_sheet,
         "stock": stock,
         "brand": brand,
@@ -476,7 +466,6 @@ for _ in range(num_house_utilities):
     # Generate random data for each product
     name = faker.word()  # Generate a random product name
     description = faker.sentence()  # Generate a random product description
-    eco_points = round(random.uniform(0, 100), 2)  # Generate a random eco points value
     spec_sheet = faker.text(max_nb_chars=200)  # Generate a random specification sheet
     stock = 0
     brand = faker.company()
@@ -504,7 +493,6 @@ for _ in range(num_house_utilities):
     product = {
         "name": name,
         "description": description,
-        "eco_points": eco_points,
         "spec_sheet": spec_sheet,
         "stock": stock,
         "brand": brand,
@@ -530,7 +518,6 @@ for _ in range(num_foods):
     # Generate random data for each product
     name = faker.word()  # Generate a random product name
     description = faker.sentence()  # Generate a random product description
-    eco_points = round(random.uniform(0, 100), 2)  # Generate a random eco points value
     spec_sheet = faker.text(max_nb_chars=200)  # Generate a random specification sheet
     stock = 0
     brand = faker.company()
@@ -559,7 +546,6 @@ for _ in range(num_foods):
     product = {
         "name": name,
         "description": description,
-        "eco_points": eco_points,
         "spec_sheet": spec_sheet,
         "stock": stock,
         "brand": brand,
@@ -627,7 +613,8 @@ for i in range(num_rejected):
 for i in range(num_approved):
     # Create a SellerProduct object
     seller_product = SellerProductUpdate(
-        state="Approved"
+        state="Approved",
+        eco_points = round(random.uniform(0, 100), 2)  # Generate a random eco points value
     )
 
     # Add the seller product to the session

@@ -13,10 +13,8 @@ class SellerProductBase(BaseModel):
     price: NonNegativeFloat
     shipping_costs: NonNegativeFloat
 
-
 class SellerProductCreate(SellerProductBase):
     id_product: int
-
 
 class SellerProductUpdate(SellerProductBase):
     quantity: Optional[NonNegativeInt] = None
@@ -24,6 +22,7 @@ class SellerProductUpdate(SellerProductBase):
     shipping_costs: Optional[NonNegativeFloat] = None
     state: Optional[ProductState] = None 
     justification: Optional[str] = Field(default=None, max_length=100)
+    eco_points: Optional[NonNegativeFloat] = None
 
 
 class SellerProduct(SellerProductBase):
