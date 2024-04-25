@@ -40,9 +40,16 @@ product_service = ProductService(session)
 image_service = ImageService(session, product_service)
 card_service = CardService(session, buyer_service=buyer_service)
 address_service = AddressService(session, buyer_service)
-order_service = OrderService(session, buyer_service, card_service, address_service)
 seller_product_serv = SellerProductService(
     session, seller_service=seller_service, product_service=product_service
+)
+order_service = OrderService(
+    session,
+    buyer_service,
+    card_service,
+    address_service,
+    product_service,
+    seller_product_serv,
 )
 in_shopping_cart_service = InShoppingCartService(
     session, buyer_service, seller_product_serv
@@ -66,7 +73,7 @@ refund_product_service = RefundProductService(
     product_line_service=product_line_service,
 )
 
-admin_service= AdminService(session=session, user_service=UserService)
+admin_service = AdminService(session=session, user_service=UserService)
 
 
 # Initialize Faker with a specific seed (for consistency)
@@ -92,8 +99,8 @@ num_cart_items = 100
 num_list_items = 100
 num_orders = 40
 num_product_lines_per_order = 2
-num_rejected=20
-num_approved=100
+num_rejected = 20
+num_approved = 100
 
 
 # # Initialize SQLAlchemy session
@@ -101,7 +108,11 @@ num_approved=100
 # Session = sessionmaker(bind=engine)
 # session = Session()
 
-admin_service.add(AdminCreate(email="admin@example.com", name="Robert", surname="House", password="admin"))
+admin_service.add(
+    AdminCreate(
+        email="admin@example.com", name="Robert", surname="House", password="admin"
+    )
+)
 
 used_emails = []
 used_dnis = []
@@ -562,8 +573,6 @@ for _ in range(num_foods):
 
     # Add the product to the session
     created_product = product_service.add(category="food", product_data=product)
-    
-
 
     num_iterations = random.randint(1, 5)
 
@@ -608,8 +617,7 @@ seller_product_ids = seller_product_serv.seller_product_repo.get_id_list()
 for i in range(num_rejected):
     # Create a SellerProduct object
     seller_product = SellerProductUpdate(
-        state="Rejected",
-        justification=faker.text(max_nb_chars=49)
+        state="Rejected", justification=faker.text(max_nb_chars=49)
     )
 
     # Add the seller product to the session
@@ -621,12 +629,15 @@ for i in range(num_approved):
     # Create a SellerProduct object
     seller_product = SellerProductUpdate(
         state="Approved",
-        eco_points = round(random.uniform(0, 100), 2)  # Generate a random eco points value
+        eco_points=round(
+            random.uniform(0, 100), 2
+        ),  # Generate a random eco points value
     )
 
     # Add the seller product to the session
     seller_product_serv.update(
-        seller_product_id=seller_product_ids[i+1+num_rejected], new_data=seller_product
+        seller_product_id=seller_product_ids[i + 1 + num_rejected],
+        new_data=seller_product,
     )
 
 for _ in range(num_cart_items):
