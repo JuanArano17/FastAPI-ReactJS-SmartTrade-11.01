@@ -254,9 +254,12 @@ for _ in range(num_books):
     # Add the product to the session
     created_product = product_service.add(category="book", product_data=product)
 
-    url = faker.image_url()
-    image_create = ImageCreate(url=url)
-    image_service.add(id_product=created_product.id, image=image_create)
+    num_iterations = random.randint(1, 5)
+
+    for _ in range(num_iterations):
+        url = faker.image_url()
+        image_create = ImageCreate(url=url)
+        image_service.add(id_product=created_product.id, image=image_create)
 
     # Assuming session is your SQLAlchemy session object
 
@@ -300,9 +303,12 @@ for _ in range(num_games):
     # Add the product to the session
     created_product = product_service.add(category="game", product_data=product)
 
-    url = faker.image_url()
-    image_create = ImageCreate(url=url)
-    image_service.add(id_product=created_product.id, image=image_create)
+    num_iterations = random.randint(1, 5)
+
+    for _ in range(num_iterations):
+        url = faker.image_url()
+        image_create = ImageCreate(url=url)
+        image_service.add(id_product=created_product.id, image=image_create)
 
     # Assuming session is your SQLAlchemy session object
 
@@ -358,9 +364,12 @@ for _ in range(num_clothes):
     # Add the product to the session
     created_product = product_service.add(category="clothes", product_data=product)
 
-    url = faker.image_url()
-    image_create = ImageCreate(url=url)
-    image_service.add(id_product=created_product.id, image=image_create)
+    num_iterations = random.randint(1, 5)
+
+    for _ in range(num_iterations):
+        url = faker.image_url()
+        image_create = ImageCreate(url=url)
+        image_service.add(id_product=created_product.id, image=image_create)
 
     # Assuming session is your SQLAlchemy session object
 
@@ -403,9 +412,12 @@ for _ in range(num_electronics):
     # Add the product to the session
     created_product = product_service.add(category="electronics", product_data=product)
 
-    url = faker.image_url()
-    image_create = ImageCreate(url=url)
-    image_service.add(id_product=created_product.id, image=image_create)
+    num_iterations = random.randint(1, 5)
+
+    for _ in range(num_iterations):
+        url = faker.image_url()
+        image_create = ImageCreate(url=url)
+        image_service.add(id_product=created_product.id, image=image_create)
 
     # Assuming session is your SQLAlchemy session object
 
@@ -450,9 +462,12 @@ for _ in range(num_electrodomestics):
         category="electrodomestics", product_data=product
     )
 
-    url = faker.image_url()
-    image_create = ImageCreate(url=url)
-    image_service.add(id_product=created_product.id, image=image_create)
+    num_iterations = random.randint(1, 5)
+
+    for _ in range(num_iterations):
+        url = faker.image_url()
+        image_create = ImageCreate(url=url)
+        image_service.add(id_product=created_product.id, image=image_create)
 
     # Assuming session is your SQLAlchemy session object
 
@@ -501,9 +516,12 @@ for _ in range(num_house_utilities):
         category="houseutilities", product_data=product
     )
 
-    url = faker.image_url()
-    image_create = ImageCreate(url=url)
-    image_service.add(id_product=created_product.id, image=image_create)
+    num_iterations = random.randint(1, 5)
+
+    for _ in range(num_iterations):
+        url = faker.image_url()
+        image_create = ImageCreate(url=url)
+        image_service.add(id_product=created_product.id, image=image_create)
 
     # Assuming session is your SQLAlchemy session object
 
@@ -551,10 +569,15 @@ for _ in range(num_foods):
 
     # Add the product to the session
     created_product = product_service.add(category="food", product_data=product)
+    
 
-    url = faker.image_url()
-    image_create = ImageCreate(url=url)
-    image_service.add(id_product=created_product.id, image=image_create)
+
+    num_iterations = random.randint(1, 5)
+
+    for _ in range(num_iterations):
+        url = faker.image_url()
+        image_create = ImageCreate(url=url)
+        image_service.add(id_product=created_product.id, image=image_create)
 
     # Assuming session is your SQLAlchemy session object
 
@@ -579,7 +602,6 @@ for _ in range(num_seller_products):
         quantity=quantity,
         price=price,
         shipping_costs=shipping_costs,
-        state="Pending",
         id_product=id_product,
     )
 
@@ -593,7 +615,8 @@ seller_product_ids = seller_product_serv.seller_product_repo.get_id_list()
 for i in range(num_rejected):
     # Create a SellerProduct object
     seller_product = SellerProductUpdate(
-        state="Rejected"
+        state="Rejected",
+        justification=faker.text(max_nb_chars=49)
     )
 
     # Add the seller product to the session

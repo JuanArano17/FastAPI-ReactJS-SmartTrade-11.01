@@ -12,8 +12,6 @@ class SellerProductBase(BaseModel):
     quantity: NonNegativeInt
     price: NonNegativeFloat
     shipping_costs: NonNegativeFloat
-    state: ProductState = "Pending"
-    justification: Optional[str] = Field(default=None, min_length=1, max_length=50)
 
 
 class SellerProductCreate(SellerProductBase):
@@ -25,7 +23,7 @@ class SellerProductUpdate(SellerProductBase):
     price: Optional[NonNegativeFloat] = None
     shipping_costs: Optional[NonNegativeFloat] = None
     state: Optional[ProductState] = None 
-    justification: Optional[str] = Field(default=None, min_length=1, max_length=50)
+    justification: Optional[str] = Field(default=None, max_length=100)
 
 
 class SellerProduct(SellerProductBase):

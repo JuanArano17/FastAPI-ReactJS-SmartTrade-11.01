@@ -59,7 +59,7 @@ class SellerProductService:
         product.stock += seller_product.quantity  # type: ignore
 
         seller_product_obj = SellerProduct(
-            **seller_product.model_dump(), id_seller=id_seller
+            **seller_product.model_dump(), id_seller=id_seller, state="Pending"
         )
         seller_product_obj = self.seller_product_repo.add(seller_product_obj)
         return seller_product_obj
@@ -139,6 +139,15 @@ class SellerProductService:
             product.stock += new_data.quantity - seller_product.quantity  # type: ignore
             seller_product.notify_observers(new_data.quantity)
 
+        if new_data.state and new_data.state=="Rejected" and (not new_data.justification or len(new_data.justification)<1):
+            raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="Rejected products require a justification",
+                )
+        
+        if new_data.state and new_data.state=="Approved":
+            new_data.justification=""
+            
         return self.seller_product_repo.update(seller_product, new_data)
 
     def delete_by_id(self, seller_product_id):
