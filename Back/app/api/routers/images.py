@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query
 
 from app.api.deps import ImageServiceDep
-from app.schemas.image import Image, ImageCreate, ImageUpdate
+from app.schemas.products.image import Image, ImageCreate, ImageUpdate
 
 router = APIRouter(prefix="/products/{product_id}/images", tags=["images"])
 
@@ -75,10 +75,16 @@ async def delete_image(
 
     return image_service.delete_by_id(image_id)
 
+
 image_router = APIRouter(prefix="/images", tags=["get_images"])
 
+
 @image_router.get("/", response_model=dict[int, list[Image]])
-async def get_images_for_products(*, product_ids: list[int] = Query(..., description="List of product IDs"), image_service: ImageServiceDep):
+async def get_images_for_products(
+    *,
+    product_ids: list[int] = Query(..., description="List of product IDs"),
+    image_service: ImageServiceDep,
+):
     """
     Retrieve all images for a list of products.
     """
@@ -88,4 +94,3 @@ async def get_images_for_products(*, product_ids: list[int] = Query(..., descrip
         if images:
             images_by_product[product_id] = images
     return images_by_product
-

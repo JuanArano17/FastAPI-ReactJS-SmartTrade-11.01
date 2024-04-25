@@ -2,10 +2,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app.schemas.seller import Seller
-from app.schemas.buyer import Buyer
-from app.schemas.token import Token
-from app.api.deps import CurrentUserDep, UserServiceDep
+from app.schemas.users.token import Token
+from app.api.deps import UserServiceDep
 from app.core.security import create_access_token, authenticate_user
 
 router = APIRouter(tags=["login"])
@@ -27,11 +25,3 @@ async def login_access_token(
         raise HTTPException(status_code=400, detail="Incorrect email or password")
 
     return Token(access_token=create_access_token(user.email), token_type="bearer")
-
-
-@router.post("/login/test-token")
-async def test_token(current_user: CurrentUserDep) -> Buyer | Seller:
-    """
-    Test access token
-    """
-    return current_user

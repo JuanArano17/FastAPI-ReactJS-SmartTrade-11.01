@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.deps import SellerServiceDep
-from app.schemas.seller import Seller, SellerCreate, SellerUpdate
+from app.schemas.users.types.seller import Seller, SellerCreate, SellerUpdate
 
 router = APIRouter(prefix="/sellers", tags=["sellers"])
 

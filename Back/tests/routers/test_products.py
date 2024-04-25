@@ -3,90 +3,93 @@ from fastapi import status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models.user import User
-from app.schemas.buyer import BuyerCreate
-from app.models.product import Product
-from app.models.food import Food
-from app.service.buyer import BuyerService
-from app.service.product import ProductService
+from app.models.products.product import Product
+from app.models.products.categories.food import Food
+from app.service.products.product import ProductService
 
 
 def fake_book():
     return {
         "name": "Dune",
-        "description":None,
+        "description": None,
         "spec_sheet": "Specs...",
-        "stock":0,
+        "stock": 0,
         "eco_points": 10,
         "author": "Frank Herbert",
         "pages": 900,
     }
 
+
 def fake_game():
     return {
         "name": "gta6",
-        "description":None,
+        "description": None,
         "spec_sheet": "Specs...",
-        "stock":0,
+        "stock": 0,
         "eco_points": 10,
         "publisher": "Rockstar",
         "platform": "ps5",
-        "size":"100GB",
+        "size": "100GB",
     }
+
 
 def fake_electronics():
     return {
         "name": "EliteBook",
-        "description":None,
+        "description": None,
         "spec_sheet": "Specs...",
-        "stock":0,
+        "stock": 0,
         "eco_points": 9,
         "brand": "HP",
         "type": "PC",
         "capacity": "1000GB",
     }
 
+
 def fake_electrodomestics():
     return {
         "name": "toaster",
-        "description":None,
+        "description": None,
         "spec_sheet": "Specs...",
-        "stock":0,
+        "stock": 0,
         "eco_points": 19,
         "brand": "Bosch",
         "type": "kitchen electro",
         "power_source": "batteries",
     }
 
+
 def fake_food():
     return {
         "name": "toaster",
-        "description":None,
+        "description": None,
         "spec_sheet": "Specs...",
-        "stock":0,
+        "stock": 0,
         "eco_points": 19,
         "brand": "Kellogs",
         "type": "cereal",
         "ingredients": "carbs 500g, protein 300g",
     }
 
+
 def fake_house_utilities():
     return {
         "name": "three pointed forks",
-        "description":None,
+        "description": None,
         "spec_sheet": "Specs...",
-        "stock":0,
+        "stock": 0,
         "eco_points": 19,
         "brand": "fork s.a",
         "type": "forks",
     }
 
+
 def fake_clothes():
     return {
         "name": "Nike shirt",
-        "description":None,
+        "description": None,
         "spec_sheet": "Specs...",
-        "stock":0,
+        "stock": 0,
         "eco_points": 19,
         "materials": "cotton, wool",
         "type": "T-shirt",
@@ -103,7 +106,7 @@ def test_create_book(client: TestClient, product_service: ProductService, db: Se
     assert content["name"] == data["name"]
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
-    assert content["description"] == data ["description"]
+    assert content["description"] == data["description"]
     assert content["eco_points"] == data["eco_points"]
     assert content["author"] == data["author"]
     assert content["pages"] == data["pages"]
@@ -122,7 +125,7 @@ def test_create_game(client: TestClient, product_service: ProductService, db: Se
     assert content["name"] == data["name"]
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
-    assert content["description"] == data ["description"]
+    assert content["description"] == data["description"]
     assert content["eco_points"] == data["eco_points"]
     assert content["publisher"] == data["publisher"]
     assert content["platform"] == data["platform"]
@@ -133,7 +136,9 @@ def test_create_game(client: TestClient, product_service: ProductService, db: Se
     assert product is not None
 
 
-def test_create_electronics(client: TestClient, product_service: ProductService, db: Session):
+def test_create_electronics(
+    client: TestClient, product_service: ProductService, db: Session
+):
     data = fake_electronics()
 
     response = client.post("/products/?category_name=electronics", json=data)
@@ -142,7 +147,7 @@ def test_create_electronics(client: TestClient, product_service: ProductService,
     assert content["name"] == data["name"]
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
-    assert content["description"] == data ["description"]
+    assert content["description"] == data["description"]
     assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["brand"] == data["brand"]
@@ -153,7 +158,10 @@ def test_create_electronics(client: TestClient, product_service: ProductService,
     product = product_service.get_by_id(content["id"])
     assert product is not None
 
-def test_create_electrodomestics(client: TestClient, product_service: ProductService, db: Session):
+
+def test_create_electrodomestics(
+    client: TestClient, product_service: ProductService, db: Session
+):
     data = fake_electrodomestics()
 
     response = client.post("/products/?category_name=electrodomestics", json=data)
@@ -162,7 +170,7 @@ def test_create_electrodomestics(client: TestClient, product_service: ProductSer
     assert content["name"] == data["name"]
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
-    assert content["description"] == data ["description"]
+    assert content["description"] == data["description"]
     assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["brand"] == data["brand"]
@@ -171,6 +179,7 @@ def test_create_electrodomestics(client: TestClient, product_service: ProductSer
 
     product = product_service.get_by_id(content["id"])
     assert product is not None
+
 
 def test_create_food(client: TestClient, product_service: ProductService, db: Session):
     data = fake_food()
@@ -181,7 +190,7 @@ def test_create_food(client: TestClient, product_service: ProductService, db: Se
     assert content["name"] == data["name"]
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
-    assert content["description"] == data ["description"]
+    assert content["description"] == data["description"]
     assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["brand"] == data["brand"]
@@ -192,7 +201,9 @@ def test_create_food(client: TestClient, product_service: ProductService, db: Se
     assert product is not None
 
 
-def test_create_house_utilities(client: TestClient, product_service: ProductService, db: Session):
+def test_create_house_utilities(
+    client: TestClient, product_service: ProductService, db: Session
+):
     data = fake_house_utilities()
 
     response = client.post("/products/?category_name=houseutilities", json=data)
@@ -201,7 +212,7 @@ def test_create_house_utilities(client: TestClient, product_service: ProductServ
     assert content["name"] == data["name"]
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
-    assert content["description"] == data ["description"]
+    assert content["description"] == data["description"]
     assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["brand"] == data["brand"]
@@ -211,7 +222,9 @@ def test_create_house_utilities(client: TestClient, product_service: ProductServ
     assert product is not None
 
 
-def test_create_clothes(client: TestClient, product_service: ProductService, db: Session):
+def test_create_clothes(
+    client: TestClient, product_service: ProductService, db: Session
+):
     data = fake_clothes()
 
     response = client.post("/products/?category_name=clothes", json=data)
@@ -220,7 +233,7 @@ def test_create_clothes(client: TestClient, product_service: ProductService, db:
     assert content["name"] == data["name"]
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
-    assert content["description"] == data ["description"]
+    assert content["description"] == data["description"]
     assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["size"] == data["size"]
@@ -256,7 +269,9 @@ def test_create_product_wrong_category(client: TestClient):
     assert "detail" in response.json()
 
 
-def test_get_book_by_id(client: TestClient, product_service: ProductService, db: Session):
+def test_get_book_by_id(
+    client: TestClient, product_service: ProductService, db: Session
+):
     data = fake_book()
     product = product_service.add("book", data)
 
@@ -266,7 +281,7 @@ def test_get_book_by_id(client: TestClient, product_service: ProductService, db:
     assert content["name"] == data["name"]
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
-    assert content["description"] == data ["description"]
+    assert content["description"] == data["description"]
     assert content["eco_points"] == data["eco_points"]
     assert content["author"] == data["author"]
     assert content["pages"] == data["pages"]
@@ -274,7 +289,9 @@ def test_get_book_by_id(client: TestClient, product_service: ProductService, db:
     assert content["id"] == product.id  # type: ignore
 
 
-def test_get_game_by_id(client: TestClient, product_service: ProductService, db: Session):
+def test_get_game_by_id(
+    client: TestClient, product_service: ProductService, db: Session
+):
     data = fake_game()
     product = product_service.add("game", data)
 
@@ -284,7 +301,7 @@ def test_get_game_by_id(client: TestClient, product_service: ProductService, db:
     assert content["name"] == data["name"]
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
-    assert content["description"] == data ["description"]
+    assert content["description"] == data["description"]
     assert content["eco_points"] == data["eco_points"]
     assert content["publisher"] == data["publisher"]
     assert content["platform"] == data["platform"]
@@ -293,7 +310,9 @@ def test_get_game_by_id(client: TestClient, product_service: ProductService, db:
     assert content["id"] == product.id  # type: ignore
 
 
-def test_get_electronics_by_id(client: TestClient, product_service: ProductService, db: Session):
+def test_get_electronics_by_id(
+    client: TestClient, product_service: ProductService, db: Session
+):
     data = fake_electronics()
     product = product_service.add("electronics", data)
 
@@ -303,7 +322,7 @@ def test_get_electronics_by_id(client: TestClient, product_service: ProductServi
     assert content["name"] == data["name"]
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
-    assert content["description"] == data ["description"]
+    assert content["description"] == data["description"]
     assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["brand"] == data["brand"]
@@ -312,7 +331,9 @@ def test_get_electronics_by_id(client: TestClient, product_service: ProductServi
     assert content["id"] == product.id  # type: ignore
 
 
-def test_get_electrodomestics_by_id(client: TestClient, product_service: ProductService, db: Session):
+def test_get_electrodomestics_by_id(
+    client: TestClient, product_service: ProductService, db: Session
+):
     data = fake_electrodomestics()
     product = product_service.add("electrodomestics", data)
 
@@ -322,7 +343,7 @@ def test_get_electrodomestics_by_id(client: TestClient, product_service: Product
     assert content["name"] == data["name"]
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
-    assert content["description"] == data ["description"]
+    assert content["description"] == data["description"]
     assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["brand"] == data["brand"]
@@ -331,7 +352,9 @@ def test_get_electrodomestics_by_id(client: TestClient, product_service: Product
     assert content["id"] == product.id  # type: ignore
 
 
-def test_get_house_utilities_by_id(client: TestClient, product_service: ProductService, db: Session):
+def test_get_house_utilities_by_id(
+    client: TestClient, product_service: ProductService, db: Session
+):
     data = fake_house_utilities()
     product = product_service.add("houseutilities", data)
 
@@ -341,7 +364,7 @@ def test_get_house_utilities_by_id(client: TestClient, product_service: ProductS
     assert content["name"] == data["name"]
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
-    assert content["description"] == data ["description"]
+    assert content["description"] == data["description"]
     assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["brand"] == data["brand"]
@@ -349,7 +372,9 @@ def test_get_house_utilities_by_id(client: TestClient, product_service: ProductS
     assert content["id"] == product.id  # type: ignore
 
 
-def test_get_food_by_id(client: TestClient, product_service: ProductService, db: Session):
+def test_get_food_by_id(
+    client: TestClient, product_service: ProductService, db: Session
+):
     data = fake_food()
     product = product_service.add("food", data)
 
@@ -359,7 +384,7 @@ def test_get_food_by_id(client: TestClient, product_service: ProductService, db:
     assert content["name"] == data["name"]
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
-    assert content["description"] == data ["description"]
+    assert content["description"] == data["description"]
     assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["brand"] == data["brand"]
@@ -368,7 +393,9 @@ def test_get_food_by_id(client: TestClient, product_service: ProductService, db:
     assert content["id"] == product.id  # type: ignore
 
 
-def test_get_clothes_by_id(client: TestClient, product_service: ProductService, db: Session):
+def test_get_clothes_by_id(
+    client: TestClient, product_service: ProductService, db: Session
+):
     data = fake_clothes()
     product = product_service.add("clothes", data)
 
@@ -378,7 +405,7 @@ def test_get_clothes_by_id(client: TestClient, product_service: ProductService, 
     assert content["name"] == data["name"]
     assert content["spec_sheet"] == data["spec_sheet"]
     assert content["stock"] == data["stock"]
-    assert content["description"] == data ["description"]
+    assert content["description"] == data["description"]
     assert content["eco_points"] == data["eco_points"]
     assert content["type"] == data["type"]
     assert content["size"] == data["size"]
@@ -417,10 +444,12 @@ def test_get_products(client: TestClient, product_service: ProductService, db: S
     assert clothes.id in [product["id"] for product in content]
 
     assert book.name in [product["name"] for product in content]
-    #assert game.publisher in [product["publisher"] for product in content] - only if we want it to retrieve product specific attributes
+    # assert game.publisher in [product["publisher"] for product in content] - only if we want it to retrieve product specific attributes
 
 
-def test_update_product(client: TestClient, product_service: ProductService, db: Session):
+def test_update_product(
+    client: TestClient, product_service: ProductService, db: Session
+):
     data = fake_electronics()
     product = product_service.add("electronics", data)
 
@@ -445,7 +474,7 @@ def test_update_product(client: TestClient, product_service: ProductService, db:
 
     new_data = {
         "description": "cool laptop",
-        "capacity" : "900GB",
+        "capacity": "900GB",
     }
     response = client.put(f"/products/{product.id}", json=new_data)  # type: ignore
     assert response.status_code == status.HTTP_200_OK
@@ -453,6 +482,7 @@ def test_update_product(client: TestClient, product_service: ProductService, db:
     assert content["description"] == new_data["description"]
     assert content["capacity"] == new_data["capacity"]
     assert "id" in content
+
 
 def test_update_product_invalid_data(
     client: TestClient, product_service: ProductService, db: Session
@@ -463,35 +493,41 @@ def test_update_product_invalid_data(
     new_data = data.copy()
     new_data["name"] = "New Name"
     new_data["description"] = "New Desc"
-    new_data["spec_sheet"] = "123"  
+    new_data["spec_sheet"] = "123"
     new_data["eco_points"] = 100
     new_data["author"] = "Me"
-    new_data["pages"] = "x" #invalid page number
+    new_data["pages"] = "x"  # invalid page number
 
     response = client.put(f"/products/{product.id}", json=new_data)  # type: ignore
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "detail" in response.json()
 
-    new_data={"publisher": "me"} #wrong keyword
+    new_data = {"publisher": "me"}  # wrong keyword
     response = client.put(f"/products/{product.id}", json=new_data)  # type: ignore
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "detail" in response.json()
 
 
-
-def test_delete_product(client: TestClient, product_service: ProductService, db: Session):
+def test_delete_product(
+    client: TestClient, product_service: ProductService, db: Session
+):
     data = fake_food()
-    product = product_service.add("food",data)
+    product = product_service.add("food", data)
 
     response = client.delete(f"/products/{product.id}")  # type: ignore
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content is None or content == {}
 
-    product1 = db.execute(select(Product).where(Product.id == product.id)).scalar_one_or_none()  # type: ignore
+    product1 = db.execute(
+        select(Product).where(Product.id == product.id)
+    ).scalar_one_or_none()  # type: ignore
     assert product1 is None
-    product1 = db.execute(select(Food).where(Food.id == product.id)).scalar_one_or_none()  # type: ignore
+    product1 = db.execute(
+        select(Food).where(Food.id == product.id)
+    ).scalar_one_or_none()  # type: ignore
     assert product1 is None
+
 
 def test_delete_product_not_found(client: TestClient):
     response = client.delete("/products/999")
@@ -500,13 +536,15 @@ def test_delete_product_not_found(client: TestClient):
     assert content["detail"] == "Product with id 999 not found."
 
 
-def test_delete_products(client: TestClient, product_service: ProductService, db: Session):
-    game = product_service.add("game", fake_game())
-    electronics = product_service.add("electronics", fake_electronics())
-    electrodomestics=product_service.add("electrodomestics", fake_electrodomestics())
-    food=product_service.add("food", fake_food())
-    house_utilities=product_service.add("houseutilities", fake_house_utilities())
-    clothes=product_service.add("clothes", fake_clothes())
+def test_delete_products(
+    client: TestClient, product_service: ProductService, db: Session
+):
+    product_service.add("game", fake_game())
+    product_service.add("electronics", fake_electronics())
+    product_service.add("electrodomestics", fake_electrodomestics())
+    product_service.add("food", fake_food())
+    product_service.add("houseutilities", fake_house_utilities())
+    product_service.add("clothes", fake_clothes())
 
     response = client.delete("/products/")
     assert response.status_code == status.HTTP_200_OK

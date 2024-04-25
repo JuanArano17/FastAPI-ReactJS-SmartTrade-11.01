@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.main import api_router
 
-app = FastAPI()
+app = FastAPI(title="SmartTrade API", swagger_ui_parameters={"docExpansion": "none"})
 
 origins = [
     "http://localhost:3000",

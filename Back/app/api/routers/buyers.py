@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.deps import BuyerServiceDep
-from app.schemas.buyer import Buyer, BuyerCreate, BuyerUpdate
+from app.schemas.users.types.buyer import Buyer, BuyerCreate, BuyerUpdate
 
 router = APIRouter(prefix="/buyers", tags=["buyers"])
 

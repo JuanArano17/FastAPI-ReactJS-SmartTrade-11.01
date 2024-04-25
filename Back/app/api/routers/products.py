@@ -1,75 +1,46 @@
-from typing import Any, Optional, Union
+from typing import Optional, Union
 from fastapi import APIRouter
 from pydantic import BaseModel
 
 from app.api.deps import ProductServiceDep
-from app.schemas.product import Product
-from app.schemas.book import Book
-from app.schemas.clothes import Clothes
-from app.schemas.electrodomestics import Electrodomestics
-from app.schemas.electronics import Electronics
-from app.schemas.food import Food
-from app.schemas.game import Game
-from app.schemas.house_utilities import HouseUtilities
+from app.schemas.products.categories.book import Book
+from app.schemas.products.categories.clothes import Clothes
+from app.schemas.products.categories.electrodomestics import Electrodomestics
+from app.schemas.products.categories.electronics import Electronics
+from app.schemas.products.categories.food import Food
+from app.schemas.products.categories.game import Game
+from app.schemas.products.categories.house_utilities import HouseUtilities
 
 router = APIRouter(prefix="/products", tags=["products"])
+
+
 class ProductResponse(BaseModel):
-    product: Union[Book, Clothes, Electrodomestics, Electronics, Food, Game, HouseUtilities]
+    product: Union[
+        Book, Clothes, Electrodomestics, Electronics, Food, Game, HouseUtilities
+    ]
     category: str
+
 
 @router.get(
     "/",
 )
-async def read_products(product_service: ProductServiceDep, category: Optional[str] = None):
+async def read_products(
+    product_service: ProductServiceDep, category: Optional[str] = None
+):
     """
     Retrieve products.
     """
-    products = product_service.get_all()
-    product_dicts = []
-    for product in products:
-        product_category = product.__class__.__name__
-        if category is None or category.lower() == product_category.lower():
-            product_dict = product.__dict__
-            product_dict['category'] = product_category
-            
-            # Get the list of seller products for the current product
-            seller_products = [seller_product.__dict__ for seller_product in product.seller_products]
-            product_dict['seller_products'] = seller_products
-            
-            # Get the list of images
-            images = [image.__dict__ for image in product.images]
-            product_dict['images'] = images
-            
-            product_dicts.append(product_dict)
-    return product_dicts
+    return product_service.get_all_full(category)
 
 
-@router.get(
-    "/{product_id}"
-)
+@router.get("/{product_id}")
 async def read_product(*, product_id: int, product_service: ProductServiceDep):
     """
     Retrieve a product.
     """
 
-    product =  product_service.get_by_id(product_id)
-    category = product.__class__.__name__
+    return product_service.get_by_id_full(product_id)
 
-     # Get attributes of the base class
-    product_dict = product.__dict__
-
-    # Add category to the product dictionary
-    product_dict['category'] = category
-    # Get attributes of the product that are specific to the category
-    # Get attributes of the product as a dictionary
-    product_dict.update({column: getattr(product, column) for column in product.__table__.columns.keys()})
-    # Get the list of seller products
-    seller_products = [seller_product.__dict__ for seller_product in product.seller_products]
-    images = [image.__dict__ for image in product.images]
-    product_dict['seller_products'] = seller_products
-    product_dict['images'] = images
-    return product_dict
-    
 
 @router.post(
     "/",
