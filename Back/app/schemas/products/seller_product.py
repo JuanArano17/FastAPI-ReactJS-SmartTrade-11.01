@@ -12,7 +12,7 @@ class SellerProductBase(BaseModel):
     quantity: NonNegativeInt
     price: NonNegativeFloat
     shipping_costs: NonNegativeFloat
-    state: ProductState
+    state: ProductState = "Pending"
 
 
 class SellerProductCreate(SellerProductBase):

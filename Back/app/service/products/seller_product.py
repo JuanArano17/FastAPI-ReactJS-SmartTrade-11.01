@@ -120,6 +120,15 @@ class SellerProductService:
             seller_product_info = self.map_seller_product_to_read_schema(seller_product)
             complete_seller_products.append(seller_product_info)
         return complete_seller_products
+    
+    def get_all_by_state(self,state) -> list[SellerProductRead]:
+        seller_products = self.seller_product_repo.get_all()
+        complete_seller_products = []
+        for seller_product in seller_products:
+            if(seller_product.state==state):
+                seller_product_info = self.map_seller_product_to_read_schema(seller_product)
+                complete_seller_products.append(seller_product_info)
+        return complete_seller_products
 
     def update(self, seller_product_id, new_data: SellerProductUpdate) -> SellerProduct:
         seller_product = self.get_by_id(seller_product_id)
