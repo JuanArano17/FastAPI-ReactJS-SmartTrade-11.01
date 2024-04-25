@@ -28,6 +28,9 @@ from app.schemas.orders.order import OrderCreate
 from app.service.users.types.user import UserService
 from faker import Faker
 
+from schemas.users.types.admin import AdminCreate
+from service.users.types.admin import AdminService
+
 
 session = get_db()
 user_service = UserService(session=session)
@@ -63,6 +66,8 @@ refund_product_service = RefundProductService(
     product_line_service=product_line_service,
 )
 
+admin_service= AdminService(session=session, user_service=UserService)
+
 
 # Initialize Faker with a specific seed (for consistency)
 faker = Faker()
@@ -95,6 +100,8 @@ num_approved=100
 # engine = get_engine()
 # Session = sessionmaker(bind=engine)
 # session = Session()
+
+admin_service.add(AdminCreate(email="admin@example.com", name="Robert", surname="House", password="admin"))
 
 used_emails = []
 used_dnis = []
