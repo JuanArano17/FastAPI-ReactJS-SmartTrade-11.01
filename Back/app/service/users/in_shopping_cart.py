@@ -1,8 +1,10 @@
+from app.models.users.types.user import User
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
 from app.service.users.types.buyer import BuyerService
 from app.schemas.users.in_shopping_cart import (
+    CompleteShoppingCart,
     InShoppingCartCreate,
     InShoppingCartUpdate,
 )
@@ -96,6 +98,25 @@ class InShoppingCartService:
         self.cart_repo.add(cart_product)
         return cart_product
 
+    def add_by_user(
+        self, user: User, shopping_cart_product: InShoppingCartCreate
+    ) -> CompleteShoppingCart:
+        buyer = self.buyer_service.get_by_id(user.id)
+        cart_product = self.add(
+            id_buyer=buyer.id, shopping_cart_product=shopping_cart_product
+        )
+        seller_product = self.seller_product_service.get_by_id(
+            cart_product.id_seller_product
+        )
+        complete_seller_product = (
+            self.seller_product_service.map_seller_product_to_read_schema(
+                seller_product
+            )
+        )
+        return CompleteShoppingCart(
+            **cart_product.__dict__, seller_product=complete_seller_product
+        )
+
     def get_by_id(self, id_buyer, id_seller_product) -> InShoppingCart:
         if cart_item := self.cart_repo.get_by_id(
             id_buyer=id_buyer, id_seller_product=id_seller_product
@@ -106,6 +127,43 @@ class InShoppingCartService:
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Cart item with id_seller_product={id_seller_product} and id_buyer={id_buyer} not found.",
         )
+
+    # def _get_by_id(self, id_buyer, id_seller_product) -> CompleteShoppingCart:
+    #     cart_item = self.cart_repo.get_by_id(id_buyer=id_buyer, id_seller_product=id_seller_product)
+
+    #     if not cart_item:
+    #         raise HTTPException(
+    #             status_code=status.HTTP_404_NOT_FOUND,
+    #             detail=f"Cart item with id_seller_product={id_seller_product} and id_buyer={id_buyer} not found.",
+    #         )
+
+    #     seller_product = self.seller_product_service.get_by_id(id_seller_product)
+    #     complete_seller_product = self.seller_product_service.map_seller_product_to_read_schema(seller_product)
+    #     return CompleteShoppingCart(**cart_item.__dict__, seller_product=complete_seller_product)
+
+    def get_by_id_buyer(self, id_buyer) -> list[InShoppingCart]:
+        return self.cart_repo.get_by_id_buyer(id_buyer=id_buyer)
+
+    def get_by_user(self, user: User) -> list[CompleteShoppingCart]:
+        buyer = self.buyer_service.get_by_id(user.id)
+        shopping_cart = []
+
+        for cart_item in self.get_by_id_buyer(buyer.id):
+            seller_product = self.seller_product_service.get_by_id(
+                cart_item.id_seller_product
+            )
+            complete_seller_product = (
+                self.seller_product_service.map_seller_product_to_read_schema(
+                    seller_product
+                )
+            )
+            shopping_cart.append(
+                CompleteShoppingCart(
+                    **cart_item.__dict__, seller_product=complete_seller_product
+                )
+            )
+
+        return shopping_cart
 
     def get_all(self) -> list[InShoppingCart]:
         return self.cart_repo.get_all()
@@ -120,7 +178,24 @@ class InShoppingCartService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Not enough seller products",
             )
-        return self.cart_repo.update(cart_item, new_data)
+        return self.cart_repo.update(cart_item, new_data)  # type: ignore
+
+    def update_by_user(
+        self, user: User, id_seller_product, new_data: InShoppingCartUpdate
+    ) -> CompleteShoppingCart:
+        buyer = self.buyer_service.get_by_id(user.id)
+        cart_item = self.update(buyer.id, id_seller_product, new_data)
+        seller_product = self.seller_product_service.get_by_id(
+            cart_item.id_seller_product
+        )
+        complete_seller_product = (
+            self.seller_product_service.map_seller_product_to_read_schema(
+                seller_product
+            )
+        )
+        return CompleteShoppingCart(
+            **cart_item.__dict__, seller_product=complete_seller_product
+        )
 
     def delete_by_id(self, id_buyer, id_seller_product):
         self.cart_repo.delete_by_id(
@@ -130,8 +205,14 @@ class InShoppingCartService:
     def delete_all(self):
         self.cart_repo.delete_all()
 
-    def get_by_id_buyer(self, id_buyer) -> list[InShoppingCart]:
-        return self.cart_repo.get_by_id_buyer(id_buyer=id_buyer)
+    def delete_all_by_user(self, user: User):
+        buyer = self.buyer_service.get_by_id(user.id)
+        self.cart_repo.delete_by_id_buyer(id_buyer=buyer.id)
 
     def delete_by_id_buyer(self, id_buyer):
         return self.cart_repo.delete_by_id_buyer(id_buyer=id_buyer)
+
+    def delete_one_by_user(self, user: User, id_seller_product):
+        buyer = self.buyer_service.get_by_id(user.id)
+        self.get_by_id(buyer.id, id_seller_product)
+        self.delete_by_id(buyer.id, id_seller_product)
