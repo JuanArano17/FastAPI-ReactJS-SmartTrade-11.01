@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from app.api.deps import BuyerServiceDep
 from app.schemas.users.types.buyer import Buyer, BuyerCreate, BuyerUpdate
 
-router = APIRouter(prefix="/buyers", tags=["buyers"])
+router = APIRouter(prefix="/buyers", tags=["Buyers"])
 
 
 @router.get("/", response_model=list[Buyer])

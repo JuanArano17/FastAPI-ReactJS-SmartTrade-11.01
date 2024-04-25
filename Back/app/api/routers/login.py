@@ -6,7 +6,7 @@ from app.schemas.users.token import Token
 from app.api.deps import UserServiceDep
 from app.core.security import create_access_token, authenticate_user
 
-router = APIRouter(tags=["login"])
+router = APIRouter(tags=["Login"])
 
 
 @router.post("/login/access-token")

@@ -1,9 +1,10 @@
+from app.models.users.types.user import User
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
 from app.service.products.seller_product import SellerProductService
 from app.service.users.types.buyer import BuyerService
-from app.schemas.users.in_wish_list import InWishListCreate
+from app.schemas.users.in_wish_list import CompleteWishList, InWishListCreate
 from app.models.users.in_wish_list import InWishList
 from app.crud_repository import CRUDRepository
 
@@ -68,6 +69,23 @@ class InWishListService:
         self.wishlist_repo.add(wl_item)
         return wl_item
 
+    def add_by_user(
+        self, user: User, wish_list_item: InWishListCreate
+    ) -> CompleteWishList:
+        buyer = self.buyer_service.get_by_id(user.id)
+        wish_list_item = self.add(id_buyer=buyer.id, wish_list_item=wish_list_item)
+        seller_product = self.seller_product_service.get_by_id(
+            wish_list_item.id_seller_product
+        )
+        complete_seller_product = (
+            self.seller_product_service.map_seller_product_to_read_schema(
+                seller_product
+            )
+        )
+        return CompleteWishList(
+            **wish_list_item.__dict__, seller_product=complete_seller_product
+        )
+
     def get_by_id(self, id_seller_product, id_buyer) -> InWishList:
         if wl_item := self.wishlist_repo.get_by_id(
             id_buyer=id_buyer, id_seller_product=id_seller_product
@@ -85,6 +103,27 @@ class InWishListService:
     def get_all_by_buyer(self, id_buyer) -> list[InWishList]:
         return self.wishlist_repo.get_where(InWishList.id_buyer == id_buyer)
 
+    def get_all_by_user(self, user: User) -> list[CompleteWishList]:
+        buyer = self.buyer_service.get_by_id(user.id)
+        wish_list = []
+
+        for item in self.get_all_by_buyer(buyer.id):
+            seller_product = self.seller_product_service.get_by_id(
+                item.id_seller_product
+            )
+            complete_seller_product = (
+                self.seller_product_service.map_seller_product_to_read_schema(
+                    seller_product
+                )
+            )
+            wish_list.append(
+                CompleteWishList(
+                    **item.__dict__, seller_product=complete_seller_product
+                )
+            )
+
+        return wish_list
+
     def delete_by_id(self, id_seller_product, id_buyer):
         self.wishlist_repo.delete_by_id(
             id_buyer=id_buyer, id_seller_product=id_seller_product
@@ -99,3 +138,11 @@ class InWishListService:
 
     def delete_by_id_buyer(self, id_buyer):
         return self.wishlist_repo.delete_by_id_buyer(id_buyer=id_buyer)
+
+    def delete_all_by_user(self, user: User):
+        buyer = self.buyer_service.get_by_id(user.id)
+        self.delete_by_id_buyer(buyer.id)
+
+    def delete_one_by_user(self, user: User, id_seller_product):
+        buyer = self.buyer_service.get_by_id(user.id)
+        self.delete_by_id(id_seller_product, buyer.id)

@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Query
 from app.api.deps import ImageServiceDep
 from app.schemas.products.image import Image, ImageCreate, ImageUpdate
 
-router = APIRouter(prefix="/products/{product_id}/images", tags=["images"])
+router = APIRouter(prefix="/products/{product_id}/images", tags=["Images"])
 
 
 @router.get("/", response_model=list[Image])
@@ -76,7 +76,7 @@ async def delete_image(
     return image_service.delete_by_id(image_id)
 
 
-image_router = APIRouter(prefix="/images", tags=["get_images"])
+image_router = APIRouter(prefix="/images", tags=["Images"])
 
 
 @image_router.get("/", response_model=dict[int, list[Image]])
