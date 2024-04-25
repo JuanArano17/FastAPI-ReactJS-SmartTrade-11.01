@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Container, Typography, Grid, Button, Paper, Divider, IconButton, CircularProgress, Stack, Rating } from '@mui/material';
+import { Box, Container, Typography, Grid, Button, Paper, Divider, IconButton, CircularProgress, Rating, ButtonBase } from '@mui/material';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import StarIcon from '@mui/icons-material/Star';
+import InfoIcon from '@mui/icons-material/Info';
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
 import styles from '../styles/styles';
@@ -16,6 +17,7 @@ const ProductDetailPage = () => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [imageIndex, setImageIndex] = useState(0);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -63,9 +65,14 @@ const ProductDetailPage = () => {
         return Object.keys(productData)
             .filter(key => !commonAttributes.includes(key))
             .map(key => (
-                <Typography variant="body2" key={key}>
-                    {key.charAt(0).toUpperCase() + key.slice(1)}: {productData[key]}
-                </Typography>
+                <Paper key={key} elevation={1} sx={{ margin: '10px 0', padding: '10px' }}>
+                    <Typography variant="body2" color="text.secondary" component="span">
+                        {`${key.charAt(0).toUpperCase() + key.slice(1)}: `}
+                    </Typography>
+                    <Typography variant="body2" component="span" sx={{ fontWeight: 'bold' }}>
+                        {productData[key]}
+                    </Typography>
+                </Paper>
             ));
     };
 
@@ -76,6 +83,9 @@ const ProductDetailPage = () => {
     if (error) {
         return <Typography color="error">{error}</Typography>;
     }
+    const handleImageChange = (newIndex) => {
+        setImageIndex(newIndex);
+    };
     return (
         <Box sx={styles.mainBox}>
             <TopBar showSearchBar={true} showLogoutButton={true} />
@@ -91,11 +101,13 @@ const ProductDetailPage = () => {
                         <Grid container spacing={2}>
                             <Grid item xs={12} md={5} sx={{ display: 'flex', justifyContent: 'center' }}>
                                 <Box sx={{ width: '100%', height: 300, display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
-                                    <img
-                                        src={productData.images.length > 0 ? productData.images[0].url : '/path/to/default.jpg'}
-                                        alt={productData.name}
-                                        style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }}
-                                    />
+                                    <ButtonBase onClick={() => handleImageChange((imageIndex + 1) % productData.images.length)} disabled={productData.images.length <= 1}>
+                                        <img
+                                            src={productData.images[imageIndex]}
+                                            alt={`Image ${imageIndex + 1} of ${productData.name}`}
+                                            style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }}
+                                        />
+                                    </ButtonBase>
                                 </Box>
                             </Grid>
                             <Grid item xs={12} md={7}>

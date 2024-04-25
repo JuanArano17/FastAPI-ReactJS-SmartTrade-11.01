@@ -41,7 +41,7 @@ const getProductById = async (product_id) => {
 const getProductSellerById = async (product_id) => {
     try {
         console.log("Intentando conseguir el producto...")
-        const response = await axiosInstance.get(`/seller-products/${product_id}/`);
+        const response = await axiosInstance.get(`/seller_products/${product_id}`);
         console.log("producto conseguido correctamente", response)
         return response.data;
     } catch (error) {
