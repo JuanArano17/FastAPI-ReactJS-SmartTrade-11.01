@@ -79,7 +79,7 @@ class SellerService:
             )
 
         common_attributes = {}
-        for key in ["email", "name", "surname", "password"]:
+        for key in ["email", "name", "surname", "password", "profile_picture"]:
             common_attributes[key] = getattr(new_data, key)
             setattr(
                 new_data, key, None

@@ -25,6 +25,7 @@ class SellerUpdate(SellerBase):
     # TODO: change it later for a more formal validation
     cif: Optional[str] = Field(default=None, pattern=r"^[A-Z][0-9]{8}$")
     password: Optional[str] = None
+    profile_picture: Optional[str] = None
 
 
 class Seller(SellerBase):
@@ -33,3 +34,4 @@ class Seller(SellerBase):
     id: int
     type: str
     seller_products: List[SellerProduct] = []
+    profile_picture: Optional[str] = None

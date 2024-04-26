@@ -16,7 +16,7 @@ class BuyerBase(BaseModel):
     dni: str = Field(min_length=9, max_length=9, pattern=r"^\d{8}[a-zA-Z]$")
     billing_address: str = Field(min_length=1, max_length=100)
     payment_method: str = Field(default="Credit Card", min_length=1, max_length=20)
-
+    profile_picture: Optional[str] = None
 
 class BuyerCreate(BuyerBase):
     password: str
@@ -34,6 +34,7 @@ class BuyerUpdate(BuyerBase):
     billing_address: Optional[str] = Field(default=None, min_length=1, max_length=100)
     payment_method: Optional[str] = Field(default=None, min_length=1, max_length=20)
     password: Optional[str] = None
+    profile_picture: Optional[str] = None
 
 
 class Buyer(BuyerBase):
