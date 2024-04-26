@@ -119,3 +119,19 @@ async def update_seller_product(
     return seller_product_service.update(
         seller_product_id=seller_product_id, new_data=seller_product
     )
+
+
+seller_router = APIRouter(prefix="/sellers", tags=["Seller Products"])
+
+
+
+@seller_router.get(
+    "/{seller_id}/products", response_model=list[SellerProductRead], response_model_exclude_none=True
+)
+async def read_seller_products(
+    *, seller_id: int, seller_product_service: SellerProductServiceDep
+):
+    """
+    Retrieve seller products from seller.
+    """
+    return seller_product_service.get_by_id_seller(id_seller=seller_id)

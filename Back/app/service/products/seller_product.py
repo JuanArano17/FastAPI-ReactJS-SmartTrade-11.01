@@ -23,6 +23,13 @@ class SellerProductRepository(CRUDRepository):
             .filter(self._model.id_product == id_product)
             .all()
         )
+    
+    def get_by_id_seller(self, id_seller) -> list[SellerProduct]:
+        return (
+            self._db.query(self._model)
+            .filter(self._model.id_seller == id_seller)
+            .all()
+        )
 
     def delete_by_id_product(self, id_product):
         self._db.query(self._model).filter(
@@ -168,9 +175,19 @@ class SellerProductService:
             product.stock -= seller_product.quantity  # type: ignore
         self.seller_product_repo.delete_all()
 
-    def get_by_id_product(self, id_product) -> list[SellerProduct]:
+    def get_by_id_product(self, id_product) -> list[SellerProductRead]:
         seller_products = self.seller_product_repo.get_by_id_product(
             id_product=id_product
+        )
+        complete_seller_products = []
+        for seller_product in seller_products:
+            seller_product_info = self.map_seller_product_to_read_schema(seller_product)
+            complete_seller_products.append(seller_product_info)
+        return complete_seller_products
+    
+    def get_by_id_seller(self, id_seller) -> list[SellerProductRead]:
+        seller_products = self.seller_product_repo.get_by_id_seller(
+            id_seller=id_seller
         )
         complete_seller_products = []
         for seller_product in seller_products:

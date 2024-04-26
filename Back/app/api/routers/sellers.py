@@ -1,7 +1,8 @@
 from fastapi import APIRouter
 
-from app.api.deps import SellerServiceDep
+from app.api.deps import SellerProductServiceDep, SellerServiceDep
 from app.schemas.users.types.seller import Seller, SellerCreate, SellerUpdate
+from schemas.products.seller_product import SellerProductRead
 
 router = APIRouter(prefix="/sellers", tags=["Sellers"])
 
@@ -54,3 +55,14 @@ async def delete_sellers(seller_service: SellerServiceDep):
     Delete all sellers.
     """
     return seller_service.delete_all()
+
+@router.get(
+    "/{seller_id}/products", response_model=list[SellerProductRead], response_model_exclude_none=True
+)
+async def read_seller_products(
+    *, seller_id: int, seller_product_service: SellerProductServiceDep
+):
+    """
+    Retrieve seller products from product.
+    """
+    return seller_product_service.get_by_id_seller(id_seller=seller_id)
