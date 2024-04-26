@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Container, Typography, Grid, Button, Paper, Divider, IconButton, CircularProgress, Rating, ButtonBase } from '@mui/material';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
-import StarIcon from '@mui/icons-material/Star';
-import InfoIcon from '@mui/icons-material/Info';
+import { Box, Container, Typography, Grid, Button, Paper, Divider, CircularProgress, Rating, ButtonBase } from '@mui/material';
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
 import styles from '../styles/styles';
 import { getProductSellerById } from '../api/services/products/ProductsService';
-import { addToWishList, deleteFromWishList } from '../api/services/products/WishListService';
 import { addCartItem } from '../api/services/products/ShoppingCartService';
+import FavoriteButton from '../components/favorite-button/FavoriteButton';
 
 const ProductDetailPage = () => {
     const { id } = useParams();
     const [productData, setProductData] = useState(null);
-    const [isFavorite, setIsFavorite] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [imageIndex, setImageIndex] = useState(0);
@@ -37,20 +33,6 @@ const ProductDetailPage = () => {
         fetchProducts();
     }, [id]);
 
-    const handleFavoriteClick = async () => {
-        setIsFavorite(!isFavorite);
-        try {
-            if (!isFavorite) {
-                const response = await addToWishList(productData.id);
-                console.log('Añadido a la lista de deseos:', response);
-            } else {
-                const response = await deleteFromWishList(productData.id);
-                console.log('Removido de la lista de deseos:', response);
-            }
-        } catch (error) {
-            console.error('Error al actualizar la lista de deseos', error);
-        }
-    };
     const handleAddToCart = async () => {
         const quantity = 1;
         try {
@@ -92,12 +74,7 @@ const ProductDetailPage = () => {
             <Container sx={styles.mainContainer}>
                 {productData && (
                     <Paper elevation={3} sx={{ ...styles.paperContainer, position: 'relative' }}>
-                        <IconButton
-                            onClick={handleFavoriteClick}
-                            sx={{ position: 'absolute', top: 8, right: 8, backgroundColor: 'background.paper', borderRadius: '50%' }}
-                        >
-                            {isFavorite ? <StarIcon sx={{ color: "#ffcc00" }} /> : <StarBorderIcon />}
-                        </IconButton>
+                        <FavoriteButton productId={productData.id} ></FavoriteButton>
                         <Grid container spacing={2}>
                             <Grid item xs={12} md={5} sx={{ display: 'flex', justifyContent: 'center' }}>
                                 <Box sx={{ width: '100%', height: 300, display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
@@ -125,12 +102,6 @@ const ProductDetailPage = () => {
                                 <Button variant="contained" sx={{ mb: 2 }} onClick={handleAddToCart}>
                                     Add to Cart
                                 </Button>
-                                <IconButton
-                                    onClick={handleFavoriteClick}
-                                    sx={{ position: 'absolute', top: 8, right: 8 }}
-                                >
-                                    {isFavorite ? <StarIcon sx={{ color: "#ffcc00" }} /> : <StarBorderIcon />}
-                                </IconButton>
                             </Grid>
                         </Grid>
                         <Divider sx={styles.ThickDivider}></Divider>

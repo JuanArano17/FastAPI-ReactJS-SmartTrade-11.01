@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { IconButton } from '@mui/material';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import StarIcon from '@mui/icons-material/Star';
-import { getFavoriteStatus, addToWishList, deleteFromWishList } from '../api/services/products/WishListService';
+import { getWishStatus, addToWishList, deleteFromWishList } from '../../api/services/products/WishListService';
 
-const FavoriteButton = ({ productId }) => {
+const FavoriteButton = ({ productId, onToggle}) => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -12,8 +12,8 @@ const FavoriteButton = ({ productId }) => {
         const checkFavoriteStatus = async () => {
             setLoading(true);
             try {
-                const status = await getFavoriteStatus(productId);
-                setIsFavorite(status);
+                const isCurrentlyFavorite = await getWishStatus(productId);
+                setIsFavorite(isCurrentlyFavorite);
             } catch (error) {
                 console.error('Error al verificar el estado de favoritos', error);
             }
@@ -31,18 +31,24 @@ const FavoriteButton = ({ productId }) => {
             } else {
                 await deleteFromWishList(productId);
             }
+            if (onToggle) {
+                onToggle();
+            }
             setIsFavorite(!isFavorite);
         } catch (error) {
             console.error('Error al actualizar la lista de deseos', error);
+        } finally {
+            setLoading(false);  
         }
-        setLoading(false);
     };
-
     return (
-        <IconButton onClick={handleToggleFavorite} disabled={loading}>
+        <IconButton 
+            onClick={handleToggleFavorite} 
+            disabled={loading} 
+            sx={{ position: 'absolute', top: 8, right: 8, backgroundColor: 'background.paper', borderRadius: '50%' }}
+        >
             {isFavorite ? <StarIcon sx={{ color: "#ffcc00" }} /> : <StarBorderIcon />}
         </IconButton>
     );
 };
-
 export default FavoriteButton;

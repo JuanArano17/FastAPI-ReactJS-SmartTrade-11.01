@@ -35,4 +35,16 @@ const deleteFromWishList = async (id_seller) => {
         throw error;
     }
 };
-export { getWishItems, addToWishList, deleteFromWishList }
+const getWishStatus = async (id_product) => {
+    try {
+        console.log("Empezando getWishStatus:");
+        const wishItems = await getWishItems();
+        const isInWish = wishItems.some(item => item.seller_product.id === id_product);
+        console.log('Producto está en wishlist:', isInWish);
+        return isInWish;
+    } catch (error) {
+        console.error('Error al recuperar productos del wishlist:', error);
+        throw error;
+    }
+};
+export { getWishItems, addToWishList, deleteFromWishList, getWishStatus }
