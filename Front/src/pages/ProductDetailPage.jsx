@@ -1,27 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Container, Typography, Grid, Button, Paper, Divider, IconButton, CircularProgress, Stack, Rating } from '@mui/material';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
-import StarIcon from '@mui/icons-material/Star';
+import { Box, Container, Typography, Grid, Button, Paper, Divider, CircularProgress, Rating, ButtonBase } from '@mui/material';
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
 import styles from '../styles/styles';
-import { getProduct } from '../api/services/products/ProductsService';
-import { addToWishList, deleteFromWishList } from '../api/services/products/WishListService';
+import { getProductSellerById } from '../api/services/products/ProductsService';
 import { addCartItem } from '../api/services/products/ShoppingCartService';
+import FavoriteButton from '../components/favorite-button/FavoriteButton';
 
 const ProductDetailPage = () => {
     const { id } = useParams();
     const [productData, setProductData] = useState(null);
-    const [isFavorite, setIsFavorite] = useState(false);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [imageIndex, setImageIndex] = useState(0);
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
-                const response = await getProduct(id);
+                const response = await getProductSellerById(id);
                 if (response) {
                     setProductData(response);
                     setLoading(false);
@@ -35,36 +33,13 @@ const ProductDetailPage = () => {
         fetchProducts();
     }, [id]);
 
-    const handleFavoriteClick = async () => {
-        setIsFavorite(!isFavorite);
-        try {
-            // Seleccionar el ID del producto del vendedor desde el objeto de datos del producto
-            const sellerProductId = productData.seller_products[0].id;
-
-            // Llama a la función addToWishList pasando el ID necesario
-            if (!isFavorite) {
-                const response = await addToWishList(sellerProductId);
-                console.log('Añadido a la lista de deseos:', response);
-            } else {
-                // Aquí se asume que tienes una función para eliminar de la lista de deseos
-                const response = await deleteFromWishList(sellerProductId);
-                console.log('Removido de la lista de deseos:', response);
-            }
-        } catch (error) {
-            console.error('Error al actualizar la lista de deseos', error);
-        }
-    };
     const handleAddToCart = async () => {
-        if (productData && productData.seller_products && productData.seller_products.length > 0) {
-            const sellerProductId = productData.seller_products[0].id; // Por ejemplo, elegir el primer producto del vendedor
-            const quantity = 1; // Define cómo quieres manejar la cantidad
-            try {
-                await addCartItem(sellerProductId, quantity);
-                console.log('Producto añadido al carrito');
-                // Aquí puedes manejar cualquier estado o redirección después de añadir al carrito
-            } catch (error) {
-                console.error('Error al añadir producto al carrito', error);
-            }
+        const quantity = 1;
+        try {
+            await addCartItem(productData.id, quantity);
+            console.log('Producto añadido al carrito');
+        } catch (error) {
+            console.error('Error al añadir producto al carrito', error);
         }
     };
     const renderAdditionalAttributes = (productData) => {
@@ -72,9 +47,14 @@ const ProductDetailPage = () => {
         return Object.keys(productData)
             .filter(key => !commonAttributes.includes(key))
             .map(key => (
-                <Typography variant="body2" key={key}>
-                    {key.charAt(0).toUpperCase() + key.slice(1)}: {productData[key]}
-                </Typography>
+                <Paper key={key} elevation={1} sx={{ margin: '10px 0', padding: '10px' }}>
+                    <Typography variant="body2" color="text.secondary" component="span">
+                        {`${key.charAt(0).toUpperCase() + key.slice(1)}: `}
+                    </Typography>
+                    <Typography variant="body2" component="span" sx={{ fontWeight: 'bold' }}>
+                        {productData[key]}
+                    </Typography>
+                </Paper>
             ));
     };
 
@@ -85,26 +65,26 @@ const ProductDetailPage = () => {
     if (error) {
         return <Typography color="error">{error}</Typography>;
     }
+    const handleImageChange = (newIndex) => {
+        setImageIndex(newIndex);
+    };
     return (
         <Box sx={styles.mainBox}>
             <TopBar showSearchBar={true} showLogoutButton={true} />
             <Container sx={styles.mainContainer}>
                 {productData && (
                     <Paper elevation={3} sx={{ ...styles.paperContainer, position: 'relative' }}>
-                        <IconButton
-                            onClick={handleFavoriteClick}
-                            sx={{ position: 'absolute', top: 8, right: 8, backgroundColor: 'background.paper', borderRadius: '50%' }}
-                        >
-                            {isFavorite ? <StarIcon sx={{ color: "#ffcc00" }} /> : <StarBorderIcon />}
-                        </IconButton>
+                        <FavoriteButton productId={productData.id} ></FavoriteButton>
                         <Grid container spacing={2}>
                             <Grid item xs={12} md={5} sx={{ display: 'flex', justifyContent: 'center' }}>
                                 <Box sx={{ width: '100%', height: 300, display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
-                                    <img
-                                        src={productData.images.length > 0 ? productData.images[0].url : '/path/to/default.jpg'}
-                                        alt={productData.name}
-                                        style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }}
-                                    />
+                                    <ButtonBase onClick={() => handleImageChange((imageIndex + 1) % productData.images.length)} disabled={productData.images.length <= 1}>
+                                        <img
+                                            src={productData.images[imageIndex]}
+                                            alt={`Image ${imageIndex + 1} of ${productData.name}`}
+                                            style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }}
+                                        />
+                                    </ButtonBase>
                                 </Box>
                             </Grid>
                             <Grid item xs={12} md={7}>
@@ -117,17 +97,11 @@ const ProductDetailPage = () => {
                                 <Rating name="read-only" value={4} readOnly />
                                 <Typography sx={{ mt: 2 }}>{productData.description}</Typography>
                                 <Typography variant="h5" sx={{ my: 2 }}>
-                                    Precio: ${productData.seller_products.length > 0 ? productData.seller_products[0].price : "Consultar"}
+                                    Precio: ${productData.price}
                                 </Typography>
                                 <Button variant="contained" sx={{ mb: 2 }} onClick={handleAddToCart}>
                                     Add to Cart
                                 </Button>
-                                <IconButton
-                                    onClick={handleFavoriteClick}
-                                    sx={{ position: 'absolute', top: 8, right: 8 }}
-                                >
-                                    {isFavorite ? <StarIcon sx={{ color: "#ffcc00" }} /> : <StarBorderIcon />}
-                                </IconButton>
                             </Grid>
                         </Grid>
                         <Divider sx={styles.ThickDivider}></Divider>

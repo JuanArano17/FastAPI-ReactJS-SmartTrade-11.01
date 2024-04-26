@@ -5,27 +5,20 @@ import TopBar from '../components/topbar/TopBar';
 import WishListItem from '../components/products/wishlist/WishListItem';
 import Footer from '../components/footer/Footer';
 import styles from '../styles/styles';
-import { getAllProducts } from '../api/services/products/ProductsService';
 import { getWishItems } from '../api/services/products/WishListService';
 
 
 const WishListPage = () => {
     const [wishItems, setWishItems] = useState([]);
-
+    const removeItemFromWishList = (productId) => {
+        setWishItems((currentItems) => currentItems.filter((item) => item.seller_product.id !== productId));
+    };
     useEffect(() => {
         const fetchWishData = async () => {
             try {
                 const wishListItems = await getWishItems();
-                const allProducts = await getAllProducts();
-
-                // Combine the wish items with product details
-                const itemsWithDetails = wishListItems.map(wishItem => {
-                    const product = allProducts.find(p => p.id_seller_product === wishItem.id_seller_product);
-                    return { ...wishItem, ...product };
-                });
-
-                console.log("Items recibidos del backend para la lista de deseos:", itemsWithDetails);
-                setWishItems(itemsWithDetails);
+                console.log("Items recibidos del backend para la lista de deseos:", wishListItems);
+                setWishItems(wishListItems);
             } catch (error) {
                 console.error('Error al cargar los datos de la lista de deseos:', error);
             }
@@ -50,7 +43,11 @@ const WishListPage = () => {
                 </Typography>
                 <Grid container spacing={2}>
                     {wishItems.map((item) => (
-                        <WishListItem key={item.id_seller_product} item={item} />
+                        <WishListItem 
+                        key={item.seller_product.id} 
+                        item={item.seller_product} 
+                        onRemove={removeItemFromWishList}
+                        />
                     ))}
                 </Grid>
             </Container>

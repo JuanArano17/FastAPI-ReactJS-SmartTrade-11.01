@@ -3,7 +3,7 @@ import { Typography, Slider, Select, MenuItem, FormControl, InputLabel, Button, 
 
 const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => {
     const [selectedCategory, setSelectedCategory] = useState('');
-    const [priceRange, setPriceRange] = useState([0, 10000000]); // Valor inicial alto para cubrir todos los precios posibles
+    const [priceRange, setPriceRange] = useState([0, 10000000]);
 
     const [categories, setCategories] = useState([]);
     const [maxPrice, setMaxPrice] = useState(0);
@@ -12,8 +12,6 @@ const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => 
         if (products) {
             const uniqueCategories = Array.from(new Set(products.map(product => product.category)));
             setCategories(uniqueCategories);
-
-            // Calcular y actualizar el precio máximo directamente de la propiedad 'price' de cada producto
             const highestPrice = Math.max(...products.map(product => product.price));
             setMaxPrice(highestPrice);
             setPriceRange([0, highestPrice]);

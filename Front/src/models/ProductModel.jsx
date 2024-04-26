@@ -5,8 +5,8 @@ export const getDefaultProductModel = () => ({
     specSheet: "",
     ecoPoints: 0,
     stock: 0,
-    category: "", 
-    image: null, 
+    category: "",
+    images: [],
 });
 
 export const createProductFromApiResponse = (apiResponse) => ({
@@ -16,5 +16,6 @@ export const createProductFromApiResponse = (apiResponse) => ({
     specSheet: apiResponse.spec_sheet || getDefaultProductModel().specSheet,
     ecoPoints: apiResponse.eco_points || getDefaultProductModel().ecoPoints,
     stock: apiResponse.stock || getDefaultProductModel().stock,
-    category: apiResponse.category || getDefaultProductModel().category, // Asegurarse de incluir la categoría
+    category: apiResponse.category || getDefaultProductModel().category,
+    images: apiResponse.images?.map(image => image.url) || getDefaultProductModel().images,
 });
