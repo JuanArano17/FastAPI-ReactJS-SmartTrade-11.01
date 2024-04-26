@@ -1,10 +1,9 @@
 import React from 'react';
-import { Card, CardMedia, CardContent, Typography, CardActions, Button, Grid } from '@mui/material';
-
+import { Card, CardMedia, CardContent, Typography, CardActions, Button } from '@mui/material';
+import FavoriteButton from '../../favorite-button/FavoriteButton';
 const SummarizedProduct = ({ product }) => {
     const { idProduct, name, images, price, description } = product;
     const image = images.length > 0 ? images[0] : 'default-product-image.jpg'; 
-
     return (
         <Card 
         sx={{ 
@@ -14,7 +13,8 @@ const SummarizedProduct = ({ product }) => {
             flexDirection: 'column', 
             justifyContent: 'space-between', 
             height: '100%' 
-        }}>
+        }}
+        >
             <CardMedia
                 component="img"
                 image={image}
@@ -22,6 +22,7 @@ const SummarizedProduct = ({ product }) => {
                 sx={{ height: 140, backgroundSize: 'contain' }} 
             />
             <CardContent>
+                <FavoriteButton productId={product.id} ></FavoriteButton>
                 <Typography gutterBottom variant="h6" component="div" sx={{ textAlign: 'left' }}>
                     {name}
                 </Typography>

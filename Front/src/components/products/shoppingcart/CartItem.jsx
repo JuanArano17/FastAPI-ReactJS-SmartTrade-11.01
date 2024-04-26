@@ -50,9 +50,8 @@ const CartItem = ({ item, setCartItems, quantity }) => {
                         <TextField
                             value={quantity}
                             onChange={(e) => updateQuantity(parseInt(e.target.value, 10))}
-                            type="number"
                             inputProps={{ min: 1, max: item.stock }}
-                            sx={{ mx: 1 }}
+                            sx={{ mx: 1, maxWidth:"55px"}}
                         />
                         <IconButton onClick={() => updateQuantity(quantity + 1)} disabled={quantity >= item.stock}>
                             <AddIcon />
