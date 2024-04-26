@@ -23,6 +23,7 @@ class SellerProductUpdate(SellerProductBase):
     state: Optional[ProductState] = None 
     justification: Optional[str] = Field(default=None, max_length=100)
     eco_points: Optional[NonNegativeFloat] = None
+    age_restricted: Optional[bool] = None
 
 
 class SellerProduct(SellerProductBase):
@@ -41,6 +42,7 @@ class SellerProductRead(BaseModel):
     state: str
     name: str
     description: Optional[str] = ""
+    age_restricted: bool
     eco_points: float
     images: list[str] = []
     price: float

@@ -632,6 +632,7 @@ for i in range(num_approved):
         eco_points=round(
             random.uniform(0, 100), 2
         ),  # Generate a random eco points value
+        age_restricted=random.choice([True,False])
     )
 
     # Add the seller product to the session

@@ -66,7 +66,7 @@ class SellerProductService:
         product.stock += seller_product.quantity  # type: ignore
 
         seller_product_obj = SellerProduct(
-            **seller_product.model_dump(), id_seller=id_seller, state="Pending", eco_points=0
+            **seller_product.model_dump(), id_seller=id_seller, state="Pending", eco_points=0, age_restricted=False
         )
         seller_product_obj = self.seller_product_repo.add(seller_product_obj)
         return seller_product_obj
@@ -86,6 +86,7 @@ class SellerProductService:
             state=seller_product.state,
             name=product.name,
             description=product.description,
+            age_restricted=seller_product.age_restricted,
             eco_points=seller_product.eco_points,
             spec_sheet=product.spec_sheet,
             justification=seller_product.justification,
@@ -158,6 +159,12 @@ class SellerProductService:
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     detail="Eco-points must be assigned to approved products",
                 )
+            if new_data.age_restricted==None:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="It must be specified whether approved products are age restricted or not",
+                )
+            
             new_data.justification=""
             
         return self.seller_product_repo.update(seller_product, new_data)
