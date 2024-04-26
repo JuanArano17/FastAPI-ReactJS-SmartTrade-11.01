@@ -66,7 +66,7 @@ class SellerProductService:
         product.stock += seller_product.quantity  # type: ignore
 
         seller_product_obj = SellerProduct(
-            **seller_product.model_dump(), id_seller=id_seller, state="Pending", eco_points=0
+            **seller_product.model_dump(), id_seller=id_seller, state="Pending", eco_points=0, age_restricted=False
         )
         seller_product_obj = self.seller_product_repo.add(seller_product_obj)
         return seller_product_obj
@@ -86,6 +86,7 @@ class SellerProductService:
             state=seller_product.state,
             name=product.name,
             description=product.description,
+            age_restricted=seller_product.age_restricted,
             eco_points=seller_product.eco_points,
             spec_sheet=product.spec_sheet,
             justification=seller_product.justification,
@@ -107,6 +108,13 @@ class SellerProductService:
             publisher=product.publisher if hasattr(product, "publisher") else None,
             platform=product.platform if hasattr(product, "platform") else None,
         )
+    
+    def map_seller_products(self, seller_products):
+        complete_seller_products = []
+        for seller_product in seller_products:
+            seller_product_info = self.map_seller_product_to_read_schema(seller_product)
+            complete_seller_products.append(seller_product_info)
+        return complete_seller_products
 
     def get_by_id(self, seller_product_id) -> SellerProduct:
         if seller_product := self.seller_product_repo.get_by_id(seller_product_id):
@@ -123,11 +131,7 @@ class SellerProductService:
 
     def get_all(self) -> list[SellerProductRead]:
         seller_products = self.seller_product_repo.get_all()
-        complete_seller_products = []
-        for seller_product in seller_products:
-            seller_product_info = self.map_seller_product_to_read_schema(seller_product)
-            complete_seller_products.append(seller_product_info)
-        return complete_seller_products
+        return self.map_seller_products
     
     def get_all_by_state(self,state) -> list[SellerProductRead]:
         seller_products = self.seller_product_repo.get_all()
@@ -158,6 +162,12 @@ class SellerProductService:
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     detail="Eco-points must be assigned to approved products",
                 )
+            if new_data.age_restricted==None:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="It must be specified whether approved products are age restricted or not",
+                )
+            
             new_data.justification=""
             
         return self.seller_product_repo.update(seller_product, new_data)
@@ -179,21 +189,15 @@ class SellerProductService:
         seller_products = self.seller_product_repo.get_by_id_product(
             id_product=id_product
         )
-        complete_seller_products = []
-        for seller_product in seller_products:
-            seller_product_info = self.map_seller_product_to_read_schema(seller_product)
-            complete_seller_products.append(seller_product_info)
-        return complete_seller_products
+        return self.map_seller_products(seller_products)
     
     def get_by_id_seller(self, id_seller) -> list[SellerProductRead]:
         seller_products = self.seller_product_repo.get_by_id_seller(
             id_seller=id_seller
         )
-        complete_seller_products = []
-        for seller_product in seller_products:
-            seller_product_info = self.map_seller_product_to_read_schema(seller_product)
-            complete_seller_products.append(seller_product_info)
-        return complete_seller_products
+        return self.map_seller_products(seller_products)
 
     def delete_by_id_product(self, id_product):
         return self.seller_product_repo.delete_by_id_product(id_product=id_product)
+
+    

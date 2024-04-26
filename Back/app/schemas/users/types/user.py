@@ -6,6 +6,7 @@ class UserBase(BaseModel):
     email: EmailStr
     name: str = Field(min_length=1, max_length=20)
     surname: str = Field(min_length=1, max_length=40)
+    profile_picture: Optional[str] = None
 
 
 class UserCreate(UserBase):
@@ -17,6 +18,7 @@ class UserUpdate(UserBase):
     name: Optional[str] = Field(default=None, min_length=1, max_length=20)
     surname: Optional[str] = Field(default=None, min_length=1, max_length=40)
     password: Optional[str] = None
+    profile_picture: Optional[str] = None
 
 
 # That doesn't seem to make sense. Not all users have these attributes, only buyers.

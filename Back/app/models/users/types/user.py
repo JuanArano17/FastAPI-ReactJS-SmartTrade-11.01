@@ -11,6 +11,7 @@ class User(Base):
     surname = Column(String(50), nullable=False)
     password = Column(String(255), nullable=False)
     type = Column(String, nullable=False)
+    profile_picture = Column(String(255))
 
     __mapper_args__ = {
         "polymorphic_identity": "User",
@@ -18,4 +19,4 @@ class User(Base):
     }
 
     def __repr__(self):
-        return f"User(id={self.id}, email='{self.email}', name='{self.name}', surname='{self.surname}', password='{self.password}', type='{self.type}')"
+        return f"User(id={self.id}, email='{self.email}', name='{self.name}', surname='{self.surname}', password='{self.password}', type='{self.type}'. profile_picture='{self.profile_picture}')"

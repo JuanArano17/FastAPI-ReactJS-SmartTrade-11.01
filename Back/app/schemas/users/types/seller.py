@@ -11,6 +11,8 @@ class SellerBase(BaseModel):
     bank_data: str = Field(min_length=10, max_length=140)
     # TODO: change it later for a more formal validation
     cif: str = Field(pattern=r"^[A-Z][0-9]{8}$")
+    profile_picture: Optional[str] = None
+
 
 
 class SellerCreate(SellerBase):
@@ -25,6 +27,7 @@ class SellerUpdate(SellerBase):
     # TODO: change it later for a more formal validation
     cif: Optional[str] = Field(default=None, pattern=r"^[A-Z][0-9]{8}$")
     password: Optional[str] = None
+    profile_picture: Optional[str] = None
 
 
 class Seller(SellerBase):
@@ -33,3 +36,4 @@ class Seller(SellerBase):
     id: int
     type: str
     seller_products: List[SellerProduct] = []
+    

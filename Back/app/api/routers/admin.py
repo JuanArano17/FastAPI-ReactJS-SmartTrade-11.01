@@ -5,7 +5,7 @@ from app.schemas.products.seller_product import (
     SellerProductRead
 )
 
-router = APIRouter(prefix="/admin", tags=["seller-products"])
+router = APIRouter(prefix="/admin", tags=["Seller Products"])
 
 
 @router.get(
