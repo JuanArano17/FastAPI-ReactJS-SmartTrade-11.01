@@ -9,7 +9,6 @@ class Product(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
     description = Column(String(255))
-    eco_points = Column(Float, nullable=False)
     spec_sheet = Column(String(255), nullable=False)
     stock = Column(Integer, nullable=False)
     category = Column(String, nullable=False)
@@ -30,4 +29,4 @@ class Product(Base):
     )
 
     def __repr__(self):
-        return f"Product(id={self.id}, name='{self.name}', description='{self.description}', eco_points={self.eco_points}, spec_sheet='{self.spec_sheet}', stock={self.stock}, type={self.category})"
+        return f"Product(id={self.id}, name='{self.name}', description='{self.description}', spec_sheet='{self.spec_sheet}', stock={self.stock}, type={self.category})"

@@ -8,7 +8,6 @@ from app.schemas.products.seller_product import SellerProduct
 class HouseUtilitiesBase(BaseModel):
     name: str = Field(min_length=1, max_length=40)
     description: Optional[str] = None
-    eco_points: NonNegativeFloat
     spec_sheet: str = Field(min_length=1, max_length=240)
     stock: NonNegativeInt = Field(default=0)
     brand: str = Field(min_length=1, max_length=40)
@@ -22,7 +21,6 @@ class HouseUtilitiesCreate(HouseUtilitiesBase):
 class HouseUtilitiesUpdate(HouseUtilitiesBase):
     name: Optional[str] = Field(default=None, min_length=1, max_length=40)
     description: Optional[str] = None
-    eco_points: Optional[NonNegativeFloat] = None
     spec_sheet: str = Field(default=None, min_length=1, max_length=240)
     stock: Optional[NonNegativeInt] = None
     brand: Optional[str] = Field(default=None, min_length=1, max_length=40)

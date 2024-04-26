@@ -8,7 +8,6 @@ from app.schemas.products.seller_product import SellerProduct
 class GameBase(BaseModel):
     name: str = Field(min_length=1, max_length=40)
     description: Optional[str] = None
-    eco_points: NonNegativeFloat
     spec_sheet: str = Field(min_length=1, max_length=240)
     stock: NonNegativeInt = Field(default=0)
     publisher: str = Field(min_length=1, max_length=40)
@@ -23,7 +22,6 @@ class GameCreate(GameBase):
 class GameUpdate(GameBase):
     name: Optional[str] = Field(default=None, min_length=1, max_length=40)
     description: Optional[str] = None
-    eco_points: Optional[NonNegativeFloat] = None
     spec_sheet: str = Field(default=None, min_length=1, max_length=240)
     stock: Optional[NonNegativeInt] = None
     publisher: Optional[str] = Field(default=None, min_length=1, max_length=30)

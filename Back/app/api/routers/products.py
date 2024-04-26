@@ -11,7 +11,7 @@ from app.schemas.products.categories.food import Food
 from app.schemas.products.categories.game import Game
 from app.schemas.products.categories.house_utilities import HouseUtilities
 
-router = APIRouter(prefix="/products", tags=["products"])
+router = APIRouter(prefix="/products", tags=["Products"])
 
 
 class ProductResponse(BaseModel):

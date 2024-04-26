@@ -43,7 +43,6 @@ def fake_book():
         "description": None,
         "spec_sheet": "Specs...",
         "stock": 0,
-        "eco_points": 10,
         "author": "Frank Herbert",
         "pages": 900,
     }

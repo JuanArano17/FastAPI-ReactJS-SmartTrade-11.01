@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from api.routers import admin
 from app.api.routers import orders
 from app.api.routers import cards
 from app.api.routers import wish_list
@@ -25,10 +26,14 @@ api_router.include_router(seller_product.router)
 api_router.include_router(login.router)
 # api_router.include_router(cards.router)
 api_router.include_router(cards.cards_router)
-api_router.include_router(orders.router)
+# api_router.include_router(orders.router)
 api_router.include_router(orders.orders_router)
+api_router.include_router(orders.orders)
 api_router.include_router(users.router)
 # api_router.include_router(all_seller_product.router)
 api_router.include_router(wish_list.list_token_router)
 api_router.include_router(shopping_cart.cart_token_router)
 api_router.include_router(seller_product.seller_prod_router)
+api_router.include_router(seller_product.seller_router)
+api_router.include_router(admin.router)
+

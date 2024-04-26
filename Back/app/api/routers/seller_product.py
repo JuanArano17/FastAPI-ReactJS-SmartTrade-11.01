@@ -9,7 +9,7 @@ from app.schemas.products.seller_product import (
 )
 
 router = APIRouter(
-    prefix="/product/{product_id}/seller_products", tags=["seller-products"]
+    prefix="/product/{product_id}/seller_products", tags=["Seller Products"]
 )
 
 
@@ -35,7 +35,7 @@ async def delete_seller_products(
     return seller_product_service.delete_by_id_product(id_product=product_id)
 
 
-seller_prod_router = APIRouter(prefix="/seller_products", tags=["seller-products"])
+seller_prod_router = APIRouter(prefix="/seller_products", tags=["Seller Products"])
 
 
 @seller_prod_router.get(
@@ -45,7 +45,7 @@ async def read_seller_products_pure(*, seller_product_service: SellerProductServ
     """
     Retrieve seller products.
     """
-    return seller_product_service.get_all()
+    return seller_product_service.get_all_by_state("Approved")
 
 
 @seller_prod_router.get(
@@ -119,3 +119,19 @@ async def update_seller_product(
     return seller_product_service.update(
         seller_product_id=seller_product_id, new_data=seller_product
     )
+
+
+seller_router = APIRouter(prefix="/sellers", tags=["Seller Products"])
+
+
+
+@seller_router.get(
+    "/{seller_id}/products", response_model=list[SellerProductRead], response_model_exclude_none=True
+)
+async def read_seller_products(
+    *, seller_id: int, seller_product_service: SellerProductServiceDep
+):
+    """
+    Retrieve seller products from seller.
+    """
+    return seller_product_service.get_by_id_seller(id_seller=seller_id)
