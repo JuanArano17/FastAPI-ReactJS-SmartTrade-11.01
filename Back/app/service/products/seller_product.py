@@ -10,7 +10,49 @@ from app.service.users.types.seller import SellerService
 from app.models.products.seller_product import SellerProduct
 from app.crud_repository import CRUDRepository
 from app.service.products.product import ProductService
+from abc import ABC, abstractmethod
 
+class SellerProductState(ABC):
+    @abstractmethod
+    def handle(self, new_data):
+        pass
+
+class PendingState(SellerProductState):
+    def handle(self, new_data):
+        if new_data.state == "Rejected":
+            if not new_data.justification or len(new_data.justification) < 1:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="Rejected products require a justification",
+                )
+        elif new_data.state == "Approved":
+            new_data.justification = ""
+            if new_data.eco_points is None:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="Eco-points must be assigned to approved products",
+                )
+            if new_data.age_restricted is None:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="Age restriction must be specified for approved products",
+                )
+            
+class ApprovedState(SellerProductState):
+    def handle(self, new_data):
+        if new_data.state == "Rejected":
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Approved products cannot be rejected",
+            )
+
+class RejectedState(SellerProductState):
+    def handle(self, new_data):
+        if new_data.state == "Approved":
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Rejected products cannot be approved",
+            )
 
 class SellerProductRepository(CRUDRepository):
     def __init__(self, session: Session):
@@ -70,6 +112,17 @@ class SellerProductService:
         )
         seller_product_obj = self.seller_product_repo.add(seller_product_obj)
         return seller_product_obj
+    
+    def get_current_state(self, state: str) -> SellerProductState:
+        # Determine the current state based on the provided state attribute
+        if state == "Pending":
+            return PendingState()
+        elif state == "Approved":
+            return ApprovedState()
+        elif state == "Rejected":
+            return RejectedState()
+        else:
+            raise ValueError("Invalid state value")
 
     def map_seller_product_to_read_schema(
         self, seller_product: SellerProduct
@@ -144,32 +197,12 @@ class SellerProductService:
 
     def update(self, seller_product_id, new_data: SellerProductUpdate) -> SellerProduct:
         seller_product = self.get_by_id(seller_product_id)
+        current_state = self.get_current_state(seller_product.state)  # Get the current state
 
-        if new_data.quantity:
-            product = self.product_service.get_by_id(seller_product.id_product)
-            product.stock += new_data.quantity - seller_product.quantity  # type: ignore
-            seller_product.notify_observers(new_data.quantity)
+        # Call the handle_update method of the current state object
+        current_state.handle(new_data)
 
-        if new_data.state and new_data.state=="Rejected" and (not new_data.justification or len(new_data.justification)<1):
-            raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail="Rejected products require a justification",
-                )
-        
-        if new_data.state and new_data.state=="Approved":
-            if not new_data.eco_points:
-                raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail="Eco-points must be assigned to approved products",
-                )
-            if new_data.age_restricted==None:
-                raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail="It must be specified whether approved products are age restricted or not",
-                )
-            
-            new_data.justification=""
-            
+        # Perform other operations common to all states
         return self.seller_product_repo.update(seller_product, new_data)
 
     def delete_by_id(self, seller_product_id):
