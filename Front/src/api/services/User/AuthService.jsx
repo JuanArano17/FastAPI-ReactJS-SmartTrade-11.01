@@ -56,4 +56,13 @@ const loginUserService = async (userData) => {
         throw error;
     }
 }
-export {registerUserSellerService, registerUserBuyerService, loginUserService};
+const myInfoService = async () => {
+    try {
+        const response = await axiosInstance.get('/users/me');
+        return response.data
+    } catch (error) {
+        console.error('Hubo un error obtener la informacion del usuario: ', error.response ? error.response.data : error);
+        throw error;
+    }
+}
+export {registerUserSellerService, registerUserBuyerService, loginUserService, myInfoService};
