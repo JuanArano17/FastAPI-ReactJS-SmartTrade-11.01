@@ -3,7 +3,7 @@ export const getDefaultRegisterSellerModel = () => ({
     lastName: "",
     email: "",
     password: "",
-    birthDate: new Date(),
+    birth_date: new Date(),
     cif: "",
     bankData: "",
 });

@@ -1,15 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Slider, Select, MenuItem, FormControl, InputLabel, Button, Grid } from '@mui/material';
+import { Typography, Slider, Select, MenuItem, FormControl, InputLabel, Button, Grid, Switch, FormControlLabel } from '@mui/material';
+import { myInfoService } from '../../../api/services/user/AuthService';
 
 const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [priceRange, setPriceRange] = useState([0, 10000000]);
-
+    const [userAge, setUserAge] = useState(null);
     const [categories, setCategories] = useState([]);
     const [maxPrice, setMaxPrice] = useState(0);
 
+    const fetchUserInfo = async () => {
+        try {
+            const userInfo = await myInfoService();
+            const birthDate = new Date(userInfo.birth_date);
+            const age = calculateAge(birthDate);
+            setUserAge(age);
+        } catch (error) {
+            console.error('Error al obtener la información del usuario:', error);
+        }
+    };
     useEffect(() => {
         if (products) {
+            fetchUserInfo();
             const uniqueCategories = Array.from(new Set(products.map(product => product.category)));
             setCategories(uniqueCategories);
             const highestPrice = Math.max(...products.map(product => product.price));
@@ -23,10 +35,22 @@ const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => 
             const matchesSearchTerm = searchTerm === "" || product.name.toLowerCase().includes(searchTerm.toLowerCase()) || product.description.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesCategory = selectedCategory === "" || product.category === selectedCategory;
             const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
-            return matchesSearchTerm && matchesCategory && matchesPrice;
+            const isAgeAppropriate = userAge >= 18 || !product.age_restricted;
+            return matchesSearchTerm && matchesCategory && matchesPrice && isAgeAppropriate;
         });
+        console.log(result);
         setSearchFilteredProducts(result);
-    }, [selectedCategory, priceRange, products, searchTerm]);
+    }, [selectedCategory, priceRange, products, searchTerm, userAge]);
+
+    const calculateAge = (birthDate) => {
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
+    };
 
     const handlePriceChange = (event, newValue) => {
         setPriceRange(newValue);
@@ -41,14 +65,14 @@ const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => 
         <Grid container spacing={2} alignItems="center" justifyContent="center">
             <Grid item md={2}>
                 <FormControl variant="outlined" fullWidth>
-                    <InputLabel htmlFor="category-select">Categoría</InputLabel>
+                    <InputLabel htmlFor="category-select">Category</InputLabel>
                     <Select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
                         label="Categoría"
                         inputProps={{ id: 'category-select' }}
                     >
-                        <MenuItem value="">Todas</MenuItem>
+                        <MenuItem value="">All</MenuItem>
                         {categories.map((category) => (
                             <MenuItem key={category} value={category}>{category}</MenuItem>
                         ))}
@@ -56,7 +80,7 @@ const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => 
                 </FormControl>
             </Grid>
             <Grid item md={6}>
-                <Typography gutterBottom>Rango de Precios</Typography>
+                <Typography gutterBottom>Price range</Typography>
                 <Slider
                     value={priceRange}
                     onChange={handlePriceChange}
@@ -67,7 +91,7 @@ const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => 
                 />
             </Grid>
             <Grid item>
-                <Button variant="outlined" onClick={clearFilters}>Limpiar Filtros</Button>
+                <Button variant="outlined" onClick={clearFilters}>Clean Filters</Button>
             </Grid>
         </Grid>
     );

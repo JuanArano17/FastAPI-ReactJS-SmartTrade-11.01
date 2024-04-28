@@ -1,5 +1,4 @@
 import axiosInstance from '../AxiosInstance'; 
-import { useHistory } from 'react-router-dom';
 const registerUserBuyerService = async (buyerData) => {
     const validBuyerData = {
         name: buyerData.name,
@@ -10,6 +9,7 @@ const registerUserBuyerService = async (buyerData) => {
         eco_points: 0,
         billing_address: buyerData.billing_address,
         payment_method: 'Credit Card', 
+        birth_date: buyerData.birth_date
     };
     try {
         const response = await axiosInstance.post('/buyers', validBuyerData);
@@ -28,6 +28,7 @@ const registerUserSellerService = async (userData) => {
         bank_data:userData.bankData,
         cif:userData.cif,
         password:userData.password,
+        birth_date:userData.birth_date
     }
     try {
         const response = await axiosInstance.post('/sellers', validUserData);
@@ -58,7 +59,7 @@ const loginUserService = async (userData) => {
 }
 const myInfoService = async () => {
     try {
-        const response = await axiosInstance.get('/users/me');
+        const response = await axiosInstance.get('/users/me/');
         return response.data
     } catch (error) {
         console.error('Hubo un error obtener la informacion del usuario: ', error.response ? error.response.data : error);

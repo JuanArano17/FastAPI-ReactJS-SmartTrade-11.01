@@ -13,7 +13,7 @@ const formFields = [
     { id: "lastName", name: "Surname", label: "Letelier", autoComplete: "lname" },
     { id: "email", name: "Email", label: "letelier@upv.edu.es", autoComplete: "email" },
     { id: "password", name: "Password", label: "PSW_curso_2023_2024", autoComplete: "new-password", type: "password" },
-    { id: "age", name: "Birth date", type: "date" },
+    { id: "birth_date", name: "Birth date", type: "date" },
 ];
 
 const formBankFields = [
@@ -48,8 +48,8 @@ const SellerRegistration = () => {
         if (id === 'password') {
             errors.password = validatePassword(value) ? '' : 'Password does not meet criteria!';
         }
-        if (id === 'age') {
-            errors.age = validateAge(value) ? '' : 'Age is not valid!';
+        if (id === 'birth_date') {
+            errors.birth_date = validateAge(value) ? '' : 'Age is not valid!';
         }
         if (id === 'cif') {
             errors.cif = validateCIF(value) ? '' : 'CIF is not valid!';
@@ -147,8 +147,6 @@ const SellerRegistration = () => {
                                             error={!!formErrors[field.id]}
                                             helperText={formErrors[field.id]}
                                             sx={styles.textField}
-                                            error={!!formErrors[field.id]}
-                                            helperText={formErrors[field.id]}
                                             InputProps={{
                                                 sx: styles.textfields
                                             }}

@@ -13,7 +13,8 @@ export const getDefaultProductSellerModel = () => ({
     stock: 0,
     category: "",
     type: "",
-    brand: ""
+    brand: "",
+    age_restricted: false
 });
 
 export const createProductSellerFromApiResponse = (apiResponse) => ({
@@ -31,5 +32,6 @@ export const createProductSellerFromApiResponse = (apiResponse) => ({
     stock: apiResponse.stock || getDefaultProductSellerModel().stock,
     category: apiResponse.category || getDefaultProductSellerModel().category,
     type: apiResponse.type || getDefaultProductSellerModel().type,
-    brand: apiResponse.brand || getDefaultProductSellerModel().brand
+    brand: apiResponse.brand || getDefaultProductSellerModel().brand,
+    age_restricted: apiResponse.age_restricted || getDefaultProductSellerModel().age_restricted
 });

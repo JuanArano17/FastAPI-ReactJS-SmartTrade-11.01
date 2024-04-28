@@ -18,7 +18,7 @@ const formFields = [
     { id: "dni", name: "DNI", placeholder: "12345678A*" },
     { id: "password", name: "Password", placeholder: "PSW_curso_2023_2024*", autoComplete: "new-password", type: "password" },
     { id: "billing_address", name: "BillingAddress", placeholder: "Calle nueva 123", autoComplete:""},
-    { id: "age", name: "Birth date", type: "date" }
+    { id: "birth_date", name: "Birth date", type: "date" }
 ];
 const BuyerRegistration = () => {
     const history = useHistory();
@@ -48,8 +48,8 @@ const BuyerRegistration = () => {
         if (id === 'password') {
             errors.password = validatePassword(value) ? '' : 'Password does not meet criteria!';
         }
-        if (id === 'age') {
-            errors.age = validateAge(value) ? '' : 'Age is not valid!';
+        if (id === 'birth_date') {
+            errors.birth_date = validateAge(value) ? '' : 'Age is not valid!';
         }
         if (id === 'dni') {
             errors.dni = validateDNI(value) ? '' : 'DNI is not valid!';
@@ -61,7 +61,7 @@ const BuyerRegistration = () => {
         e.preventDefault();
         if (isFormValid()) {
             try {
-                console.log('Se esta intentando registrar un usuario Buyer')
+                console.log('Se esta intentando registrar un usuario Buyer: ', formData)
                 const userResponse = await registerUserBuyerService(formData);
                 console.log('Se ha registrado un usuario Buyer', userResponse);
                 setOpenSnackbar(true);

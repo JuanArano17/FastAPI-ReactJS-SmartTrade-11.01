@@ -36,7 +36,6 @@ const CatalogPage = () => {
             try {
                 setLoading(true);
                 const productsWithSellers = await getAllProductsSeller();
-                console.log('productospage', productsWithSellers);
                 setProducts(productsWithSellers);
                 setLoading(false);
             } catch (err) {
@@ -46,7 +45,7 @@ const CatalogPage = () => {
         };
 
         fetchProducts();
-    }, [searchTerm]); // Ahora también depende de searchTerm
+    }, [searchTerm]);
 
     const totalPages = Math.ceil(searchFilteredProducts.length / productsPerPage);
     const indexOfLastProduct = currentPage * productsPerPage;
