@@ -9,7 +9,7 @@ import { useHistory } from 'react-router-dom';
 const AdminPage = () => {
     const [products, setProducts] = useState([]);
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
     const history = useHistory();
 
     useEffect(() => {
@@ -39,11 +39,6 @@ const AdminPage = () => {
         history.push(`/admin/validate-product/${id}`);
     };
 
-    const handleDelete = (id) => {
-        console.log('Eliminar producto:', id);
-        // Lógica para eliminar producto
-    };
-
     return (
         <Box sx={styles.mainBox}>
             <TopBar showSearchBar={true} showLogoutButton={true} />
@@ -52,14 +47,16 @@ const AdminPage = () => {
                     Admin Panel
                 </Typography>
                 <Grid margin={'50px'}>
-                    <TableContainer component={Paper}>
+                    <Paper elevation={6}>
+                        <TableContainer component={Paper}>
                         <Table>
                             <TableHead>
                                 <TableRow>
                                     <TableCell>ID</TableCell>
-                                    <TableCell>Nombre</TableCell>
-                                    <TableCell>Estado</TableCell>
-                                    <TableCell>Acciones</TableCell>
+                                    <TableCell>Name</TableCell>
+                                    <TableCell>Description</TableCell>
+                                    <TableCell>State</TableCell>
+                                    <TableCell>Actions</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -67,10 +64,10 @@ const AdminPage = () => {
                                     <TableRow key={product.id}>
                                         <TableCell>{product.id}</TableCell>
                                         <TableCell>{product.name}</TableCell>
+                                        <TableCell>{product.description}</TableCell>
                                         <TableCell>{product.state}</TableCell>
                                         <TableCell>
-                                            <Button color="primary" onClick={() => handleValidate(product.id)}>Validar</Button>
-                                            <Button color="secondary" onClick={() => handleDelete(product.id)}>Eliminar</Button>
+                                            <Button color="primary" onClick={() => handleValidate(product.id)}>validate</Button>
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -86,6 +83,8 @@ const AdminPage = () => {
                             onRowsPerPageChange={handleChangeRowsPerPage}
                         />
                     </TableContainer>
+                    </Paper>
+                    
                 </Grid>
             </Container>
             <Footer />
