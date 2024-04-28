@@ -1,10 +1,12 @@
 import random
 import string
+from faker import Faker
+from datetime import datetime, timedelta
+
+from app.database import SessionLocal as get_db
 from app.service.users.types.seller import SellerService
 from app.service.users.types.buyer import BuyerService
 from app.service.users.card import CardService
-from app.database import SessionLocal as get_db
-from datetime import datetime, timedelta
 from app.service.products.seller_product import SellerProductService
 from app.schemas.users.address import AddressCreate
 from app.schemas.users.types.buyer import BuyerCreate
@@ -26,10 +28,8 @@ from app.service.orders.refund_product import RefundProductService
 from app.schemas.orders.refund_product import RefundProductCreate
 from app.schemas.orders.order import OrderCreate
 from app.service.users.types.user import UserService
-from faker import Faker
-
-from schemas.users.types.admin import AdminCreate
-from service.users.types.admin import AdminService
+from app.schemas.users.types.admin import AdminCreate
+from app.service.users.types.admin import AdminService
 
 
 session = get_db()
@@ -73,7 +73,7 @@ refund_product_service = RefundProductService(
     product_line_service=product_line_service,
 )
 
-admin_service = AdminService(session=session, user_service=UserService)
+admin_service = AdminService(session=session, user_service=user_service)
 
 
 # Initialize Faker with a specific seed (for consistency)
@@ -129,11 +129,12 @@ for i in range(num_buyers):
         "email": faker.email(),
         "name": faker.first_name(),
         "surname": faker.last_name(),
+        "birth_date": faker.date_of_birth(minimum_age=15, maximum_age=80),
         "eco_points": 0.0,
         "dni": dni,
         "billing_address": faker.address(),
         "payment_method": "Credit Card",
-        "password": faker.password(length=12),
+        "password": "prueba",
     }
 
     while buyer_data["email"] in used_emails:
@@ -168,9 +169,10 @@ for i in range(num_sellers):
         "email": faker.email(),
         "name": faker.first_name(),
         "surname": faker.last_name(),
+        "birth_date": faker.date_of_birth(minimum_age=18, maximum_age=80),
         "cif": cif,
         "bank_data": bank_data,
-        "password": faker.password(length=12),
+        "password": "prueba",
     }
 
     while seller_data["email"] in used_emails:
@@ -632,7 +634,7 @@ for i in range(num_approved):
         eco_points=round(
             random.uniform(0, 100), 2
         ),  # Generate a random eco points value
-        age_restricted=random.choice([True,False])
+        age_restricted=random.choice([True, False]),
     )
 
     # Add the seller product to the session
