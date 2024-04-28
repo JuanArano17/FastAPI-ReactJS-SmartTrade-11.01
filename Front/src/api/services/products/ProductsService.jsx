@@ -15,6 +15,16 @@ const getAllProducts = async () => {
         throw error;
     }
 };
+const getProductById = async (product_id) => {
+    try {
+        console.log("Intentando conseguir el producto...")
+        const response = await axiosInstance.get(`products/${product_id}`);
+        console.log("producto conseguido correctamente", response)
+        return response.data;
+    } catch (error) {
+        console.error('Hubo un error al obtener el producto', error.response ? error.response.data : error);
+    }
+}
 const getAllProductsSeller = async () => {
     try {
         console.log("Intentando conseguir todos los productos de los vendedores...")
@@ -28,24 +38,33 @@ const getAllProductsSeller = async () => {
         throw error;
     }
 }
-const getProductById = async (product_id) => {
-    try {
-        console.log("Intentando conseguir el producto...")
-        const response = await axiosInstance.get(`products/${product_id}`);
-        console.log("producto conseguido correctamente", response)
-        return response.data;
-    } catch (error) {
-        console.error('Hubo un error al obtener el producto', error.response ? error.response.data : error);
-    }
-}
 const getProductSellerById = async (product_id) => {
     try {
-        console.log("Intentando conseguir el producto...")
+        console.log(`Intentando conseguir el producto con id: ${product_id}...`);
         const response = await axiosInstance.get(`/seller_products/${product_id}`);
-        console.log("producto conseguido correctamente", response)
+        console.log("producto conseguido correctamente", response);
         return response.data;
     } catch (error) {
         console.error('Hubo un error al obtener el producto', error.response ? error.response.data : error);
     }
 }
-export { getProductById,getAllProducts, getAllProductsSeller, getProductSellerById }
+const editSellerProductById = async (product) => {
+    const formatedProduct = {
+        quantity: product.quantity,
+        price: product.price,
+        shipping_costs: product.shipping_costs,
+        state: product.state,
+        justification: product.justification,
+        eco_points: product.eco_points,
+        age_restricted: product.age_restricted
+    };
+    try {
+        console.log(`Intentando editar el producto con id: ${product.id}...`);
+        const response = await axiosInstance.put(`/seller_products/${product.id}`);
+        console.log("producto editado correctamente", response);
+        return response.data;
+    } catch (error) {
+        console.error('Hubo un error al editar el producto', error.response ? error.response.data : error);
+    }
+}
+export { getAllProducts, getProductById, getAllProductsSeller, getProductSellerById, editSellerProductById}

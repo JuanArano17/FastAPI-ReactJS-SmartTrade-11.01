@@ -8,6 +8,8 @@ import ProductDetailPage from './pages/ProductDetailPage';
 import CatalogPage from './pages/CatalogPage';
 import ShoppingCartPage from './pages/ShoppingCartPage';
 import WishListPage from './pages/WishListPage';
+import AdminPage from './pages/AdminPage';
+import ValidateProductPage from './pages/ValidateProductPage';
 
 function App() {
   return (
@@ -23,6 +25,8 @@ function App() {
           <Route path="/forgotPassword" component={ForgotPasswordPage} />
           <Route path="/shopping-cart" component={ShoppingCartPage} />
           <Route path="/wish-list" component={WishListPage} />
+          <Route path="/admin/validate-product/:id" component={ValidateProductPage} />
+          <Route path="/admin" component={AdminPage} />
           <Route exact path="/" component={HomePage} />
         </Switch>
       </Router>

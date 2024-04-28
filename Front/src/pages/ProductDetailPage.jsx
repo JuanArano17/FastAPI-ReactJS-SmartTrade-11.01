@@ -43,7 +43,7 @@ const ProductDetailPage = () => {
         }
     };
     const renderAdditionalAttributes = (productData) => {
-        const commonAttributes = ['name', 'description', 'eco_points', 'spec_sheet', 'stock', 'id', 'images', 'seller_products'];
+        const commonAttributes = ['name', 'description', 'eco_points', 'id_product', 'id_seller', 'spec_sheet', 'stock', 'id', 'images', 'seller_products'];
         return Object.keys(productData)
             .filter(key => !commonAttributes.includes(key))
             .map(key => (
