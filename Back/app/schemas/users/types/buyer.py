@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, Field, EmailStr, NonNegativeFloat
+from pydantic import BaseModel, ConfigDict, Field, EmailStr, NonNegativeFloat, PastDate
 from typing import List, Optional
 from app.schemas.users.card import Card
 from app.schemas.users.address import Address
@@ -11,12 +11,14 @@ class BuyerBase(BaseModel):
     email: EmailStr
     name: str = Field(min_length=1, max_length=20)
     surname: str = Field(min_length=1, max_length=40)
+    birth_date: PastDate
     eco_points: NonNegativeFloat
     # TODO: change it later for a more formal validation
     dni: str = Field(min_length=9, max_length=9, pattern=r"^\d{8}[a-zA-Z]$")
     billing_address: str = Field(min_length=1, max_length=100)
     payment_method: str = Field(default="Credit Card", min_length=1, max_length=20)
     profile_picture: Optional[str] = None
+
 
 class BuyerCreate(BuyerBase):
     password: str

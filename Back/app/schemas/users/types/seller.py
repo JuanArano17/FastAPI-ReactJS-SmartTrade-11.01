@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, PastDate
 
 from app.schemas.products.seller_product import SellerProduct
 
@@ -8,11 +8,11 @@ class SellerBase(BaseModel):
     email: EmailStr
     name: str = Field(min_length=1, max_length=20)
     surname: str = Field(min_length=1, max_length=40)
+    birth_date: PastDate
     bank_data: str = Field(min_length=10, max_length=140)
     # TODO: change it later for a more formal validation
     cif: str = Field(pattern=r"^[A-Z][0-9]{8}$")
     profile_picture: Optional[str] = None
-
 
 
 class SellerCreate(SellerBase):
@@ -36,4 +36,3 @@ class Seller(SellerBase):
     id: int
     type: str
     seller_products: List[SellerProduct] = []
-    

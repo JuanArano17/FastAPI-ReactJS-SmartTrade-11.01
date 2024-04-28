@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, Field, EmailStr
+from pydantic import BaseModel, ConfigDict, Field, EmailStr, PastDate
 from typing import Optional
 
 
@@ -38,3 +38,4 @@ class User(UserBase):
 
     id: int
     type: str
+    birth_date: PastDate | None = None
