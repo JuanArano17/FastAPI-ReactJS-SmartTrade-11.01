@@ -65,4 +65,4 @@ const myInfoService = async () => {
         throw error;
     }
 }
-export {registerUserSellerService, registerUserBuyerService, loginUserService};
+export {registerUserSellerService, registerUserBuyerService, loginUserService, myInfoService};
