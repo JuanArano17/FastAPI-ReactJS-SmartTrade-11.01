@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, Date, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from app.models.users.types.user import User
@@ -13,6 +13,7 @@ class Seller(User):
         primary_key=True,
         index=True,
     )
+    birth_date = Column(Date, nullable=False)
     cif = Column(String(255), nullable=False, unique=True)
     bank_data = Column(String(255), nullable=False)
 

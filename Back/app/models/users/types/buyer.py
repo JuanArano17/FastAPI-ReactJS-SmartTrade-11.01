@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Float
+from sqlalchemy import Column, Date, ForeignKey, Integer, String, Float
 from sqlalchemy.orm import relationship
 
 from app.models.users.types.user import User
@@ -13,6 +13,7 @@ class Buyer(User):
         primary_key=True,
         index=True,
     )
+    birth_date = Column(Date, nullable=False)
     eco_points = Column(Float, nullable=False)
     dni = Column(String(255), nullable=False, unique=True)
     billing_address = Column(String(255))
