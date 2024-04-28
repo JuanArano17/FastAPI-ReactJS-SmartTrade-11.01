@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from app.api.deps import SellerProductServiceDep
+from app.api.deps import CurrentUserDep, SellerProductServiceDep
 from app.schemas.products.seller_product import (
     SellerProduct,
     SellerProductCreate,
@@ -121,17 +121,18 @@ async def update_seller_product(
     )
 
 
-seller_router = APIRouter(prefix="/sellers", tags=["Seller Products"])
-
+seller_router = APIRouter(
+    prefix="/seller_products/me", tags=["Seller Products"]
+)
 
 
 @seller_router.get(
-    "/{seller_id}/products", response_model=list[SellerProductRead], response_model_exclude_none=True
+    "/", response_model=list[SellerProductRead], response_model_exclude_none=True
 )
-async def read_seller_products(
-    *, seller_id: int, seller_product_service: SellerProductServiceDep
+async def read_seller_products_from_seller(
+    *, seller_product_service: SellerProductServiceDep, current_user:CurrentUserDep
 ):
     """
     Retrieve seller products from seller.
     """
-    return seller_product_service.get_by_id_seller(id_seller=seller_id)
+    return seller_product_service.get_by_id_seller(current_user.id)
