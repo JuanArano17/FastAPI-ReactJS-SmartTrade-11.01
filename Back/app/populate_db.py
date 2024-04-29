@@ -363,7 +363,7 @@ for _ in range(num_clothes):
             "Coat",
         ]
     )
-    size = random.choice(["XS", "S", "M", "L", "XL", "XXL"])
+    #size = random.choice(["XS", "S", "M", "L", "XL", "XXL"])
     # Create a Product object
     product = {
         "name": name,
@@ -372,7 +372,7 @@ for _ in range(num_clothes):
         "stock": stock,
         "materials": materials,
         "type": type,
-        "size": size,
+        #"size": size,
     }
 
     # Add the product to the session

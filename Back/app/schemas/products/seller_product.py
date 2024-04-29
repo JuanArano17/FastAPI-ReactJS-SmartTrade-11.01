@@ -53,7 +53,6 @@ class SellerProductRead(BaseModel):
     stock: int
     author: Optional[str] = None
     pages: Optional[int] = None
-    size: Optional[str] = None
     materials: Optional[str] = None
     type: Optional[str] = None
     brand: Optional[str] = None
