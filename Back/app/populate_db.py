@@ -30,6 +30,7 @@ from app.schemas.orders.order import OrderCreate
 from app.service.users.types.user import UserService
 from app.schemas.users.types.admin import AdminCreate
 from app.service.users.types.admin import AdminService
+from schemas.products.categories.variations.size import SizeCreate
 
 
 session = get_db()
@@ -363,7 +364,6 @@ for _ in range(num_clothes):
             "Coat",
         ]
     )
-    #size = random.choice(["XS", "S", "M", "L", "XL", "XXL"])
     # Create a Product object
     product = {
         "name": name,
@@ -589,28 +589,39 @@ product_ids = product_service.product_repo.get_id_list()
 seller_ids = seller_service.seller_repo.get_id_list()
 used_product_ids = set()
 
-for _ in range(num_seller_products):
-    # Generate random data for each seller product
-    quantity = random.randint(11, 100)
-    price = round(random.uniform(1.0, 100.0), 2)
-    shipping_costs = round(random.uniform(1.0, 20.0), 2)
 
+for _ in range(num_seller_products):
     # Choose a unique product ID
     id_product = random.choice(product_ids)
     while id_product in used_product_ids:
         id_product = random.choice(product_ids)
     used_product_ids.add(id_product)
 
-    # Create a SellerProduct object
-    seller_product = SellerProductCreate(
-        quantity=quantity,
-        price=price,
-        shipping_costs=shipping_costs,
-        id_product=id_product,
-    )
 
+    quantity = random.randint(11, 100)
+    price = round(random.uniform(1.0, 100.0), 2)
+    remaining_quantity=quantity
+    shipping_costs = round(random.uniform(1.0, 20.0), 2)
+    product=product_service.get_by_id(id_product)
+    sizes=[]
+    if(product.__class__.__name__=="Clothes"):
+        i=0
+        print(remaining_quantity)
+        while remaining_quantity > 0:
+            size = random.choice(["XS", "S", "M", "L", "XL", "XXL"])
+            quantity_per_size = random.randint(1, remaining_quantity)
+            sizes.append(SizeCreate(size=size, quantity=quantity_per_size).model_dump())
+            remaining_quantity -= quantity_per_size
+    
+    seller_product = SellerProductCreate(
+            quantity=quantity,
+            price=price,
+            shipping_costs=shipping_costs,
+            id_product=id_product,
+            sizes=sizes
+        )
     # Add the seller product to the session
-    seller_product_serv.add(
+    seller_product=seller_product_serv.add(
         id_seller=random.choice(seller_ids), seller_product=seller_product
     )
 

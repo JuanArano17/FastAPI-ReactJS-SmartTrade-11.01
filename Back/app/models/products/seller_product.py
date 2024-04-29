@@ -30,6 +30,7 @@ class SellerProduct(Base):
     in_shopping_carts = relationship("InShoppingCart", back_populates="seller_product")
     seller = relationship("Seller", back_populates="seller_products")
     product_lines = relationship("ProductLine", back_populates="seller_product")
+    sizes = relationship("Size", back_populates="seller_product")
 
     def __repr__(self):
         return f"SellerProduct(id={self.id}, id_product={self.id_product}, id_seller={self.id_seller}, quantity={self.quantity}, price={self.price}, shipping_costs={self.shipping_costs}, state={self.state}, justification={self.justification}, eco_points={self.eco_points}, age_restricted={self.age_restricted})"
