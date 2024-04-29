@@ -17,7 +17,7 @@ class BookBase(BaseModel):
     description: Optional[str] = None
     spec_sheet: str = Field(min_length=1, max_length=240)
     stock: NonNegativeInt = Field(default=0)
-    author: str = Field(min_length=1, max_length=20)
+    author: str = Field(min_length=1, max_length=40)
     pages: PositiveInt = Field(lt=30000)
 
 
@@ -30,7 +30,7 @@ class BookUpdate(BookBase):
     description: Optional[str] = None
     spec_sheet: str = Field(default=None, min_length=1, max_length=240)
     stock: Optional[NonNegativeInt] = None
-    author: Optional[str] = Field(default=None, min_length=1, max_length=20)
+    author: Optional[str] = Field(default=None, min_length=1, max_length=40)
     pages: Optional[PositiveInt] = Field(default=None, lt=30000)
 
 

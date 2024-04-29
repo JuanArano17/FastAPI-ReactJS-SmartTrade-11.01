@@ -12,6 +12,9 @@ from app.crud_repository import CRUDRepository
 from app.service.products.product import ProductService
 from abc import ABC, abstractmethod
 
+from app.models.products.categories.variations.size import Size
+from app.schemas.products.categories.variations.size import SizeCreate
+
 class SellerProductState(ABC):
     @abstractmethod
     def handle(self, new_data):
@@ -89,6 +92,7 @@ class SellerProductService:
     ):
         self.session = session
         self.seller_product_repo = SellerProductRepository(session=session)
+        self.size_repo = CRUDRepository(session=session,model=Size)
         self.seller_service = seller_service
         self.product_service = product_service
 
@@ -105,16 +109,47 @@ class SellerProductService:
                 detail=f"Seller already has a product with id {seller_product.id_product}",
             )
 
-        product.stock += seller_product.quantity  # type: ignore
+        if (product.__class__.__name__=="Clothes"):
+            if seller_product.sizes == []:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="Clothing products must have at least one size specified.",
+                )
+            
+            total_size=0
+            for size_data in seller_product.sizes:
+                total_size+=size_data.quantity
 
-        seller_product_obj = SellerProduct(
-            **seller_product.model_dump(), id_seller=id_seller, state="Pending", eco_points=0, age_restricted=False
-        )
-        seller_product_obj = self.seller_product_repo.add(seller_product_obj)
-        return seller_product_obj
+            if(total_size!=seller_product.quantity):
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="The quantities of the clothes sizes don't add up to the full quantity",
+                )    
+            
+            seller_product_obj = SellerProduct(
+                **seller_product.model_dump(exclude="sizes"), id_seller=id_seller, state="Pending", eco_points=0, age_restricted=False
+            )
+            seller_product_obj = self.seller_product_repo.add(seller_product_obj)
+
+            for size_data in seller_product.sizes:
+                self.size_repo.add(Size(**size_data.model_dump(), seller_product_id=seller_product_obj.id))
+            return seller_product_obj
+        else:
+            if seller_product.sizes!=[]:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="This category of product cannot have sizes",
+                )
+            product.stock += seller_product.quantity  # type: ignore
+            
+            seller_product_obj = SellerProduct(
+                **seller_product.model_dump(exclude="sizes"), id_seller=id_seller, state="Pending", eco_points=0, age_restricted=False
+            )
+            seller_product_obj = self.seller_product_repo.add(seller_product_obj)
+            return seller_product_obj
+        
     
     def get_current_state(self, state: str) -> SellerProductState:
-        # Determine the current state based on the provided state attribute
         if state == "Pending":
             return PendingState()
         elif state == "Approved":
@@ -150,6 +185,7 @@ class SellerProductService:
             materials=product.materials if hasattr(product, "materials") else None,
             type=product.type if hasattr(product, "type") else None,
             brand=product.brand if hasattr(product, "brand") else None,
+            size=product.size if hasattr(product, "size") else None,
             capacity=product.capacity if hasattr(product, "capacity") else None,
             power_source=product.power_source
             if hasattr(product, "power_source")
@@ -159,6 +195,7 @@ class SellerProductService:
             else None,
             publisher=product.publisher if hasattr(product, "publisher") else None,
             platform=product.platform if hasattr(product, "platform") else None,
+            sizes=seller_product.sizes
         )
     
     def map_seller_products(self, seller_products):
@@ -196,12 +233,56 @@ class SellerProductService:
 
     def update(self, seller_product_id, new_data: SellerProductUpdate) -> SellerProduct:
         seller_product = self.get_by_id(seller_product_id)
-        current_state = self.get_current_state(seller_product.state)  # Get the current state
+        current_state = self.get_current_state(seller_product.state) 
+        product=self.product_service.get_by_id(seller_product.id_product)
 
-        # Call the handle_update method of the current state object
+        if(new_data.sizes and product.__class__.__name__!="Clothes"):
+            raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Seller products of this category cannot have sizes",
+                )
+        
+        if(product.__class__.__name__=="Clothes"):
+            #total_size=0
+            #for size_data in new_data.sizes:
+            #    total_size+=size_data.quantity
+            
+            #if(new_data.quantity and new_data.quantity!=seller_product.quantity and new_data.sizes!=[] and new_data.sizes!=None):
+            #    sizes=seller_product.sizes
+            #    for size_data in new_data.sizes:
+            #        for old_sizes in sizes:
+            #            if(size_data.id==old_sizes.id):
+                            
+
+
+            #       for size_data in new_data.sizes:
+            #        size = self.size_repo.get_by_id(size_data.id)
+            #        if size:
+            #            self.size_repo.update(size, size_data)
+            #        else:
+            #            raise HTTPException(
+            #                status_code=status.HTTP_404_NOT_FOUND,
+            #                detail=f"Size with id {size_data['id']} not found for the seller product.",
+            #            )
+                
+            if new_data.sizes and new_data.sizes!=[] and not new_data.quantity:
+                new_data.quantity=seller_product.quantity
+                for size_data in new_data.sizes:
+                    size = self.size_repo.get_by_id(size_data.id)
+                    if size:
+                        for old_size in seller_product.sizes:
+                            if old_size.id == size_data.id:
+                                old_size_quantity=old_size.quantity
+                        new_data.quantity=new_data.quantity-old_size_quantity+size_data.quantity
+                        self.size_repo.update(size, size_data)
+                    else:
+                        raise HTTPException(
+                            status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Size with id {size_data['id']} not found for the seller product.",
+                        )
+
         current_state.handle(new_data)
 
-        # Perform other operations common to all states
         return self.seller_product_repo.update(seller_product, new_data)
 
     def delete_by_id(self, seller_product_id):
