@@ -11,7 +11,6 @@ class Clothes(Product):
         nullable=False,
         primary_key=True,
     )
-    size = Column(String(255), nullable=False)
     materials = Column(String(255), nullable=False)
     type = Column(String(255), nullable=False)
 
@@ -20,4 +19,4 @@ class Clothes(Product):
     }
 
     def __repr__(self):
-        return f"Clothes(id={self.id}, name='{self.name}', description='{self.description}', eco_points={self.eco_points}, spec_sheet='{self.spec_sheet}', stock={self.stock}, size={self.size}, materials={self.materials}, type={self.type})"
+        return f"Clothes(id={self.id}, name='{self.name}', description='{self.description}', spec_sheet='{self.spec_sheet}', stock={self.stock}, materials={self.materials}, type={self.type})"

@@ -10,9 +10,6 @@ class ClothesBase(BaseModel):
     description: Optional[str] = None
     spec_sheet: str = Field(min_length=1, max_length=240)
     stock: NonNegativeInt = Field(default=0)
-    size: str = Field(
-        pattern=r"\b(XS|S|M|L|XL|XXL|XXXL)\b", min_length=1, max_length=20
-    )
     materials: str = Field(min_length=1, max_length=40)
     type: str = Field(min_length=1, max_length=20)
 
@@ -26,9 +23,6 @@ class ClothesUpdate(ClothesBase):
     description: Optional[str] = None
     spec_sheet: str = Field(default=None, min_length=1, max_length=240)
     stock: Optional[NonNegativeInt] = None
-    size: str = Field(
-        default=None, pattern=r"\b(XS|S|M|L|XL|XXL|XXXL)\b", min_length=1, max_length=20
-    )
     materials: str = Field(default=None, min_length=1, max_length=40)
     type: str = Field(default=None, min_length=1, max_length=20)
 

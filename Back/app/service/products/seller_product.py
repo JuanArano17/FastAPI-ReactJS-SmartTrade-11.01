@@ -147,7 +147,6 @@ class SellerProductService:
             images=[image.url for image in product.images],
             author=product.author if hasattr(product, "author") else None,
             pages=product.pages if hasattr(product, "pages") else None,
-            size=product.size if hasattr(product, "size") else None,
             materials=product.materials if hasattr(product, "materials") else None,
             type=product.type if hasattr(product, "type") else None,
             brand=product.brand if hasattr(product, "brand") else None,
