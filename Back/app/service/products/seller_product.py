@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
-
+from app.schemas.products.seller_product import ProductState
 from app.schemas.products.seller_product import (
     SellerProductCreate,
     SellerProductRead,
@@ -19,13 +19,13 @@ class SellerProductState(ABC):
 
 class PendingState(SellerProductState):
     def handle(self, new_data):
-        if new_data.state == "Rejected":
+        if new_data.state == ProductState.Rejected:
             if not new_data.justification or len(new_data.justification) < 1:
                 raise HTTPException(
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     detail="Rejected products require a justification",
                 )
-        elif new_data.state == "Approved":
+        elif new_data.state == ProductState.Approved:
             new_data.justification = ""
             if new_data.eco_points is None:
                 raise HTTPException(
@@ -40,7 +40,7 @@ class PendingState(SellerProductState):
             
 class ApprovedState(SellerProductState):
     def handle(self, new_data):
-        if new_data.state == "Rejected":
+        if new_data.state == ProductState.Rejected:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="Approved products cannot be rejected",
@@ -48,7 +48,7 @@ class ApprovedState(SellerProductState):
 
 class RejectedState(SellerProductState):
     def handle(self, new_data):
-        if new_data.state == "Approved":
+        if new_data.state == ProductState.Approved:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="Rejected products cannot be approved",
@@ -108,7 +108,7 @@ class SellerProductService:
         product.stock += seller_product.quantity  # type: ignore
 
         seller_product_obj = SellerProduct(
-            **seller_product.model_dump(), id_seller=id_seller, state="Pending", eco_points=0, age_restricted=False
+            **seller_product.model_dump(), id_seller=id_seller, state=ProductState.Pending, eco_points=0, age_restricted=False
         )
         seller_product_obj = self.seller_product_repo.add(seller_product_obj)
         return seller_product_obj
