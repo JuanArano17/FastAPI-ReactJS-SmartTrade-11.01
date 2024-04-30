@@ -186,11 +186,11 @@ class SellerProductService:
         seller_products = self.seller_product_repo.get_all()
         return self.map_seller_products
     
-    def get_all_by_state(self,state,age) -> list[SellerProductRead]:
+    def get_all_by_state(self,state) -> list[SellerProductRead]:
         seller_products = self.seller_product_repo.get_all()
         complete_seller_products = []
         for seller_product in seller_products:
-            if(seller_product.state==state and (age>=18 or (age<18 and seller_product.age_restricted==False))):
+            if(seller_product.state==state):
                 seller_product_info = self.map_seller_product_to_read_schema(seller_product)
                 complete_seller_products.append(seller_product_info)
         return complete_seller_products
@@ -218,18 +218,11 @@ class SellerProductService:
             product.stock -= seller_product.quantity  # type: ignore
         self.seller_product_repo.delete_all()
 
-    def get_by_id_product(self, id_product, state, age) -> list[SellerProductRead]:
-        #seller_products = self.seller_product_repo.get_by_id_product(
-        #    id_product=id_product
-        #)
-        #return self.map_seller_products(seller_products)
-        seller_products = self.seller_product_repo.get_by_id_product(id_product=id_product)
-        complete_seller_products = []
-        for seller_product in seller_products:
-            if(seller_product.state==state and (age>=18 or (age<18 and seller_product.age_restricted==False))):
-                seller_product_info = self.map_seller_product_to_read_schema(seller_product)
-                complete_seller_products.append(seller_product_info)
-        return complete_seller_products
+    def get_by_id_product(self, id_product) -> list[SellerProductRead]:
+        seller_products = self.seller_product_repo.get_by_id_product(
+            id_product=id_product
+        )
+        return self.map_seller_products(seller_products)
     
     def get_by_id_seller(self, id_seller) -> list[SellerProductRead]:
         seller_products = self.seller_product_repo.get_by_id_seller(

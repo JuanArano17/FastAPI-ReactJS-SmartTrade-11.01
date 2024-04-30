@@ -1,7 +1,6 @@
-from datetime import datetime
 from fastapi import APIRouter, HTTPException
 
-from app.api.deps import BuyerServiceDep, CurrentUserDep, SellerProductServiceDep
+from app.api.deps import CurrentUserDep, SellerProductServiceDep
 from app.schemas.products.seller_product import (
     SellerProduct,
     SellerProductCreate,
@@ -18,15 +17,12 @@ router = APIRouter(
     "/", response_model=list[SellerProductRead], response_model_exclude_none=True
 )
 async def read_seller_products(
-    *, product_id: int, buyer_service:BuyerServiceDep , seller_product_service: SellerProductServiceDep, current_user: CurrentUserDep
+    *, product_id: int, seller_product_service: SellerProductServiceDep
 ):
     """
     Retrieve seller products from product.
     """
-    buyer=buyer_service.get_by_id(current_user.id)
-    current_date = datetime.now()
-    age = current_date.year - buyer.birth_date.year - ((current_date.month, current_date.day) < (buyer.birth_date.month, buyer.birth_date.day))
-    return seller_product_service.get_by_id_product(id_product=product_id, state="Approved", age=age)
+    return seller_product_service.get_by_id_product(id_product=product_id)
 
 
 @router.delete("/")
@@ -45,15 +41,11 @@ seller_prod_router = APIRouter(prefix="/seller_products", tags=["Seller Products
 @seller_prod_router.get(
     "/", response_model=list[SellerProductRead], response_model_exclude_none=True
 )
-async def read_seller_products_pure(*, buyer_service:BuyerServiceDep , seller_product_service: SellerProductServiceDep, current_user: CurrentUserDep):
+async def read_seller_products_pure(*, seller_product_service: SellerProductServiceDep):
     """
-    Retrieve seller products for buyers.
+    Retrieve seller products.
     """
-    buyer=buyer_service.get_by_id(current_user.id)
-    current_date = datetime.now()
-    age = current_date.year - buyer.birth_date.year - ((current_date.month, current_date.day) < (buyer.birth_date.month, buyer.birth_date.day))
-
-    return seller_product_service.get_all_by_state("Approved", age=age)
+    return seller_product_service.get_all_by_state("Approved")
 
 
 @seller_prod_router.get(
