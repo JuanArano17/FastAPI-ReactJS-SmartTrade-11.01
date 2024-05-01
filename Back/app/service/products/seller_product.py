@@ -235,55 +235,43 @@ class SellerProductService:
         seller_product = self.get_by_id(seller_product_id)
         current_state = self.get_current_state(seller_product.state) 
         product=self.product_service.get_by_id(seller_product.id_product)
-
         if(new_data.sizes and product.__class__.__name__!="Clothes"):
             raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Seller products of this category cannot have sizes",
                 )
         
+        if(new_data.quantity and product.__class__.__name__=="Clothes"):
+            raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Only update size quantities for clothing objects",
+                )
+
         if(product.__class__.__name__=="Clothes"):
-            #total_size=0
-            #for size_data in new_data.sizes:
-            #    total_size+=size_data.quantity
-            
-            #if(new_data.quantity and new_data.quantity!=seller_product.quantity and new_data.sizes!=[] and new_data.sizes!=None):
-            #    sizes=seller_product.sizes
-            #    for size_data in new_data.sizes:
-            #        for old_sizes in sizes:
-            #            if(size_data.id==old_sizes.id):
-                            
-
-
-            #       for size_data in new_data.sizes:
-            #        size = self.size_repo.get_by_id(size_data.id)
-            #        if size:
-            #            self.size_repo.update(size, size_data)
-            #        else:
-            #            raise HTTPException(
-            #                status_code=status.HTTP_404_NOT_FOUND,
-            #                detail=f"Size with id {size_data['id']} not found for the seller product.",
-            #            )
-                
-            if new_data.sizes and new_data.sizes!=[] and not new_data.quantity:
-                new_data.quantity=seller_product.quantity
+            if new_data.sizes:
                 for size_data in new_data.sizes:
-                    size = self.size_repo.get_by_id(size_data.id)
+                    size = self.size_repo.get_where(Size.size==size_data.size,Size.seller_product_id==seller_product_id)
                     if size:
-                        for old_size in seller_product.sizes:
-                            if old_size.id == size_data.id:
-                                old_size_quantity=old_size.quantity
-                        new_data.quantity=new_data.quantity-old_size_quantity+size_data.quantity
-                        self.size_repo.update(size, size_data)
+                        self.size_repo.update(size[0], size_data)
                     else:
                         raise HTTPException(
                             status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Size with id {size_data['id']} not found for the seller product.",
+                            detail=f"Size {size_data.size} not found for the seller product.",
                         )
-
         current_state.handle(new_data)
+        #new_data.sizes=[]
+        modified_data=SellerProductUpdate(**new_data.model_dump(exclude="sizes"))
+        if(self.are_all_fields_none_except_sizes(modified_data)):
+            return seller_product
+        return self.seller_product_repo.update(seller_product, modified_data)
+        
 
-        return self.seller_product_repo.update(seller_product, new_data)
+
+    def are_all_fields_none_except_sizes(self, new_data):
+        for field_name, field_value in new_data:
+            if field_name != 'sizes' and field_value is not None:
+                return False
+        return True
 
     def delete_by_id(self, seller_product_id):
         seller_product = self.get_by_id(seller_product_id)
