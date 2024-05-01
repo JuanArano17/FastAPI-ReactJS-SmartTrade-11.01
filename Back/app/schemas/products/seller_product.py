@@ -37,7 +37,7 @@ class SellerProduct(SellerProductBase):
     id: int
     id_product: int
     id_seller: int
-    #sizes: list[Size] = []
+    sizes: list[Size] = []
     
 
 
