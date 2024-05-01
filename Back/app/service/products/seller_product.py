@@ -115,11 +115,11 @@ class SellerProductService:
     
     def get_current_state(self, state: str) -> SellerProductState:
         # Determine the current state based on the provided state attribute
-        if state == "Pending":
+        if state == ProductState.Pending:
             return PendingState()
-        elif state == "Approved":
+        elif state == ProductState.Approved:
             return ApprovedState()
-        elif state == "Rejected":
+        elif state == ProductState.Rejected:
             return RejectedState()
         else:
             raise ValueError("Invalid state value")
