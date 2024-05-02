@@ -174,6 +174,9 @@ class SellerProductService:
         self, seller_product: SellerProduct
     ) -> SellerProductRead:
         product = self.product_service.get_by_id(seller_product.id_product)
+        sizes=seller_product.sizes
+        if(product.category!="Clothes"):
+            sizes=None
         return SellerProductRead(
             quantity=seller_product.quantity,
             price=seller_product.price,
@@ -206,7 +209,7 @@ class SellerProductService:
             else None,
             publisher=product.publisher if hasattr(product, "publisher") else None,
             platform=product.platform if hasattr(product, "platform") else None,
-            sizes=seller_product.sizes
+            sizes=sizes
         )
     
     def map_seller_products(self, seller_products):
