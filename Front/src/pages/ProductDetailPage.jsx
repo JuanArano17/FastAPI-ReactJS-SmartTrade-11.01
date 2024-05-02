@@ -20,6 +20,7 @@ const ProductDetailPage = () => {
             try {
                 setLoading(true);
                 const response = await getProductSellerById(id);
+                console.log(response.data)
                 if (response) {
                     setProductData(response);
                     setLoading(false);

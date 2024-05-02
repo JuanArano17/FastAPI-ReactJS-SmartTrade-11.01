@@ -1,32 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Slider, Select, MenuItem, FormControl, InputLabel, Button, Grid, Switch, FormControlLabel } from '@mui/material';
-import { myInfoService } from '../../../api/services/user/AuthService';
+import { Typography, Slider, Select, MenuItem, FormControl, InputLabel, Button, Grid } from '@mui/material';
 
 const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [priceRange, setPriceRange] = useState([0, 10000000]);
-    const [userAge, setUserAge] = useState(null);
+    const [ecoPointsRange, setEcoPointsRange] = useState([0, 100]);
     const [categories, setCategories] = useState([]);
     const [maxPrice, setMaxPrice] = useState(0);
+    const [maxEcoPoints, setMaxEcoPoints] = useState(100); 
 
-    const fetchUserInfo = async () => {
-        try {
-            const userInfo = await myInfoService();
-            const birthDate = new Date(userInfo.birth_date);
-            const age = calculateAge(birthDate);
-            setUserAge(age);
-        } catch (error) {
-            console.error('Error al obtener la información del usuario:', error);
-        }
-    };
     useEffect(() => {
         if (products) {
-            fetchUserInfo();
             const uniqueCategories = Array.from(new Set(products.map(product => product.category)));
             setCategories(uniqueCategories);
             const highestPrice = Math.max(...products.map(product => product.price));
+            const highestEcoPoints = Math.max(...products.map(product => product.ecoPoints)); 
             setMaxPrice(highestPrice);
+            setMaxEcoPoints(highestEcoPoints);
             setPriceRange([0, highestPrice]);
+            setEcoPointsRange([0, highestEcoPoints]); 
         }
     }, [products]);
 
@@ -35,42 +27,35 @@ const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => 
             const matchesSearchTerm = searchTerm === "" || product.name.toLowerCase().includes(searchTerm.toLowerCase()) || product.description.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesCategory = selectedCategory === "" || product.category === selectedCategory;
             const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
-            const isAgeAppropriate = userAge >= 18 || !product.age_restricted;
-            return matchesSearchTerm && matchesCategory && matchesPrice && isAgeAppropriate;
+            const matchesEcoPoints = product.ecoPoints >= ecoPointsRange[0] && product.ecoPoints <= ecoPointsRange[1]; 
+            return matchesSearchTerm && matchesCategory && matchesPrice && matchesEcoPoints;
         });
-        console.log(result);
         setSearchFilteredProducts(result);
-    }, [selectedCategory, priceRange, products, searchTerm, userAge]);
-
-    const calculateAge = (birthDate) => {
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const m = today.getMonth() - birthDate.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-            age--;
-        }
-        return age;
-    };
+    }, [selectedCategory, priceRange, ecoPointsRange, products, searchTerm]);
 
     const handlePriceChange = (event, newValue) => {
         setPriceRange(newValue);
     };
 
+    const handleEcoPointsChange = (event, newValue) => {
+        setEcoPointsRange(newValue);
+    };
+
     const clearFilters = () => {
         setSelectedCategory('');
         setPriceRange([0, maxPrice]);
+        setEcoPointsRange([0, maxEcoPoints]);
     };
 
     return (
         <Grid container spacing={2} alignItems="center" justifyContent="center">
             <Grid item md={2}>
-                <FormControl variant="outlined" fullWidth>
-                    <InputLabel htmlFor="category-select">Category</InputLabel>
+                <FormControl fullWidth>
+                    <InputLabel>Category</InputLabel>
                     <Select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
-                        label="Categoría"
-                        inputProps={{ id: 'category-select' }}
+                        label="Category"
                     >
                         <MenuItem value="">All</MenuItem>
                         {categories.map((category) => (
@@ -79,19 +64,27 @@ const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => 
                     </Select>
                 </FormControl>
             </Grid>
-            <Grid item md={6}>
-                <Typography gutterBottom>Price range</Typography>
+            <Grid item md={3}sx={{ margin: '0 10px' }}>
+                <Typography gutterBottom>Price Range</Typography>
                 <Slider
                     value={priceRange}
                     onChange={handlePriceChange}
                     valueLabelDisplay="auto"
-                    aria-labelledby="range-slider"
-                    min={0}
                     max={maxPrice}
+                    
                 />
             </Grid>
-            <Grid item>
-                <Button variant="outlined" onClick={clearFilters}>Clean Filters</Button>
+            <Grid item md={3}sx={{ margin: '0 10px' }}>
+                <Typography gutterBottom>Eco Points Range</Typography>
+                <Slider
+                    value={ecoPointsRange}
+                    onChange={handleEcoPointsChange}
+                    valueLabelDisplay="auto"
+                    max={maxEcoPoints}
+                />
+            </Grid>
+            <Grid item md={2}>
+                <Button variant="outlined" onClick={clearFilters}>Clear Filters</Button>
             </Grid>
         </Grid>
     );
