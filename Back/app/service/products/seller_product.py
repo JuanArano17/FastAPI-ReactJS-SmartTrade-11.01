@@ -130,8 +130,10 @@ class SellerProductService:
                 ) 
                 used_sizes.append(size_data.size)
             
+            product.stock += seller_product.quantity  # type: ignore
+
             seller_product_obj = SellerProduct(
-                **seller_product.model_dump(exclude="sizes"), id_seller=id_seller, state="Pending", eco_points=0, age_restricted=False
+                **seller_product.model_dump(exclude="sizes"), id_seller=id_seller, state=ProductState.Pending, eco_points=0, age_restricted=False
             )
             seller_product_obj = self.seller_product_repo.add(seller_product_obj)
 
@@ -154,14 +156,14 @@ class SellerProductService:
             product.stock += seller_product.quantity  # type: ignore
 
             seller_product_obj = SellerProduct(
-                **seller_product.model_dump(exclude="sizes"), id_seller=id_seller, state="Pending", eco_points=0, age_restricted=False
+                **seller_product.model_dump(exclude="sizes"), id_seller=id_seller, state=ProductState.Pending, eco_points=0, age_restricted=False
             )
             seller_product_obj = self.seller_product_repo.add(seller_product_obj)
             return seller_product_obj
         
     
     def get_current_state(self, state: str) -> SellerProductState:
-        if state == "Pending":
+        if state == ProductState.Pending:
             return PendingState()
         elif state == "Approved":
             return ApprovedState()
@@ -246,6 +248,7 @@ class SellerProductService:
         seller_product = self.get_by_id(seller_product_id)
         current_state = self.get_current_state(seller_product.state) 
         product=self.product_service.get_by_id(seller_product.id_product)
+        current_state.handle(new_data)
         if(new_data.sizes and product.__class__.__name__!="Clothes"):
             raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
@@ -271,7 +274,6 @@ class SellerProductService:
                 used_sizes.append(size_data.size)
 
             new_data.quantity=seller_product.quantity
-            old_seller_product=seller_product
             if new_data.sizes:
                 for size_data in new_data.sizes:
                     size = self.size_repo.get_where(Size.size==size_data.size,Size.seller_product_id==seller_product_id)
@@ -284,10 +286,9 @@ class SellerProductService:
                         self.size_repo.add(Size(**size_data.model_dump(), seller_product_id=seller_product_id))
 
         if(new_data.quantity):
-            product.stock += new_data.quantity - seller_product.quantity
+            product.stock = product.stock + new_data.quantity - seller_product.quantity
             seller_product.notify_observers(new_data.quantity)
 
-        current_state.handle(new_data)
         #new_data.sizes=[]
         modified_data=SellerProductUpdate(**new_data.model_dump(exclude="sizes"))
         if(self.are_all_fields_none_except_sizes(modified_data)):
