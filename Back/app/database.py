@@ -22,6 +22,7 @@ from app.models.users.card import Card
 from app.models.users.types.seller import Seller
 from app.models.orders.order import Order
 from app.models.orders.product_line import ProductLine
+from app.models.products.categories.variations.size import Size
 from app.models.products.seller_product import SellerProduct
 from app.models.users.in_shopping_cart import InShoppingCart
 from app.models.users.in_wish_list import InWishList

@@ -86,7 +86,6 @@ def fake_clothes():
         "stock": 0,
         "materials": "cotton, wool",
         "type": "T-shirt",
-        "size": "M",
     }
 
 
@@ -222,7 +221,6 @@ def test_create_clothes(
     assert content["stock"] == data["stock"]
     assert content["description"] == data["description"]
     assert content["type"] == data["type"]
-    assert content["size"] == data["size"]
     assert content["materials"] == data["materials"]
     assert "id" in content
 
@@ -231,8 +229,8 @@ def test_create_clothes(
 
 
 def test_create_product_invalid_data(client: TestClient):
-    data = fake_clothes()
-    data["size"] = "N"  # Invalid clothes size
+    data = fake_game()
+    data["size"] = "N"  # Invalid game size
 
     response = client.post("/products/?category_name=clothes", json=data)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -387,7 +385,7 @@ def test_get_clothes_by_id(
     assert content["stock"] == data["stock"]
     assert content["description"] == data["description"]
     assert content["type"] == data["type"]
-    assert content["size"] == data["size"]
+    #assert content["size"] == data["size"]
     assert content["materials"] == data["materials"]
     assert "id" in content
     assert content["id"] == product.id  # type: ignore
