@@ -115,16 +115,20 @@ class SellerProductService:
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     detail="Clothing products must have at least one size specified.",
                 )
+            seller_product.quantity=0
+            for size in seller_product.sizes:
+                seller_product.quantity+=size.quantity
             
             total_size=0
+            used_sizes=[]
             for size_data in seller_product.sizes:
                 total_size+=size_data.quantity
-
-            if(total_size!=seller_product.quantity):
-                raise HTTPException(
+                if size_data.size in used_sizes:
+                    raise HTTPException(
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail="The quantities of the clothes sizes don't add up to the full quantity",
-                )    
+                    detail="There can't be repeat sizes for the same clothing item"
+                ) 
+                used_sizes.append(size_data.size)
             
             seller_product_obj = SellerProduct(
                 **seller_product.model_dump(exclude="sizes"), id_seller=id_seller, state="Pending", eco_points=0, age_restricted=False
@@ -140,8 +144,15 @@ class SellerProductService:
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     detail="This category of product cannot have sizes",
                 )
-            product.stock += seller_product.quantity  # type: ignore
             
+            if not seller_product.quantity:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="This category of product must have a quantity",
+                )
+
+            product.stock += seller_product.quantity  # type: ignore
+
             seller_product_obj = SellerProduct(
                 **seller_product.model_dump(exclude="sizes"), id_seller=id_seller, state="Pending", eco_points=0, age_restricted=False
             )
@@ -246,18 +257,36 @@ class SellerProductService:
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Only update size quantities for clothing objects",
                 )
+        
+
 
         if(product.__class__.__name__=="Clothes"):
+            used_sizes=[]
+            for size_data in new_data.sizes:
+                if size_data.size in used_sizes:
+                    raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="There can't be repeat sizes for the same clothing item"
+                ) 
+                used_sizes.append(size_data.size)
+
+            new_data.quantity=seller_product.quantity
+            old_seller_product=seller_product
             if new_data.sizes:
                 for size_data in new_data.sizes:
                     size = self.size_repo.get_where(Size.size==size_data.size,Size.seller_product_id==seller_product_id)
                     if size:
+                        new_data.quantity=new_data.quantity-size[0].quantity+size_data.quantity
                         self.size_repo.update(size[0], size_data)
                     else:
-                        raise HTTPException(
-                            status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Size {size_data.size} not found for the seller product.",
-                        )
+                        new_data.quantity=new_data.quantity+size_data.quantity
+                        size_data=SizeCreate(**size_data.model_dump())
+                        self.size_repo.add(Size(**size_data.model_dump(), seller_product_id=seller_product_id))
+
+        if(new_data.quantity):
+            product.stock += new_data.quantity - seller_product.quantity
+            seller_product.notify_observers(new_data.quantity)
+
         current_state.handle(new_data)
         #new_data.sizes=[]
         modified_data=SellerProductUpdate(**new_data.model_dump(exclude="sizes"))

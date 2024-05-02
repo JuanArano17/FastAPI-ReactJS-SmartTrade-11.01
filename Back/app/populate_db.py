@@ -606,10 +606,16 @@ for _ in range(num_seller_products):
     sizes=[]
     if(product.__class__.__name__=="Clothes"):
         i=0
-        print(remaining_quantity)
+        used_choices=[]
+        options=["XS", "S", "M", "L", "XL", "XXL", "XXXL","XXXXL"]
         while remaining_quantity > 0:
-            size = random.choice(["XS", "S", "M", "L", "XL", "XXL"])
+            size = random.choice(options)
+            while(size in used_choices):
+                size = random.choice(options)
+            used_choices.append(size)
             quantity_per_size = random.randint(1, remaining_quantity)
+            if(len(used_choices)==len(options)):
+                quantity_per_size = remaining_quantity
             sizes.append(SizeCreate(size=size, quantity=quantity_per_size).model_dump())
             remaining_quantity -= quantity_per_size
     
