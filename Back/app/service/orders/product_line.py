@@ -60,11 +60,15 @@ class ProductLineService:
         product_line = ProductLine(**product_line.model_dump(), id_order=id_order)
         order.total += product_line.subtotal  # type: ignore
 
-        # seller_product.quantity -= product_line.quantity  # type: ignore
-        seller_product_update = SellerProductUpdate(
-            quantity=seller_product.quantity - product_line.quantity
-        )
-        self.seller_product_service.update(seller_product.id, seller_product_update)
+        #seller_product.quantity -= product_line.quantity  # type: ignore
+        
+        if(seller_product.sizes==[]):
+            seller_product_update = SellerProductUpdate(
+                quantity=seller_product.quantity - product_line.quantity
+            )
+            self.seller_product_service.update(seller_product.id, seller_product_update)
+        else: 
+            pass # add logic for clothes
         product_line = self.product_line_repo.add(product_line)
         return product_line
 

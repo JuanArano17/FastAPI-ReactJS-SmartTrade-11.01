@@ -11,7 +11,7 @@ class ProductState(str, Enum):
     Pending = "Pending"
 
 class SellerProductBase(BaseModel):
-    quantity: NonNegativeInt
+    quantity: Optional[NonNegativeInt] = None
     price: NonNegativeFloat
     shipping_costs: NonNegativeFloat
     sizes: Optional[list[SizeCreate]] = []
