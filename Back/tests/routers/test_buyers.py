@@ -15,6 +15,7 @@ def fake_buyer():
         "name": "Jonathan",
         "surname": "Wick Doe",
         "dni": "58263711F",
+        "birth_date": "1993-09-26",
         "eco_points": 0,
         "billing_address": "Street Whatever 123",
         "payment_method": "Bizum",
@@ -34,6 +35,7 @@ def test_create_buyer(client: TestClient, buyer_service: BuyerService, db: Sessi
     assert content["dni"] == data["dni"]
     assert content["billing_address"] == data["billing_address"]
     assert content["payment_method"] == data["payment_method"]
+    assert content["birth_date"] == data["birth_date"]
     assert "id" in content
     assert "password" not in content
 
@@ -97,6 +99,7 @@ def test_get_buyer_by_id(client: TestClient, buyer_service: BuyerService, db: Se
     assert content["dni"] == data["dni"]
     assert content["billing_address"] == data["billing_address"]
     assert content["payment_method"] == data["payment_method"]
+    assert content["birth_date"] == data["birth_date"]
     assert "id" in content
     assert "password" not in content
     assert content["id"] == buyer.id  # type: ignore
@@ -118,6 +121,7 @@ def test_get_buyers(client: TestClient, buyer_service: BuyerService, db: Session
             email="johnwepkins@gmail.com",
             name="John",
             surname="Wepkins",
+            birth_date="1992-03-03",
             dni="12345678A",
             eco_points=0,
             billing_address="Street Whatever 123",
@@ -130,8 +134,9 @@ def test_get_buyers(client: TestClient, buyer_service: BuyerService, db: Session
             email="mariacarey@hotmail.com",
             name="Maria",
             surname="Carey",
-            dni="87654321B",
+            birth_date="1992-03-03",
             eco_points=0,
+            dni="87654321B",
             billing_address="Street Molotia 2",
             payment_method="Bizum",
             password="mypass@123",
@@ -142,6 +147,7 @@ def test_get_buyers(client: TestClient, buyer_service: BuyerService, db: Session
             email="deanwinshester@gmail.com",
             name="Dean",
             surname="Winshester",
+            birth_date="1992-03-03",
             dni="12348765C",
             eco_points=0,
             billing_address="Street Winshesters 912",
@@ -171,12 +177,6 @@ def test_update_buyer(client: TestClient, buyer_service: BuyerService, db: Sessi
         "billing_address": "New Street 123",
         "payment_method": "Credit Card",
     }
-    # new_data["name"] = "New Name"
-    # new_data["surname"] = "New Surname"
-    # new_data["dni"] = "12345678Z"
-    # new_data["eco_points"] = 100
-    # new_data["billing_address"] = "New Street 123"
-    # new_data["payment_method"] = "Credit Card"
 
     response = client.put(f"/buyers/{buyer.id}", json=new_data)  # type: ignore
     assert response.status_code == status.HTTP_200_OK
@@ -223,6 +223,7 @@ def test_update_buyer_with_used_dni(
             email="mariacarey@hotmail.com",
             name="Maria",
             surname="Carey",
+            birth_date="1992-03-03",
             dni="87654321B",
             eco_points=0,
             billing_address="Street Molotia 2",
@@ -251,6 +252,7 @@ def test_update_buyer_with_used_email(
             email="mariacarey@hotmail.com",
             name="Maria",
             surname="Carey",
+            birth_date="1992-03-03",
             dni="87654321B",
             eco_points=0,
             billing_address="Street Molotia 2",
@@ -295,6 +297,7 @@ def test_delete_buyers(client: TestClient, buyer_service: BuyerService, db: Sess
             email="johnwepkins@gmail.com",
             name="John",
             surname="Wepkins",
+            birth_date="1992-03-03",
             dni="12345678A",
             eco_points=0,
             billing_address="Street Whatever 123",
@@ -307,6 +310,7 @@ def test_delete_buyers(client: TestClient, buyer_service: BuyerService, db: Sess
             email="mariacarey@hotmail.com",
             name="Maria",
             surname="Carey",
+            birth_date="1992-03-03",
             dni="87654321B",
             eco_points=0,
             billing_address="Street Molotia 2",
@@ -319,6 +323,7 @@ def test_delete_buyers(client: TestClient, buyer_service: BuyerService, db: Sess
             email="deanwinshester@gmail.com",
             name="Dean",
             surname="Winshester",
+            birth_date="1992-03-03",
             dni="12348765C",
             eco_points=0,
             billing_address="Street Winshesters 912",

@@ -28,6 +28,7 @@ class BuyerUpdate(BuyerBase):
     email: Optional[EmailStr] = None
     name: Optional[str] = Field(default=None, min_length=1, max_length=20)
     surname: Optional[str] = Field(default=None, min_length=1, max_length=40)
+    birth_date: Optional[PastDate]= None
     eco_points: Optional[NonNegativeFloat] = None
     # TODO: change it later for a more formal validation
     dni: Optional[str] = Field(

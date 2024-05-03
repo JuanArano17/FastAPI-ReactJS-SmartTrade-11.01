@@ -23,6 +23,7 @@ class SellerUpdate(SellerBase):
     email: Optional[EmailStr] = None
     name: Optional[str] = Field(default=None, min_length=1, max_length=20)
     surname: Optional[str] = Field(default=None, min_length=1, max_length=40)
+    birth_date: Optional[PastDate]= None
     bank_data: Optional[str] = Field(default=None, min_length=10, max_length=140)
     cif: Optional[str] = Field(default=None, pattern=r"^[A-Z][0-9]{8}$")
     password: Optional[str] = None
