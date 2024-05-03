@@ -182,8 +182,8 @@ def test_update_buyer(client: TestClient, buyer_service: BuyerService, db: Sessi
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["email"] == data["email"]
-    # assert content["name"] == new_data["name"]
-    # assert content["surname"] == new_data["surname"]
+    #assert content["name"] == new_data["name"]
+    #assert content["surname"] == new_data["surname"]
     assert content["dni"] == new_data["dni"]
     assert content["eco_points"] == new_data["eco_points"]
     assert content["billing_address"] == new_data["billing_address"]

@@ -29,6 +29,7 @@ def fake_buyer():
         "name": "Jonathan",
         "surname": "Wick Doe",
         "dni": "58263711F",
+        "birth_date": "1993-02-02",
         "eco_points": 0,
         "billing_address": "Street Whatever 123",
         "payment_method": "Bizum",
@@ -45,11 +46,24 @@ def test_create_address(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
-    data = fake_address()
+    login_data = {
+        "username": data["email"],
+        "password": data["password"]
+    }
 
-    response = client.post(f"/buyers/{buyer.id}/addresses", json=data)
-    assert response.status_code == status.HTTP_200_OK
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    address_data = fake_address()
+
+    response = client.post("/addresses/me/", json=address_data, headers=headers)
     content = response.json()
+    print(content)
+    assert response.status_code == status.HTTP_200_OK
+    
     assert content["street"] == data["street"]
     assert content["floor"] == data["floor"]
     assert content["door"] == data["door"]
