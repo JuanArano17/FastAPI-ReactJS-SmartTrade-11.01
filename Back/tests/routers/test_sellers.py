@@ -14,6 +14,7 @@ def fake_seller():
         "email": "donaldtrump@gmail.com",
         "name": "Donald",
         "surname": "Trump",
+        "birth_date": "1992-03-03",
         "bank_data": "Random bank data",
         "cif": "S31002655",
         "password": "randompassword",
@@ -31,6 +32,7 @@ def test_create_seller(client: TestClient, seller_service: SellerService, db: Se
     assert content["surname"] == data["surname"]
     assert content["bank_data"] == data["bank_data"]
     assert content["cif"] == data["cif"]
+    assert content["birth_date"] == data["birth_date"]
     assert "id" in content
     assert "password" not in content
 
@@ -95,6 +97,7 @@ def test_get_seller_by_id(
     assert content["surname"] == data["surname"]
     assert content["bank_data"] == data["bank_data"]
     assert content["cif"] == data["cif"]
+    assert content["birth_date"] == data["birth_date"]
     assert "id" in content
     assert "password" not in content
     assert content["id"] == seller.id  # type: ignore
@@ -114,6 +117,7 @@ def test_get_sellers(client: TestClient, seller_service: SellerService):
             email="samuelwinshester@gmail.com",
             name="Samuel",
             surname="Winshester",
+            birth_date="1992-03-03",
             bank_data="Random bank data",
             cif="S31002655",
             password="randompassword",
@@ -125,6 +129,7 @@ def test_get_sellers(client: TestClient, seller_service: SellerService):
             email="tayloranderson@gmail.com",
             name="Taylor",
             surname="Anderson",
+            birth_date="1992-03-03",
             bank_data="Whatever bank data",
             cif="S31002656",
             password="whateverpass",
@@ -136,6 +141,7 @@ def test_get_sellers(client: TestClient, seller_service: SellerService):
             email="hendricksousa@hotmail.com",
             name="Hendrick",
             surname="Sousa",
+            birth_date="1992-03-03",
             bank_data="Another bank data",
             cif="S31002657",
             password="anotherpass",
@@ -157,19 +163,20 @@ def test_update_seller(client: TestClient, seller_service: SellerService):
     seller = seller_service.add(SellerCreate(**data))
 
     new_data = {
-        # "name": "Donaldnew",
-        # "surname": "New Trump",
+        "name": "Donaldnew",
+        "surname": "New Trump",
         "bank_data": "New bank data",
         "cif": "S31002657",
         "password": "newpassword",
+        "birth_date" : "1997-09-09"
     }
 
     response = client.put(f"/sellers/{seller.id}", json=new_data)  # type: ignore
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["email"] == data["email"]
-    # assert content["name"] == new_data["name"]
-    # assert content["surname"] == new_data["surname"]
+    assert content["name"] == new_data["name"]
+    assert content["surname"] == new_data["surname"]
     assert content["bank_data"] == new_data["bank_data"]
     assert content["cif"] == new_data["cif"]
     assert "id" in content
@@ -182,8 +189,8 @@ def test_update_seller_invalid_data(client: TestClient, seller_service: SellerSe
     seller = seller_service.add(SellerCreate(**data))
 
     new_data = {
-        # "name": "Donaldnew",
-        # "surname": "New Trump",
+        "name": "Donaldnew",
+        "surname": "New Trump",
         "bank_data": "New bank data",
         "cif": "1234",
         "password": "newpassword",
@@ -206,6 +213,7 @@ def test_update_seller_with_used_cif(
             email="mariacarey@hotmail.com",
             name="Maria",
             surname="Carey",
+            birth_date="1992-03-03",
             bank_data="Whatever bank data",
             cif="S31002656",
             password="mypass@123",
@@ -234,6 +242,7 @@ def test_update_seller_with_used_email(
             email="mariacarey@hotmail.com",
             name="Maria",
             surname="Carey",
+            birth_date="1992-03-03",
             bank_data="Whatever bank data",
             cif="S31002656",
             password="mypass@123",
@@ -279,6 +288,7 @@ def test_delete_all_sellers(
             email="joshuaholtz@gmail.com",
             name="Joshua",
             surname="Holtz",
+            birth_date="1992-03-03",
             bank_data="Random bank data",
             cif="S31002655",
             password="randompassword",
@@ -290,6 +300,7 @@ def test_delete_all_sellers(
             email="jefflombrado@gmail.com",
             name="Jeff",
             surname="Lombrado",
+            birth_date="1992-03-03",
             bank_data="Random bank data",
             cif="S31002656",
             password="randompassword",
@@ -301,6 +312,7 @@ def test_delete_all_sellers(
             email="jessicatrinity@gmail.com",
             name="Jessica",
             surname="Trinity",
+            birth_date="1992-03-03",
             bank_data="Random bank data",
             cif="S31002657",
             password="randompassword",
