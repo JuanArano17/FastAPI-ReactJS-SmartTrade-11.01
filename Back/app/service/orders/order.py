@@ -18,7 +18,7 @@ class OrderRepository(CRUDRepository):
         super().__init__(session=session, model=Order)
 
     def delete_all_by_buyer_id(self, id_buyer):
-        self._db.query(self._model).filter(self._model.id_buyer == id_buyer).delete()  # type: ignore
+        self._db.query(self._model).filter(self._model.id_buyer == id_buyer).delete()
 
 
 class OrderService:
@@ -46,7 +46,7 @@ class OrderService:
         self.buyer_service.get_by_id(id_buyer)
         card = self.card_service.get_by_id(order.id_card)
 
-        if card.id_buyer != id_buyer:  # type: ignore
+        if card.id_buyer != id_buyer:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"The card with id {order.id_card} does not belong to the buyer with id {id_buyer}.",
@@ -54,7 +54,7 @@ class OrderService:
 
         address = self.address_service.get_by_id(order.id_address)
 
-        if address.id_buyer != id_buyer:  # type: ignore
+        if address.id_buyer != id_buyer:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"The address with id {order.id_address} does not belong to the buyer with id {id_buyer}.",

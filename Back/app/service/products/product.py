@@ -99,7 +99,7 @@ class ProductService:
             Product,
             [Book, Game, Electronics, Clothes, Food, HouseUtilities, Electrodomestics],
         )
-        return self.session.scalars(select(Product).options(load_opt)).all()  # type: ignore
+        return self.session.scalars(select(Product).options(load_opt)).all()
 
     def update(self, product_id, new_data: dict):
         return self.product_factory.update_product(product_id, new_data)

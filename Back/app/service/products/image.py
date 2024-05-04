@@ -22,7 +22,7 @@ class ImageRepository(CRUDRepository):
     def delete_by_id_product(self, id_product):
         self._db.query(self._model).filter(
             self._model.id_product == id_product
-        ).delete()  # type: ignore
+        ).delete()
         self._db.commit()
 
 

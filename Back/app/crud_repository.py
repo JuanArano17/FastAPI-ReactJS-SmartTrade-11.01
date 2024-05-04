@@ -25,7 +25,7 @@ class CRUDRepository:
         return self._db.query(self._model).all()
 
     def get_by_id(self, id) -> T | None:
-        return self._db.query(self._model).filter(self._model.id == id).first()  # type: ignore
+        return self._db.query(self._model).filter(self._model.id == id).first()
 
     def get_where(self, *expressions) -> list[T]:
         return self._db.query(self._model).filter(*expressions).all()
@@ -34,23 +34,22 @@ class CRUDRepository:
         data = new_entity.model_dump(
             exclude_unset=True, exclude_defaults=exclude_defaults
         )
-        self._db.query(self._model).filter(self._model.id == entity.id).update({**data})  # type: ignore
+        self._db.query(self._model).filter(self._model.id == entity.id).update({**data})
         self._db.commit()
         self._db.refresh(entity)
         return entity
 
     def delete_by_id(self, id):
-        self._db.query(self._model).filter(self._model.id == id).delete()  # type: ignore
+        self._db.query(self._model).filter(self._model.id == id).delete()
         self._db.commit()
-        
 
     def delete_all(self):
         self._db.query(self._model).delete()
         self._db.commit()
-        
+
     def get_id_list(self):
-        items=self._db.query(self._model).all()
-        ids=[]
+        items = self._db.query(self._model).all()
+        ids = []
         for item in items:
             ids.append(item.id)
         return ids
