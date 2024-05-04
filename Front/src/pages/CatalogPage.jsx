@@ -71,7 +71,7 @@ const CatalogPage = () => {
                 <Paper elevation={3} sx={styles.paperContainer}>
                     <Grid container spacing={3}>
                         {currentProducts && currentProducts.map((product) => (
-                            <Grid item xs={12} sm={4} md={4} lg={4} key={`${product.id}`}>
+                            <Grid sx={{ marginBottom: '40px'}} item xs={12} sm={4} md={4} lg={4} key={`${product.id}`}>
                                 <Button
                                     onClick={() => handleProductClick(product.id)}
                                     sx={{

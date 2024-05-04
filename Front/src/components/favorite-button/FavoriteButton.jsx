@@ -54,3 +54,4 @@ const FavoriteButton = ({ productId, onToggle }) => {
     );
 };
 export default FavoriteButton;
+

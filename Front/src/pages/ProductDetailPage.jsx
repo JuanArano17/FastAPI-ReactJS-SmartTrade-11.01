@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Box, Container, Typography, Grid, Button, Paper, Divider, CircularProgress, Rating, ButtonBase } from '@mui/material';
+import { useParams, useHistory } from 'react-router-dom';
+import { Box, Container, Typography, Grid, Button, Paper, Divider, CircularProgress, Rating, ButtonBase, IconButton } from '@mui/material';
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
 import styles from '../styles/styles';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { getProductSellerById } from '../api/services/products/ProductsService';
 import { addCartItem } from '../api/services/products/ShoppingCartService';
 import FavoriteButton from '../components/favorite-button/FavoriteButton';
@@ -15,6 +16,7 @@ const ProductDetailPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [imageIndex, setImageIndex] = useState(0);
+    const history = useHistory();
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -37,6 +39,10 @@ const ProductDetailPage = () => {
         };
         fetchProducts();
     }, [id]);
+
+    const handleBackToCatalog = () => {
+        history.push('/catalog'); // Asegúrate de usar la ruta correcta para el catálogo
+    };
 
     const handleAddToCart = async () => {
         const quantity = 1;
@@ -107,17 +113,20 @@ const ProductDetailPage = () => {
             <Container sx={styles.mainContainer}>
                 {productData && (
                     <Paper elevation={3} sx={{ ...styles.paperContainer, position: 'relative' }}>
+                        <IconButton onClick={handleBackToCatalog} sx={{ position: 'absolute', left: '10px', top: '10px' }}>
+                            <ArrowBackIcon />
+                        </IconButton>
                         <FavoriteButton productId={productData.id} />
                         <Grid container spacing={2}>
                             <Grid item xs={12} md={5} sx={{ display: 'flex', justifyContent: 'center' }}>
                                 <Box sx={{
-                                    width: 350,
-                                    height: 350, 
+                                    width: 600,
+                                    height: 600,
                                     display: 'flex',
                                     justifyContent: 'center',
                                     alignItems: 'center',
                                     overflow: 'hidden',
-                                    borderRadius: '40px', 
+                                    borderRadius: '40px',
                                 }}>
                                     <ButtonBase onClick={() => handleImageChange((imageIndex + 1) % productData.images.length)} disabled={productData.images.length <= 1}>
                                         <img
@@ -178,7 +187,7 @@ const ProductDetailPage = () => {
             </Container>
             <Footer />
         </Box>
-    );    
+    );
 };
 
 export default ProductDetailPage;

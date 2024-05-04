@@ -2,14 +2,15 @@ const styles = {
     mainBox: {
         display: 'flex',
         flexDirection: 'column',
-        minHeight: '100vh'
+        minHeight: '100vh',
+        paddingTop: '75px'  
     },
     paperContainer: {
         p: 4,
         boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)',
         borderRadius: '40px',
-        mb: '80px',
-        mt: '40px',
+        mt: '25px',
+        mb: '15px'
     },
     registerButton: {
         mt: 3,
