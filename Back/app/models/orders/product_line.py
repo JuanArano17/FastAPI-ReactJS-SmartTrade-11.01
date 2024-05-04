@@ -1,17 +1,18 @@
-from sqlalchemy import Float, ForeignKey, Integer, Column
-from sqlalchemy.orm import relationship
+from sqlalchemy import Float, ForeignKey, Integer
+from sqlalchemy.orm import relationship, mapped_column
+
 from app.base import Base
 
 
 class ProductLine(Base):
     __tablename__ = "ProductLine"
 
-    id = Column(Integer, primary_key=True, index=True)
-    id_order = Column(
+    id = mapped_column(Integer, primary_key=True, index=True)
+    id_order = mapped_column(
         Integer,
         ForeignKey("Order.id", ondelete="CASCADE", name="fk_product_line_order_id"),
     )
-    id_seller_product = Column(
+    id_seller_product = mapped_column(
         Integer,
         ForeignKey(
             "SellerProduct.id",
@@ -19,8 +20,8 @@ class ProductLine(Base):
             name="fk_product_line_seller_product_id",
         ),
     )
-    quantity = Column(Integer, nullable=False)
-    subtotal = Column(Float, nullable=False)
+    quantity = mapped_column(Integer, nullable=False)
+    subtotal = mapped_column(Float, nullable=False)
 
     order = relationship("Order", back_populates="product_lines")
     seller_product = relationship("SellerProduct", back_populates="product_lines")

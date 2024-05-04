@@ -1,17 +1,17 @@
-from sqlalchemy import Column, Integer, String, Float
-from sqlalchemy.orm import relationship
+from sqlalchemy import Integer, String
+from sqlalchemy.orm import relationship, mapped_column
 from app.base import Base
 
 
 class Product(Base):
     __tablename__ = "Product"
 
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(255), nullable=False)
-    description = Column(String(255))
-    spec_sheet = Column(String(255), nullable=False)
-    stock = Column(Integer, nullable=False)
-    category = Column(String, nullable=False)
+    id = mapped_column(Integer, primary_key=True, index=True)
+    name = mapped_column(String(255), nullable=False)
+    description = mapped_column(String(255))
+    spec_sheet = mapped_column(String(255), nullable=False)
+    stock = mapped_column(Integer, nullable=False)
+    category = mapped_column(String, nullable=False)
 
     __mapper_args__ = {
         "polymorphic_identity": "Product",

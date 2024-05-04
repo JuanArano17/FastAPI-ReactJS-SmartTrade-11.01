@@ -19,7 +19,7 @@ class AddressRepository(CRUDRepository):
         )
 
     def delete_by_id_buyer(self, id_buyer):
-        self._db.query(self._model).filter(self._model.id_buyer == id_buyer).delete()  # type: ignore
+        self._db.query(self._model).filter(self._model.id_buyer == id_buyer).delete()
         self._db.commit()
 
     def get_default(self, id_buyer) -> Address:
@@ -82,7 +82,7 @@ class AddressService:
     def get_one_by_user(self, user: User, address_id) -> Address:
         self._check_is_buyer(user)
         address = self.get_by_id(address_id)
-        if address.id_buyer != user.id:  # type: ignore
+        if address.id_buyer != user.id:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Address does not belong to the user.",

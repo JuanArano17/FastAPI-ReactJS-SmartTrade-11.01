@@ -237,14 +237,14 @@ def test_delete_wish_list_item(
     wish_list_item = InWishListCreate(id_seller_product=seller_product.id)
     wish_list_item = wish_list_service.add(buyer.id, wish_list_item=wish_list_item)
 
-    response = client.delete(f"/buyers/{buyer.id}/wish_list/{seller_product.id}")  # type: ignore
+    response = client.delete(f"/buyers/{buyer.id}/wish_list/{seller_product.id}")
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content is None or content == {}
 
     # list_item = db.execute(
     #    select(InWishList).where(InWishList.id == list_item.id)
-    # ).scalar_one_or_none()  # type: ignore
+    # ).scalar_one_or_none()
     # assert list_item is None
 
 

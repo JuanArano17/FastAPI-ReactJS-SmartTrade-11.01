@@ -180,12 +180,12 @@ class InShoppingCartService:
     ) -> InShoppingCart:
         cart_item = self.get_by_id(id_buyer, id_seller_product)
         seller_product = self.seller_product_service.get_by_id(id_seller_product)
-        if new_data.quantity > seller_product.quantity:  # type: ignore
+        if new_data.quantity > seller_product.quantity:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Not enough seller products",
             )
-        return self.cart_repo.update(cart_item, new_data)  # type: ignore
+        return self.cart_repo.update(cart_item, new_data)
 
     def update_by_user(
         self, user: User, id_seller_product, new_data: InShoppingCartUpdate

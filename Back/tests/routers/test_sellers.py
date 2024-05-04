@@ -38,7 +38,7 @@ def test_create_seller(client: TestClient, seller_service: SellerService, db: Se
 
     seller = seller_service.get_by_id(content["id"])
     assert seller is not None
-    assert seller.password != data["password"]  # type: ignore
+    assert seller.password != data["password"]
 
 
 def test_create_seller_invalid_data(client: TestClient):
@@ -89,7 +89,7 @@ def test_get_seller_by_id(
     data = fake_seller()
     seller = seller_service.add(SellerCreate(**data))
 
-    response = client.get(f"/sellers/{seller.id}")  # type: ignore
+    response = client.get(f"/sellers/{seller.id}")
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["email"] == data["email"]
@@ -100,8 +100,8 @@ def test_get_seller_by_id(
     assert content["birth_date"] == data["birth_date"]
     assert "id" in content
     assert "password" not in content
-    assert content["id"] == seller.id  # type: ignore
-    assert seller.password != data["password"]  # type: ignore
+    assert content["id"] == seller.id
+    assert seller.password != data["password"]
 
 
 def test_get_seller_not_found(client: TestClient):
@@ -168,10 +168,10 @@ def test_update_seller(client: TestClient, seller_service: SellerService):
         "bank_data": "New bank data",
         "cif": "S31002657",
         "password": "newpassword",
-        "birth_date" : "1997-09-09"
+        "birth_date": "1997-09-09",
     }
 
-    response = client.put(f"/sellers/{seller.id}", json=new_data)  # type: ignore
+    response = client.put(f"/sellers/{seller.id}", json=new_data)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["email"] == data["email"]
@@ -196,7 +196,7 @@ def test_update_seller_invalid_data(client: TestClient, seller_service: SellerSe
         "password": "newpassword",
     }
 
-    response = client.put(f"/sellers/{seller.id}", json=new_data)  # type: ignore
+    response = client.put(f"/sellers/{seller.id}", json=new_data)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "detail" in response.json()
 
@@ -264,12 +264,12 @@ def test_delete_seller(client: TestClient, seller_service: SellerService, db: Se
     data = fake_seller()
     seller = seller_service.add(SellerCreate(**data))
 
-    response = client.delete(f"/sellers/{seller.id}")  # type: ignore
+    response = client.delete(f"/sellers/{seller.id}")
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content is None or content == {}
 
-    seller = db.execute(select(User).where(User.id == seller.id)).scalar_one_or_none()  # type: ignore
+    seller = db.execute(select(User).where(User.id == seller.id)).scalar_one_or_none()
     assert seller is None
 
 

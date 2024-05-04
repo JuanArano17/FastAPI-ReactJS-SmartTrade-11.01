@@ -1,18 +1,20 @@
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy.orm import relationship, mapped_column
+
 from app.base import Base
-from sqlalchemy.orm import relationship
+
 
 class Size(Base):
     __tablename__ = "Size"
 
-    id = Column(
+    id = mapped_column(
         Integer,
         nullable=False,
         primary_key=True,
     )
-    size = Column(String(255), nullable=False)
-    quantity = Column(Integer, nullable=False)
-    seller_product_id = Column(
+    size = mapped_column(String(255), nullable=False)
+    quantity = mapped_column(Integer, nullable=False)
+    seller_product_id = mapped_column(
         Integer,
         ForeignKey(
             "SellerProduct.id",

@@ -1,13 +1,14 @@
-from sqlalchemy import Date, ForeignKey, Integer, Column
-from sqlalchemy.orm import relationship
+from sqlalchemy import Date, ForeignKey, Integer
+from sqlalchemy.orm import relationship, mapped_column
+
 from app.base import Base
 
 
 class RefundProduct(Base):
     __tablename__ = "RefundProduct"
 
-    id = Column(Integer, primary_key=True, index=True)
-    id_product_line = Column(
+    id = mapped_column(Integer, primary_key=True, index=True)
+    id_product_line = mapped_column(
         Integer,
         ForeignKey(
             "ProductLine.id",
@@ -16,8 +17,8 @@ class RefundProduct(Base):
         ),
         nullable=False,
     )
-    quantity = Column(Integer, nullable=False)
-    refund_date = Column(Date, nullable=False)
+    quantity = mapped_column(Integer, nullable=False)
+    refund_date = mapped_column(Date, nullable=False)
 
     product_line = relationship("ProductLine", back_populates="refund_products")
 

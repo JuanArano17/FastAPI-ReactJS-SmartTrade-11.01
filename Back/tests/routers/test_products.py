@@ -259,7 +259,7 @@ def test_get_book_by_id(
     data = fake_book()
     product = product_service.add("book", data)
 
-    response = client.get(f"/products/{product.id}")  # type: ignore
+    response = client.get(f"/products/{product.id}")
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["name"] == data["name"]
@@ -269,7 +269,7 @@ def test_get_book_by_id(
     assert content["author"] == data["author"]
     assert content["pages"] == data["pages"]
     assert "id" in content
-    assert content["id"] == product.id  # type: ignore
+    assert content["id"] == product.id
 
 
 def test_get_game_by_id(
@@ -278,7 +278,7 @@ def test_get_game_by_id(
     data = fake_game()
     product = product_service.add("game", data)
 
-    response = client.get(f"/products/{product.id}")  # type: ignore
+    response = client.get(f"/products/{product.id}")
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["name"] == data["name"]
@@ -289,7 +289,7 @@ def test_get_game_by_id(
     assert content["platform"] == data["platform"]
     assert content["size"] == data["size"]
     assert "id" in content
-    assert content["id"] == product.id  # type: ignore
+    assert content["id"] == product.id
 
 
 def test_get_electronics_by_id(
@@ -298,7 +298,7 @@ def test_get_electronics_by_id(
     data = fake_electronics()
     product = product_service.add("electronics", data)
 
-    response = client.get(f"/products/{product.id}")  # type: ignore
+    response = client.get(f"/products/{product.id}")
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["name"] == data["name"]
@@ -309,7 +309,7 @@ def test_get_electronics_by_id(
     assert content["brand"] == data["brand"]
     assert content["capacity"] == data["capacity"]
     assert "id" in content
-    assert content["id"] == product.id  # type: ignore
+    assert content["id"] == product.id
 
 
 def test_get_electrodomestics_by_id(
@@ -318,7 +318,7 @@ def test_get_electrodomestics_by_id(
     data = fake_electrodomestics()
     product = product_service.add("electrodomestics", data)
 
-    response = client.get(f"/products/{product.id}")  # type: ignore
+    response = client.get(f"/products/{product.id}")
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["name"] == data["name"]
@@ -329,7 +329,7 @@ def test_get_electrodomestics_by_id(
     assert content["brand"] == data["brand"]
     assert content["power_source"] == data["power_source"]
     assert "id" in content
-    assert content["id"] == product.id  # type: ignore
+    assert content["id"] == product.id
 
 
 def test_get_house_utilities_by_id(
@@ -338,7 +338,7 @@ def test_get_house_utilities_by_id(
     data = fake_house_utilities()
     product = product_service.add("houseutilities", data)
 
-    response = client.get(f"/products/{product.id}")  # type: ignore
+    response = client.get(f"/products/{product.id}")
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["name"] == data["name"]
@@ -348,7 +348,7 @@ def test_get_house_utilities_by_id(
     assert content["type"] == data["type"]
     assert content["brand"] == data["brand"]
     assert "id" in content
-    assert content["id"] == product.id  # type: ignore
+    assert content["id"] == product.id
 
 
 def test_get_food_by_id(
@@ -357,7 +357,7 @@ def test_get_food_by_id(
     data = fake_food()
     product = product_service.add("food", data)
 
-    response = client.get(f"/products/{product.id}")  # type: ignore
+    response = client.get(f"/products/{product.id}")
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["name"] == data["name"]
@@ -368,7 +368,7 @@ def test_get_food_by_id(
     assert content["brand"] == data["brand"]
     assert content["ingredients"] == data["ingredients"]
     assert "id" in content
-    assert content["id"] == product.id  # type: ignore
+    assert content["id"] == product.id
 
 
 def test_get_clothes_by_id(
@@ -377,7 +377,7 @@ def test_get_clothes_by_id(
     data = fake_clothes()
     product = product_service.add("clothes", data)
 
-    response = client.get(f"/products/{product.id}")  # type: ignore
+    response = client.get(f"/products/{product.id}")
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["name"] == data["name"]
@@ -385,10 +385,10 @@ def test_get_clothes_by_id(
     assert content["stock"] == data["stock"]
     assert content["description"] == data["description"]
     assert content["type"] == data["type"]
-    #assert content["size"] == data["size"]
+    # assert content["size"] == data["size"]
     assert content["materials"] == data["materials"]
     assert "id" in content
-    assert content["id"] == product.id  # type: ignore
+    assert content["id"] == product.id
 
 
 def test_get_product_not_found(
@@ -434,7 +434,7 @@ def test_update_product(
         "name": "Laptop",
     }
 
-    response = client.put(f"/products/{product.id}", json=new_data)  # type: ignore
+    response = client.put(f"/products/{product.id}", json=new_data)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["name"] == new_data["name"]
@@ -443,7 +443,7 @@ def test_update_product(
     new_data = {
         "type": "Laptop",
     }
-    response = client.put(f"/products/{product.id}", json=new_data)  # type: ignore
+    response = client.put(f"/products/{product.id}", json=new_data)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["type"] == new_data["type"]
@@ -453,7 +453,7 @@ def test_update_product(
         "description": "cool laptop",
         "capacity": "900GB",
     }
-    response = client.put(f"/products/{product.id}", json=new_data)  # type: ignore
+    response = client.put(f"/products/{product.id}", json=new_data)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["description"] == new_data["description"]
@@ -474,12 +474,12 @@ def test_update_product_invalid_data(
     new_data["author"] = "Me"
     new_data["pages"] = "x"  # invalid page number
 
-    response = client.put(f"/products/{product.id}", json=new_data)  # type: ignore
+    response = client.put(f"/products/{product.id}", json=new_data)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "detail" in response.json()
 
     new_data = {"publisher": "me"}  # wrong keyword
-    response = client.put(f"/products/{product.id}", json=new_data)  # type: ignore
+    response = client.put(f"/products/{product.id}", json=new_data)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "detail" in response.json()
 
@@ -490,18 +490,18 @@ def test_delete_product(
     data = fake_food()
     product = product_service.add("food", data)
 
-    response = client.delete(f"/products/{product.id}")  # type: ignore
+    response = client.delete(f"/products/{product.id}")
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content is None or content == {}
 
     product1 = db.execute(
         select(Product).where(Product.id == product.id)
-    ).scalar_one_or_none()  # type: ignore
+    ).scalar_one_or_none()
     assert product1 is None
     product1 = db.execute(
         select(Food).where(Food.id == product.id)
-    ).scalar_one_or_none()  # type: ignore
+    ).scalar_one_or_none()
     assert product1 is None
 
 

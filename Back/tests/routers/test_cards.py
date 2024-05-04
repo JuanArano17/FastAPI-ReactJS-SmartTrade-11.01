@@ -41,12 +41,9 @@ def test_create_card(
     db: Session,
 ):
     data = fake_buyer()
-    buyer = buyer_service.add(BuyerCreate(**data))
+    buyer_service.add(BuyerCreate(**data))
 
-    login_data = {
-        "username": data["email"],
-        "password": data["password"]
-    }
+    login_data = {"username": data["email"], "password": data["password"]}
 
     login_response = client.post("/login/access-token", data=login_data)
     assert login_response.status_code == status.HTTP_200_OK
@@ -71,19 +68,15 @@ def test_create_card(
 
 def test_create_card_invalid_data(client: TestClient, buyer_service: BuyerService):
     data = fake_buyer()
-    buyer = buyer_service.add(BuyerCreate(**data))
+    buyer_service.add(BuyerCreate(**data))
 
-    login_data = {
-        "username": data["email"],
-        "password": data["password"]
-    }
+    login_data = {"username": data["email"], "password": data["password"]}
 
     login_response = client.post("/login/access-token", data=login_data)
     assert login_response.status_code == status.HTTP_200_OK
     access_token = login_response.json()["access_token"]
 
     headers = {"Authorization": f"Bearer {access_token}"}
-    
 
     data = fake_card()
     data["card_number"] = "1"  # Invalid card number
@@ -102,10 +95,7 @@ def test_create_same_card_for_buyer(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
-    login_data = {
-        "username": data["email"],
-        "password": data["password"]
-    }
+    login_data = {"username": data["email"], "password": data["password"]}
 
     login_response = client.post("/login/access-token", data=login_data)
     assert login_response.status_code == status.HTTP_200_OK
@@ -135,10 +125,7 @@ def test_get_card_by_id(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
-    login_data = {
-        "username": data["email"],
-        "password": data["password"]
-    }
+    login_data = {"username": data["email"], "password": data["password"]}
 
     login_response = client.post("/login/access-token", data=login_data)
     assert login_response.status_code == status.HTTP_200_OK
@@ -158,9 +145,9 @@ def test_get_card_by_id(
     assert "id" in content
     assert "id_buyer" in content
     assert "card_security_num" not in content
-    assert content["id"] == card.id  # type: ignore
-    assert content["id_buyer"] == card.id_buyer  # type: ignore
-    assert card.card_security_num == data["card_security_num"]  # type: ignore
+    assert content["id"] == card.id
+    assert content["id_buyer"] == card.id_buyer
+    assert card.card_security_num == data["card_security_num"]
 
 
 def test_get_card_not_found(
@@ -169,10 +156,7 @@ def test_get_card_not_found(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
-    login_data = {
-        "username": data["email"],
-        "password": data["password"]
-    }
+    login_data = {"username": data["email"], "password": data["password"]}
 
     login_response = client.post("/login/access-token", data=login_data)
     assert login_response.status_code == status.HTTP_200_OK
@@ -180,10 +164,12 @@ def test_get_card_not_found(
 
     headers = {"Authorization": f"Bearer {access_token}"}
 
-    response = client.get("cards/me/999", headers=headers)  # type: ignore
+    response = client.get("cards/me/999", headers=headers)
     assert response.status_code == status.HTTP_404_NOT_FOUND
     content = response.json()
-    assert content["detail"] == f"Card with id 999 not found for buyer with id {buyer.id}."
+    assert (
+        content["detail"] == f"Card with id 999 not found for buyer with id {buyer.id}."
+    )
 
 
 def test_get_cards(
@@ -248,10 +234,7 @@ def test_get_cards(
         ),
     )
 
-    login_data = {
-        "username": maria.email,
-        "password": "mypass@123"
-    }
+    login_data = {"username": maria.email, "password": "mypass@123"}
 
     login_response = client.post("/login/access-token", data=login_data)
     assert login_response.status_code == status.HTTP_200_OK
@@ -259,19 +242,16 @@ def test_get_cards(
 
     headers = {"Authorization": f"Bearer {access_token}"}
 
-    response = client.get(f"/cards/me",headers=headers)
+    response = client.get("/cards/me", headers=headers)
 
-    login_data = {
-        "username": john.email,
-        "password": "arandompassword"
-    }
+    login_data = {"username": john.email, "password": "arandompassword"}
 
     login_response = client.post("/login/access-token", data=login_data)
     assert login_response.status_code == status.HTTP_200_OK
     access_token = login_response.json()["access_token"]
 
     headers = {"Authorization": f"Bearer {access_token}"}
-    response1 = client.get(f"/cards/me", headers=headers)
+    response1 = client.get("/cards/me", headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert len(content) == 1
@@ -292,10 +272,7 @@ def test_update_card(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
-    login_data = {
-        "username": data["email"],
-        "password": data["password"]
-    }
+    login_data = {"username": data["email"], "password": data["password"]}
 
     login_response = client.post("/login/access-token", data=login_data)
     assert login_response.status_code == status.HTTP_200_OK
@@ -320,7 +297,7 @@ def test_update_card(
     assert content["card_exp_date"] == new_data["card_exp_date"]
     assert "card_security_num" not in content
     assert "id" in content
-    
+
     card = card_service.get_by_id(content["id"])
     assert new_data["card_security_num"] == card.card_security_num
 
@@ -334,10 +311,7 @@ def test_update_card_invalid_data(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
-    login_data = {
-        "username": data["email"],
-        "password": data["password"]
-    }
+    login_data = {"username": data["email"], "password": data["password"]}
 
     login_response = client.post("/login/access-token", data=login_data)
     assert login_response.status_code == status.HTTP_200_OK
@@ -364,10 +338,7 @@ def test_update_same_card_for_buyer(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
-    login_data = {
-        "username": data["email"],
-        "password": data["password"]
-    }
+    login_data = {"username": data["email"], "password": data["password"]}
 
     login_response = client.post("/login/access-token", data=login_data)
     assert login_response.status_code == status.HTTP_200_OK
@@ -409,10 +380,7 @@ def test_delete_card(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
-    login_data = {
-        "username": data["email"],
-        "password": data["password"]
-    }
+    login_data = {"username": data["email"], "password": data["password"]}
 
     login_response = client.post("/login/access-token", data=login_data)
     assert login_response.status_code == status.HTTP_200_OK
@@ -423,32 +391,31 @@ def test_delete_card(
     data = fake_card()
     card = card_service.add(buyer.id, CardCreate(**data))
 
-    response = client.delete(f"/cards/me/{card.id}",headers=headers)  # type: ignore
+    response = client.delete(f"/cards/me/{card.id}", headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content is None or content == {}
 
-    card = db.execute(select(Card).where(Card.id == card.id)).scalar_one_or_none()  # type: ignore
+    card = db.execute(select(Card).where(Card.id == card.id)).scalar_one_or_none()
     assert card is None
 
 
 def test_delete_card_not_found(client: TestClient, buyer_service: BuyerService):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
-    login_data = {
-        "username": data["email"],
-        "password": data["password"]
-    }
+    login_data = {"username": data["email"], "password": data["password"]}
 
     login_response = client.post("/login/access-token", data=login_data)
     assert login_response.status_code == status.HTTP_200_OK
     access_token = login_response.json()["access_token"]
 
     headers = {"Authorization": f"Bearer {access_token}"}
-    response = client.delete(f"/cards/me/999",headers=headers)  
+    response = client.delete("/cards/me/999", headers=headers)
     assert response.status_code == status.HTTP_404_NOT_FOUND
     content = response.json()
-    assert content["detail"] == f"Card with id 999 not found for buyer with id {buyer.id}."
+    assert (
+        content["detail"] == f"Card with id 999 not found for buyer with id {buyer.id}."
+    )
 
 
 def test_delete_cards(
@@ -471,10 +438,7 @@ def test_delete_cards(
         )
     )
 
-    login_data = {
-        "username": john.email,
-        "password": "arandompassword"
-    }
+    login_data = {"username": john.email, "password": "arandompassword"}
 
     login_response = client.post("/login/access-token", data=login_data)
     assert login_response.status_code == status.HTTP_200_OK
@@ -510,8 +474,8 @@ def test_delete_cards(
             card_security_num="193",
         ),
     )
-    
-    response = client.delete(f"/cards/me",headers=headers) 
+
+    response = client.delete("/cards/me", headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content is None or content == {}

@@ -19,7 +19,7 @@ class CardRepository(CRUDRepository):
         )
 
     def delete_by_id_buyer(self, id_buyer):
-        self._db.query(self._model).filter(self._model.id_buyer == id_buyer).delete()  # type: ignore
+        self._db.query(self._model).filter(self._model.id_buyer == id_buyer).delete()
         self._db.commit()
 
 
