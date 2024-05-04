@@ -54,7 +54,20 @@ const ProductDetailPage = () => {
 
     const renderSizeButtons = (sizes) => {
         return sizes.map(size => (
-            <Button key={size.id} variant={selectedSize === size.size ? "contained" : "outlined"} onClick={() => handleSizeChange(size.size)} sx={{ m: 1 }}>
+            <Button
+                key={size.id}
+                variant={selectedSize === size.size ? "contained" : "outlined"}
+                onClick={() => handleSizeChange(size.size)}
+                sx={{
+                    m: 1,
+                    color: selectedSize === size.size ? 'white' : 'green',
+                    borderColor: 'green',
+                    backgroundColor: selectedSize === size.size ? 'green' : 'white',
+                    '&:hover': {
+                        backgroundColor: selectedSize === size.size ? 'darkgreen' : '#f4f4f4',
+                    }
+                }}
+            >
                 {size.size}
             </Button>
         ));
@@ -97,12 +110,27 @@ const ProductDetailPage = () => {
                         <FavoriteButton productId={productData.id} />
                         <Grid container spacing={2}>
                             <Grid item xs={12} md={5} sx={{ display: 'flex', justifyContent: 'center' }}>
-                                <Box sx={{ width: '100%', height: 300, display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
+                                <Box sx={{
+                                    width: 350,
+                                    height: 350, 
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    overflow: 'hidden',
+                                    borderRadius: '40px', 
+                                }}>
                                     <ButtonBase onClick={() => handleImageChange((imageIndex + 1) % productData.images.length)} disabled={productData.images.length <= 1}>
                                         <img
                                             src={productData.images[imageIndex]}
                                             alt={`Image ${imageIndex + 1} of ${productData.name}`}
-                                            style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }}
+                                            style={{
+                                                height: '100%',
+                                                width: '100%',
+                                                objectFit: 'cover',  // Cubre el contenedor sin distorsionar
+                                                objectPosition: 'center center',  // Centra la imagen en el contenedor
+                                                borderRadius: '40px',  // borderRadius a la imagen
+                                                boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.7)'  // Sombra a la imagen
+                                            }}
                                         />
                                     </ButtonBase>
                                 </Box>
@@ -119,8 +147,15 @@ const ProductDetailPage = () => {
                                 <Typography variant="h5" sx={{ my: 2 }}>
                                     Precio: ${productData.price}
                                 </Typography>
-                                {productData.sizes && renderSizeButtons(productData.sizes)}
-                                <Button variant="contained" sx={{ mb: 2 }} onClick={handleAddToCart}>
+                                <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
+                                    {productData.sizes && renderSizeButtons(productData.sizes)}
+                                </Box>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    sx={{ mt: 2, display: 'block', marginLeft: 'auto', marginRight: 'auto', borderRadius: '40px', background: 'darkgreen' }}
+                                    onClick={handleAddToCart}
+                                >
                                     Add to Cart
                                 </Button>
                             </Grid>
@@ -143,7 +178,7 @@ const ProductDetailPage = () => {
             </Container>
             <Footer />
         </Box>
-    );
+    );    
 };
 
 export default ProductDetailPage;

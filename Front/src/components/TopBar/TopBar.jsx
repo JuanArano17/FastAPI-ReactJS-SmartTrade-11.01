@@ -23,7 +23,7 @@ const TopBar = () => {
   }
 
   return (
-    <AppBar position="static" color="default" elevation={0}>
+    <AppBar position="static" sx={{ backgroundColor: '#ffffff', color: '#444444', boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)'}} elevation={0}>
       <Toolbar>
         <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: '40px', marginRight: 'auto' }}>
           <IconButton size="large" edge="start" color="success" aria-label="recycle" onClick={handleLogoClick}>
@@ -63,7 +63,7 @@ const TopBar = () => {
             <Link to="/login">
               <Button
                 variant="contained"
-                sx={{ bgcolor: '#444444', borderRadius: 32, marginRight: '20px' }}
+                sx={{ bgcolor: '#444444', borderRadius: 32, marginRight: '20px', color: '#ffffff' }}
               >
                 Login
               </Button>

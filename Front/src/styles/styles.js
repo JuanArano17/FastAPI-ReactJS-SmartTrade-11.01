@@ -7,12 +7,9 @@ const styles = {
     paperContainer: {
         p: 4,
         boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)',
-        borderRadius: '20px',
+        borderRadius: '40px',
         mb: '80px',
         mt: '40px',
-        borderColor: 'black',
-        borderWidth: '3px',
-        borderStyle: 'solid'
     },
     registerButton: {
         mt: 3,
@@ -99,10 +96,8 @@ const styles = {
         borderStyle: 'solid'
     },
     totalPriceBox: {
-        borderColor: 'black',
-        borderWidth: '1px',
-        borderRadius: '20px',
-        borderStyle: 'solid',
+        borderRadius: '40px',
+        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.4)', 
         backgroundColor: '#cbe8ba',
         padding: '10px 20px',
         display: 'flex',
@@ -116,10 +111,11 @@ const styles = {
         marginBottom: 2,
         padding: '16px',
         alignItems: 'center',
-        borderColor: 'black',
-        borderWidth: '2px',
-        borderRadius: '20px',
-        borderStyle: 'solid',
+        borderRadius: '40px', // Asegúrate que esta línea existe y tiene el valor deseado
+        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)', // Sombra para un efecto visual
+    },    
+    cartItem: {
+        borderRadius: '40px',
     },
     productImage: {
         width: 100,

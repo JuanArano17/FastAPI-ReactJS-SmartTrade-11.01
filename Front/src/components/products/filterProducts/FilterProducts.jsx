@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Slider, Select, MenuItem, FormControl, InputLabel, Button, Grid, Switch, FormControlLabel } from '@mui/material';
+import { Typography, Slider, Select, MenuItem, FormControl, InputLabel, Button, Grid } from '@mui/material';
 import { myInfoService } from '../../../api/services/user/AuthService';
 
 const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => {
@@ -19,6 +19,7 @@ const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => 
             console.error('Error al obtener la información del usuario:', error);
         }
     };
+
     useEffect(() => {
         if (products) {
             fetchUserInfo();
@@ -38,7 +39,6 @@ const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => 
             const isAgeAppropriate = userAge >= 18 || !product.age_restricted;
             return matchesSearchTerm && matchesCategory && matchesPrice && isAgeAppropriate;
         });
-        console.log(result);
         setSearchFilteredProducts(result);
     }, [selectedCategory, priceRange, products, searchTerm, userAge]);
 
@@ -63,24 +63,43 @@ const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => 
 
     return (
         <Grid container spacing={2} alignItems="center" justifyContent="center">
-            <Grid item md={2}>
-                <FormControl variant="outlined" fullWidth>
-                    <InputLabel htmlFor="category-select">Category</InputLabel>
+            <Grid item xs={3}>
+                <FormControl variant="outlined" fullWidth sx={{
+                    mb: 2, height: '56px', // Set the height of the FormControl to match the button
+                    '.MuiOutlinedInput-root': {
+                        borderRadius: '15px', bgcolor: '#81cc5c', color: '#fff', '&:hover': { bgcolor: '#629c44' },
+                        '.MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' },
+                        fontFamily: '"Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif' // Font family
+                    }
+                }}>
+                    <InputLabel htmlFor="category-select" sx={{
+                        color: '#fff',
+                        fontFamily: '"Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif', // Font family
+                        textTransform: 'capitalize' // First letter capitalized
+                    }}>Category</InputLabel>
                     <Select
                         value={selectedCategory}
                         onChange={(e) => setSelectedCategory(e.target.value)}
-                        label="Categoría"
+                        label="Category"
                         inputProps={{ id: 'category-select' }}
+                        sx={{
+                            bgcolor: '#81cc5c', color: '#fff', '&:hover': { bgcolor: '#629c44' },
+                            '.MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' },
+                            fontFamily: '"Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif' // Font family
+                        }}
                     >
                         <MenuItem value="">All</MenuItem>
                         {categories.map((category) => (
-                            <MenuItem key={category} value={category}>{category}</MenuItem>
+                            <MenuItem key={category} value={category} sx={{ textTransform: 'capitalize' }}>{category}</MenuItem>
                         ))}
                     </Select>
                 </FormControl>
             </Grid>
-            <Grid item md={6}>
-                <Typography gutterBottom>Price range</Typography>
+            <Grid item xs={6}>
+                <Typography gutterBottom sx={{
+                    fontFamily: '"Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif', // Font family
+                    textTransform: 'capitalize' // First letter capitalized
+                }}>Price Range</Typography>
                 <Slider
                     value={priceRange}
                     onChange={handlePriceChange}
@@ -88,12 +107,37 @@ const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => 
                     aria-labelledby="range-slider"
                     min={0}
                     max={maxPrice}
+                    sx={{
+                        color: '#629c44', // Changes the color of the track
+                        '& .MuiSlider-thumb': {
+                            bgcolor: 'white', // Changes thumb color to white for better contrast
+                            '&:hover': {
+                                bgcolor: '#81cc5c', // Color when thumb is hovered
+                            },
+                            fontFamily: '"Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif' // Font family
+                        },
+                        '& .MuiSlider-valueLabel': {
+                            bgcolor: 'transparent', // Makes the value label background transparent
+                            color: '#629c44', // Color of the text in the value label
+                            fontFamily: '"Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif' // Font family
+                        }
+                    }}
                 />
             </Grid>
-            <Grid item>
-                <Button variant="outlined" onClick={clearFilters}>Clean Filters</Button>
+            <Grid item xs={3}>
+                <Button variant="contained" onClick={clearFilters} fullWidth sx={{
+                    minWidth: '120px',
+                    borderRadius: '15px',
+                    backgroundColor: '#81cc5c',
+                    color: '#fff',
+                    '&:hover': { backgroundColor: '#629c44', borderColor: '#f5f5f5' },
+                    fontFamily: '"Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif', // Font family
+                    textTransform: 'capitalize', // First letter capitalized
+                    height: '56px' // Set the height to match the FormControl
+                }}>Clear Filters</Button>
             </Grid>
         </Grid>
+
     );
 };
 

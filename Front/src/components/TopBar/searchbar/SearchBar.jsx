@@ -14,7 +14,7 @@ const SearchBar = () => {
 
     return (
         <Container>
-            <Box sx={{ flexGrow: 1, justifyContent: 'center', display: 'flex' }}>
+            <Box sx={{ flexGrow: 1, justifyContent: 'center', display: 'flex',}}>
                 <form onSubmit={handleSearch}  style={{ width: '100%' }}>
                     <TextField
                         fullWidth
@@ -36,6 +36,7 @@ const SearchBar = () => {
                             },
                             "& .MuiOutlinedInput-notchedOutline": {
                                 borderRadius: '32px', 
+                                boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.4)', 
                             }
                         }}
                     />
