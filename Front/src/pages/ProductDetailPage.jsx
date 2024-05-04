@@ -11,6 +11,7 @@ import FavoriteButton from '../components/favorite-button/FavoriteButton';
 const ProductDetailPage = () => {
     const { id } = useParams();
     const [productData, setProductData] = useState(null);
+    const [selectedSize, setSelectedSize] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [imageIndex, setImageIndex] = useState(0);
@@ -20,8 +21,12 @@ const ProductDetailPage = () => {
             try {
                 setLoading(true);
                 const response = await getProductSellerById(id);
+                console.log("Product by id: ", response);
                 if (response) {
                     setProductData(response);
+                    if (response.sizes && response.sizes.length > 0) {
+                        setSelectedSize(response.sizes[0].size); // Default to first size
+                    }
                     setLoading(false);
                     setError(null);
                 }
@@ -36,14 +41,27 @@ const ProductDetailPage = () => {
     const handleAddToCart = async () => {
         const quantity = 1;
         try {
-            await addCartItem(productData.id, quantity);
-            console.log('Producto añadido al carrito');
+            await addCartItem(productData.id, quantity, selectedSize);
+            console.log('Producto añadido al carrito con tamaño: ', selectedSize);
         } catch (error) {
             console.error('Error al añadir producto al carrito', error);
         }
     };
+
+    const handleSizeChange = (size) => {
+        setSelectedSize(size);
+    };
+
+    const renderSizeButtons = (sizes) => {
+        return sizes.map(size => (
+            <Button key={size.id} variant={selectedSize === size.size ? "contained" : "outlined"} onClick={() => handleSizeChange(size.size)} sx={{ m: 1 }}>
+                {size.size}
+            </Button>
+        ));
+    };
+
     const renderAdditionalAttributes = (productData) => {
-        const commonAttributes = ['name', 'description', 'eco_points', 'id_product', 'id_seller', 'spec_sheet', 'stock', 'id', 'images', 'seller_products'];
+        const commonAttributes = ['id_product', 'id_seller', 'spec_sheet', 'stock', 'id', 'images', 'seller_products', 'justification', 'age_restricted', 'sizes', 'state'];
         return Object.keys(productData)
             .filter(key => !commonAttributes.includes(key))
             .map(key => (
@@ -65,16 +83,18 @@ const ProductDetailPage = () => {
     if (error) {
         return <Typography color="error">{error}</Typography>;
     }
+
     const handleImageChange = (newIndex) => {
         setImageIndex(newIndex);
     };
+
     return (
         <Box sx={styles.mainBox}>
             <TopBar showSearchBar={true} showLogoutButton={true} />
             <Container sx={styles.mainContainer}>
                 {productData && (
                     <Paper elevation={3} sx={{ ...styles.paperContainer, position: 'relative' }}>
-                        <FavoriteButton productId={productData.id} ></FavoriteButton>
+                        <FavoriteButton productId={productData.id} />
                         <Grid container spacing={2}>
                             <Grid item xs={12} md={5} sx={{ display: 'flex', justifyContent: 'center' }}>
                                 <Box sx={{ width: '100%', height: 300, display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
@@ -99,6 +119,7 @@ const ProductDetailPage = () => {
                                 <Typography variant="h5" sx={{ my: 2 }}>
                                     Precio: ${productData.price}
                                 </Typography>
+                                {productData.sizes && renderSizeButtons(productData.sizes)}
                                 <Button variant="contained" sx={{ mb: 2 }} onClick={handleAddToCart}>
                                     Add to Cart
                                 </Button>
