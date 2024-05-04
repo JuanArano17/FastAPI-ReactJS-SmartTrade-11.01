@@ -66,9 +66,7 @@ const SellerRegistration = () => {
                 const userResponse = await registerUserSellerService(formData);
                 console.log('Se a registrado un usuario Seller', userResponse)
                 setOpenSnackbar(true);
-                setTimeout(() => {
-                    history.push("/");
-                }, 2000);
+                history.push("/");
             } catch (error) {
                 console.error('Hubo un error al registrar al usuario:', error);
             }

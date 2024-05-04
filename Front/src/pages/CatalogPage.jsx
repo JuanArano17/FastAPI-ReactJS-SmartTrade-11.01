@@ -17,15 +17,7 @@ const CatalogPage = () => {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const productsPerPage = 12;
-
     const history = useHistory();
-
-    useEffect(() => {
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-            history.push('/');
-        }
-    }, [history]);
 
     useEffect(() => {
         setSearchTerm(search || "");

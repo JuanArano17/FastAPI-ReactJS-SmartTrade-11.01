@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
 import { Box, Container, Typography, Grid } from '@mui/material';
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
@@ -29,14 +28,7 @@ const ShoppingCartPage = () => {
             return acc + (item.seller_product.price + item.seller_product.shipping_costs) * item.quantity;
         }, 0);
     };
-    const history = useHistory();
 
-    useEffect(() => {
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-            history.push('/');
-        }
-    }, [history]);
     return (
         <Box sx={styles.mainBox}>
             <TopBar showLogoutButton={true} />
