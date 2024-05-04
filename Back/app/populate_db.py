@@ -30,7 +30,7 @@ from app.schemas.orders.order import OrderCreate
 from app.service.users.types.user import UserService
 from app.schemas.users.types.admin import AdminCreate
 from app.service.users.types.admin import AdminService
-from schemas.products.categories.variations.size import SizeCreate
+from app.schemas.products.categories.variations.size import SizeCreate
 
 
 session = get_db()
@@ -678,9 +678,23 @@ for _ in range(num_cart_items):
     )
     # Add the in shopping cart item to the session
 
-    in_shopping_cart_service.add(
+    seller_product=seller_product_serv.get_by_id(id_seller_product)
+
+    id_size=None
+    if(seller_product.sizes!=[]):
+        size_ids=[]
+        for size in seller_product.sizes:
+            size_ids.append(size.id)
+        id_size=random.choice(size_ids)
+        in_shopping_cart_service.add(
+        id_buyer=id_buyer, shopping_cart_product=in_shopping_cart, id_size=id_size
+        )
+    else:
+        in_shopping_cart_service.add(
         id_buyer=id_buyer, shopping_cart_product=in_shopping_cart
-    )
+        )
+
+    
 
 for _ in range(num_list_items):
     # Choose a buyer ID

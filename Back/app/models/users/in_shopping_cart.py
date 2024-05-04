@@ -1,26 +1,25 @@
-from sqlalchemy import Column, Integer, ForeignKey
+from sqlalchemy import Column, Integer, ForeignKey, String
 from sqlalchemy.orm import relationship
 from app.base import Base
 
 
 class InShoppingCart(Base):
     __tablename__ = "InShoppingCart"
-
     id_seller_product = Column(
         Integer,
         ForeignKey(
             "SellerProduct.id", ondelete="CASCADE", name="fk_cart_seller_product_id"
         ),
-        primary_key=True,
         index=True,
     )
     id_buyer = Column(
         Integer,
         ForeignKey("Buyer.id", ondelete="CASCADE", name="fk_cart_buyer_id"),
-        primary_key=True,
         index=True,
     )
     quantity = Column(Integer, nullable=False)
+    id_size = Column(Integer, ForeignKey("Size.id", ondelete="CASCADE", name="fk_cart_size_id"),
+                     )
 
     seller_product = relationship("SellerProduct", back_populates="in_shopping_carts")
     buyer = relationship("Buyer", back_populates="in_shopping_carts")

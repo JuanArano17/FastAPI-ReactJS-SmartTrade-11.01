@@ -1,6 +1,7 @@
+from typing import Optional
 from fastapi import APIRouter
 
-from app.api.deps import CurrentUserDep, ShoppingCartServiceDep
+from app.api.deps import CurrentUserDep, SellerProductServiceDep, ShoppingCartServiceDep
 from app.schemas.users.in_shopping_cart import (
     CompleteShoppingCart,
     InShoppingCartCreate,
@@ -37,11 +38,21 @@ async def create_cart_item(
     current_user: CurrentUserDep,
     shopping_cart_product: InShoppingCartCreate,
     shopping_cart_service: ShoppingCartServiceDep,
+    seller_product_service: SellerProductServiceDep,
+    id_size: Optional[int] = None
 ):
     """
     Create a new shopping cart item for the buyer.
     """
-    return shopping_cart_service.add_by_user(current_user, shopping_cart_product)
+
+    seller_product=seller_product_service.get_by_id(seller_product_id=shopping_cart_product.id_seller_product)
+    if seller_product.sizes==[]:
+        return shopping_cart_service.add_by_user(current_user, shopping_cart_product)
+    else:
+         return shopping_cart_service.add_by_user(current_user, shopping_cart_product, id_size)
+
+
+    
 
 
 @cart_token_router.delete("/")
