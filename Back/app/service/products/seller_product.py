@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
-
+from app.schemas.products.seller_product import ProductState
 from app.schemas.products.seller_product import (
     SellerProductCreate,
     SellerProductRead,
@@ -22,13 +22,13 @@ class SellerProductState(ABC):
 
 class PendingState(SellerProductState):
     def handle(self, new_data):
-        if new_data.state == "Rejected":
+        if new_data.state == ProductState.Rejected:
             if not new_data.justification or len(new_data.justification) < 1:
                 raise HTTPException(
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                     detail="Rejected products require a justification",
                 )
-        elif new_data.state == "Approved":
+        elif new_data.state == ProductState.Approved:
             new_data.justification = ""
             if new_data.eco_points is None:
                 raise HTTPException(
@@ -43,7 +43,7 @@ class PendingState(SellerProductState):
             
 class ApprovedState(SellerProductState):
     def handle(self, new_data):
-        if new_data.state == "Rejected":
+        if new_data.state == ProductState.Rejected:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="Approved products cannot be rejected",
@@ -51,15 +51,15 @@ class ApprovedState(SellerProductState):
 
 class RejectedState(SellerProductState):
     def handle(self, new_data):
-        if new_data.state == "Approved":
+        if new_data.state == ProductState.Approved:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="Rejected products cannot be approved",
             )
 
 class SellerProductRepository(CRUDRepository):
-    def __init__(self, session: Session):
-        super().__init__(session=session, model=SellerProduct)
+    def _init_(self, session: Session):
+        super()._init_(session=session, model=SellerProduct)
         self._model = SellerProduct
 
     def get_by_id_product(self, id_product) -> list[SellerProduct]:
@@ -84,7 +84,7 @@ class SellerProductRepository(CRUDRepository):
 
 
 class SellerProductService:
-    def __init__(
+    def _init_(
         self,
         session: Session,
         seller_service: SellerService,
@@ -109,7 +109,7 @@ class SellerProductService:
                 detail=f"Seller already has a product with id {seller_product.id_product}",
             )
 
-        if (product.__class__.__name__=="Clothes"):
+        if (product._class.name_=="Clothes"):
             if seller_product.sizes == []:
                 raise HTTPException(
                     status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -165,9 +165,9 @@ class SellerProductService:
     def get_current_state(self, state: str) -> SellerProductState:
         if state == ProductState.Pending:
             return PendingState()
-        elif state == "Approved":
+        elif state == ProductState.Approved:
             return ApprovedState()
-        elif state == "Rejected":
+        elif state == ProductState.Rejected:
             return RejectedState()
         else:
             raise ValueError("Invalid state value")
@@ -176,6 +176,9 @@ class SellerProductService:
         self, seller_product: SellerProduct
     ) -> SellerProductRead:
         product = self.product_service.get_by_id(seller_product.id_product)
+        sizes=seller_product.sizes
+        if(product.category!="Clothes"):
+            sizes=None
         return SellerProductRead(
             quantity=seller_product.quantity,
             price=seller_product.price,
@@ -208,7 +211,7 @@ class SellerProductService:
             else None,
             publisher=product.publisher if hasattr(product, "publisher") else None,
             platform=product.platform if hasattr(product, "platform") else None,
-            sizes=seller_product.sizes
+            sizes=sizes
         )
     
     def map_seller_products(self, seller_products):
@@ -249,13 +252,13 @@ class SellerProductService:
         current_state = self.get_current_state(seller_product.state) 
         product=self.product_service.get_by_id(seller_product.id_product)
         current_state.handle(new_data)
-        if(new_data.sizes and product.__class__.__name__!="Clothes"):
+        if(new_data.sizes and product._class.name_!="Clothes"):
             raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Seller products of this category cannot have sizes",
                 )
         
-        if(new_data.quantity and product.__class__.__name__=="Clothes"):
+        if(new_data.quantity and product._class.name_=="Clothes"):
             raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
                     detail=f"Only update size quantities for clothing objects",
@@ -263,7 +266,7 @@ class SellerProductService:
         
 
 
-        if(product.__class__.__name__=="Clothes"):
+        if(product._class.name_=="Clothes"):
             used_sizes=[]
             for size_data in new_data.sizes:
                 if size_data.size in used_sizes:
@@ -330,5 +333,3 @@ class SellerProductService:
 
     def delete_by_id_product(self, id_product):
         return self.seller_product_repo.delete_by_id_product(id_product=id_product)
-
-    
