@@ -33,7 +33,7 @@ const getSellerProduct = async (productId) => {
         throw error;
     }
 };
-const addCartItem = async (sellerProductId, quantity) => {
+const addCartItem = async (sellerProductId, quantity, selectedSize) => {
     const requestBody = {
       id_seller_product: sellerProductId,
       quantity: quantity,

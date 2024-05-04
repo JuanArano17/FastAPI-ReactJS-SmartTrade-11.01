@@ -4,7 +4,7 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import StarIcon from '@mui/icons-material/Star';
 import { getWishStatus, addToWishList, deleteFromWishList } from '../../api/services/products/WishListService';
 
-const FavoriteButton = ({ productId, onToggle}) => {
+const FavoriteButton = ({ productId, onToggle }) => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -23,7 +23,8 @@ const FavoriteButton = ({ productId, onToggle}) => {
         checkFavoriteStatus();
     }, [productId]);
 
-    const handleToggleFavorite = async () => {
+    const handleToggleFavorite = async (event) => {
+        event.stopPropagation(); // Detiene la propagación del evento para que no llegue al botón padre.
         setLoading(true);
         try {
             if (!isFavorite) {
@@ -31,20 +32,21 @@ const FavoriteButton = ({ productId, onToggle}) => {
             } else {
                 await deleteFromWishList(productId);
             }
+            setIsFavorite(!isFavorite);
             if (onToggle) {
                 onToggle();
             }
-            setIsFavorite(!isFavorite);
         } catch (error) {
             console.error('Error al actualizar la lista de deseos', error);
         } finally {
-            setLoading(false);  
+            setLoading(false);
         }
     };
+
     return (
         <IconButton 
-            onClick={handleToggleFavorite} 
-            disabled={loading} 
+            onClick={handleToggleFavorite}
+            disabled={loading}
             sx={{ position: 'absolute', top: 8, right: 8, backgroundColor: 'background.paper', borderRadius: '50%' }}
         >
             {isFavorite ? <StarIcon sx={{ color: "#ffcc00" }} /> : <StarBorderIcon />}
@@ -52,3 +54,4 @@ const FavoriteButton = ({ productId, onToggle}) => {
     );
 };
 export default FavoriteButton;
+

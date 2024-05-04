@@ -33,12 +33,12 @@ const CartItem = ({ item, setCartItems, quantity }) => {
 
     return (
         <Grid item xs={12} sx={styles.cartItem}>
-            <Paper elevation={3} sx={{ ...styles.cartItemPaper, position: 'relative', display: 'flex' }}>
-                <IconButton onClick={removeItem} sx={{ ...styles.deleteButton, position: 'absolute', top: 8, right: 8 }}>
+            <Paper elevation={3} sx={{ ...styles.cartItemPaper, position: 'relative' }}>
+                <IconButton onClick={removeItem} sx={{ position: 'absolute', top: 8, right: 8 }}>
                     <DeleteIcon />
                 </IconButton>
-                <Box sx={{ minWidth: '160px', maxWidth: '160px', minHeight: '160px', maxHeight: '160px', overflow: 'hidden', marginRight: '16px' }}>
-                    <img src={imageUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <Box sx={{ minWidth: '160px', maxWidth: '160px', minHeight: '160px', maxHeight: '160px', overflow: 'hidden', marginRight: '16px', borderRadius: '40px' }}>
+                    <img src={imageUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '40px' }} />
                 </Box>
                 <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', justifyContent: 'space-between', textAlign: 'left' }}>
                     <Typography variant="subtitle1" noWrap>{item.name}</Typography>
@@ -51,7 +51,7 @@ const CartItem = ({ item, setCartItems, quantity }) => {
                             value={quantity}
                             onChange={(e) => updateQuantity(parseInt(e.target.value, 10))}
                             inputProps={{ min: 1, max: item.stock }}
-                            sx={{ mx: 1, maxWidth:"55px"}}
+                            sx={{ mx: 1, maxWidth: "55px" }}
                         />
                         <IconButton onClick={() => updateQuantity(quantity + 1)} disabled={quantity >= item.stock}>
                             <AddIcon />

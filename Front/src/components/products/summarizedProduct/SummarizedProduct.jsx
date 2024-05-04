@@ -3,26 +3,31 @@ import { Card, CardMedia, CardContent, Typography, CardActions, Button } from '@
 import FavoriteButton from '../../favorite-button/FavoriteButton';
 const SummarizedProduct = ({ product }) => {
     const { idProduct, name, images, price, description } = product;
-    const image = images.length > 0 ? images[0] : 'default-product-image.jpg'; 
+    const image = images.length > 0 ? images[0] : 'default-product-image.jpg';
     return (
-        <Card 
-        sx={{ 
-            maxWidth: 350, 
-            width:'100%',
-            m: 2, display: 'flex', 
-            flexDirection: 'column', 
-            justifyContent: 'space-between', 
-            height: '100%' 
-        }}
+        <Card
+            sx={{
+                maxWidth: 350,
+                width: '100%',
+                m: 2, display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                borderRadius: '40px',
+                boxShadow: '0px 4px 20px rgba(0, 128, 0, 0.4)', 
+                height: '100%',
+                '&:hover': {
+                    boxShadow: '0px 4px 20px rgba(0, 128, 0, 1)', 
+                }
+            }}
         >
             <CardMedia
                 component="img"
                 image={image}
                 alt={name}
-                sx={{ height: 140, backgroundSize: 'contain' }} 
+                sx={{ height: 140, backgroundSize: 'contain' }}
             />
             <CardContent>
-                <FavoriteButton productId={product.id} ></FavoriteButton>
+                <FavoriteButton productId={product.id}></FavoriteButton>
                 <Typography gutterBottom variant="h6" component="div" sx={{ textAlign: 'left' }}>
                     {name}
                 </Typography>
