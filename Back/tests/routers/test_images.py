@@ -71,14 +71,14 @@ def test_get_image_by_id(
     data = fake_image()
     image = image_service.add(product.id, ImageCreate(**data))
 
-    response = client.get(f"/products/{product.id}/images/{image.id}")  # type: ignore
+    response = client.get(f"/products/{product.id}/images/{image.id}")
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["url"] == data["url"]
     assert "id" in content
     assert "id_product" in content
-    assert content["id"] == image.id  # type: ignore
-    assert content["id_product"] == image.id_product  # type: ignore
+    assert content["id"] == image.id
+    assert content["id_product"] == image.id_product
 
 
 def test_get_image_not_found(
@@ -87,7 +87,7 @@ def test_get_image_not_found(
     data = fake_product()
     product = product_service.add("book", data)
 
-    response = client.get(f"/products/{product.id}/images/999")  # type: ignore
+    response = client.get(f"/products/{product.id}/images/999")
     assert response.status_code == status.HTTP_404_NOT_FOUND
     content = response.json()
     assert content["detail"] == "Image with id 999 not found."
@@ -159,7 +159,7 @@ def test_update_image(
     image = image_service.add(product.id, ImageCreate(**data))
     # new_data = data.copy()
     new_data = {"url": "https://dummyimage2.com/800x968"}
-    response = client.put(f"/products/{product.id}/images/{image.id}", json=new_data)  # type: ignore
+    response = client.put(f"/products/{product.id}/images/{image.id}", json=new_data)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["url"] == new_data["url"]
@@ -181,7 +181,7 @@ def test_update_image_invalid_data(
     image = image_service.add(product.id, ImageCreate(**data))
     new_data = data.copy()
     new_data["ur"] = "e"  # Wrong field
-    response = client.put(f"/products/{product.id}/images/{image.id}", json=new_data)  # type: ignore
+    response = client.put(f"/products/{product.id}/images/{image.id}", json=new_data)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "detail" in response.json()
 
@@ -197,12 +197,12 @@ def test_delete_image(
     data = fake_image()
     image = image_service.add(product.id, ImageCreate(**data))
 
-    response = client.delete(f"/products/{product.id}/images/{image.id}")  # type: ignore
+    response = client.delete(f"/products/{product.id}/images/{image.id}")
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content is None or content == {}
 
-    image = db.execute(select(Image).where(Image.id == image.id)).scalar_one_or_none()  # type: ignore
+    image = db.execute(select(Image).where(Image.id == image.id)).scalar_one_or_none()
     assert image is None
 
 

@@ -41,7 +41,7 @@ def test_create_buyer(client: TestClient, buyer_service: BuyerService, db: Sessi
 
     buyer = buyer_service.get_by_id(content["id"])
     assert buyer is not None
-    assert buyer.password != data["password"]  # type: ignore
+    assert buyer.password != data["password"]
 
 
 def test_create_buyer_invalid_data(client: TestClient):
@@ -90,7 +90,7 @@ def test_get_buyer_by_id(client: TestClient, buyer_service: BuyerService, db: Se
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
-    response = client.get(f"/buyers/{buyer.id}")  # type: ignore
+    response = client.get(f"/buyers/{buyer.id}")
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["email"] == data["email"]
@@ -102,8 +102,8 @@ def test_get_buyer_by_id(client: TestClient, buyer_service: BuyerService, db: Se
     assert content["birth_date"] == data["birth_date"]
     assert "id" in content
     assert "password" not in content
-    assert content["id"] == buyer.id  # type: ignore
-    assert buyer.password != data["password"]  # type: ignore
+    assert content["id"] == buyer.id
+    assert buyer.password != data["password"]
 
 
 def test_get_buyer_not_found(
@@ -178,12 +178,12 @@ def test_update_buyer(client: TestClient, buyer_service: BuyerService, db: Sessi
         "payment_method": "Credit Card",
     }
 
-    response = client.put(f"/buyers/{buyer.id}", json=new_data)  # type: ignore
+    response = client.put(f"/buyers/{buyer.id}", json=new_data)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["email"] == data["email"]
-    #assert content["name"] == new_data["name"]
-    #assert content["surname"] == new_data["surname"]
+    # assert content["name"] == new_data["name"]
+    # assert content["surname"] == new_data["surname"]
     assert content["dni"] == new_data["dni"]
     assert content["eco_points"] == new_data["eco_points"]
     assert content["billing_address"] == new_data["billing_address"]
@@ -206,7 +206,7 @@ def test_update_buyer_invalid_data(
     new_data["billing_address"] = "New Street 123"
     new_data["payment_method"] = "Credit Card"
 
-    response = client.put(f"/buyers/{buyer.id}", json=new_data)  # type: ignore
+    response = client.put(f"/buyers/{buyer.id}", json=new_data)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "detail" in response.json()
 
@@ -275,12 +275,12 @@ def test_delete_buyer(client: TestClient, buyer_service: BuyerService, db: Sessi
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
-    response = client.delete(f"/buyers/{buyer.id}")  # type: ignore
+    response = client.delete(f"/buyers/{buyer.id}")
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content is None or content == {}
 
-    buyer = db.execute(select(User).where(User.id == buyer.id)).scalar_one_or_none()  # type: ignore
+    buyer = db.execute(select(User).where(User.id == buyer.id)).scalar_one_or_none()
     assert buyer is None
 
 

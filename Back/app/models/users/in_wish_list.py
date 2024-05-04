@@ -1,12 +1,13 @@
-from sqlalchemy import Column, Integer, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Integer, ForeignKey
+from sqlalchemy.orm import relationship, mapped_column
+
 from app.base import Base
 
 
 class InWishList(Base):
     __tablename__ = "InWishList"
 
-    id_seller_product = Column(
+    id_seller_product = mapped_column(
         Integer,
         ForeignKey(
             "SellerProduct.id",
@@ -16,7 +17,7 @@ class InWishList(Base):
         primary_key=True,
         index=True,
     )
-    id_buyer = Column(
+    id_buyer = mapped_column(
         Integer,
         ForeignKey("Buyer.id", ondelete="CASCADE", name="fk_wish_list_buyer_id"),
         primary_key=True,

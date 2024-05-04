@@ -40,19 +40,19 @@ class RefundProductService:
                 detail=f"The product line with id {id_product_line} does not belong to the order with id {id_order}.",
             )
 
-        if refund_product.refund_date.date() < order.order_date:  # type: ignore
+        if refund_product.refund_date.date() < order.order_date:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Refund date must be greater than order date",
             )
 
-        if refund_product.refund_date.date() > order.order_date + timedelta(days=30):  # type: ignore
+        if refund_product.refund_date.date() > order.order_date + timedelta(days=30):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Refund date must be within 30 days of order date",
             )
 
-        if refund_product.quantity > product_line.quantity:  # type: ignore
+        if refund_product.quantity > product_line.quantity:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Refund quantity cannot be greater than product line quantity",
@@ -62,7 +62,7 @@ class RefundProductService:
             **refund_product.model_dump(), id_product_line=id_product_line
         )
 
-        product_line.quantity -= refund_product.quantity  # type: ignore
+        product_line.quantity -= refund_product.quantity
         # must update seller product quantity whenever refund is made
         # product_line.subtotal=seller_product.price*product_line.quantity
         # seller_product.quantity += refund_product.quantity
@@ -114,7 +114,7 @@ class RefundProductService:
 
         refund_product = self.get_by_id(refund_product_id)
 
-        if refund_product.id_product_line != product_line.id:  # type: ignore
+        if refund_product.id_product_line != product_line.id:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"The refund product with id {refund_product_id} does not belong to the product line with id {id_product_line}.",
@@ -126,7 +126,7 @@ class RefundProductService:
                 detail=f"The refund product with id {refund_product_id} does not belong to the order with id {id_order}.",
             )
 
-        product_line.quantity += refund_product.quantity  # type: ignore
+        product_line.quantity += refund_product.quantity
         # seller_product.quantity -= refund_product.quantity
         self.refund_product_repo.delete_by_id(refund_product_id)
 

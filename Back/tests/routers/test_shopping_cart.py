@@ -310,14 +310,14 @@ def test_delete_shopping_cart_item(
         buyer.id, shopping_cart_product=shopping_cart_item
     )
 
-    response = client.delete(f"/buyers/{buyer.id}/shopping_cart/{seller_product.id}")  # type: ignore
+    response = client.delete(f"/buyers/{buyer.id}/shopping_cart/{seller_product.id}")
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content is None or content == {}
 
     # list_item = db.execute(
     #    select(InWishList).where(InWishList.id == list_item.id)
-    # ).scalar_one_or_none()  # type: ignore
+    # ).scalar_one_or_none()
     # assert list_item is None
 
 

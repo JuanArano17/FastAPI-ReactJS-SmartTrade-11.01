@@ -63,7 +63,7 @@ CurrentUserDep = Annotated[User, Depends(get_current_user)]
 
 
 def get_current_active_admin(current_user: CurrentUserDep):
-    if current_user.type == "Admin":  # type: ignore
+    if current_user.type == "Admin":
         return current_user
     raise HTTPException(
         status_code=status.HTTP_400_BAD_REQUEST,
