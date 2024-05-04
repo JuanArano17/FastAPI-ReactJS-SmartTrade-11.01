@@ -1,4 +1,5 @@
-from sqlalchemy import Column, ForeignKey, Integer
+from sqlalchemy import ForeignKey, Integer
+from sqlalchemy.orm import mapped_column
 
 from app.models.users.types.user import User
 
@@ -6,7 +7,7 @@ from app.models.users.types.user import User
 class Admin(User):
     __tablename__ = "Admin"
 
-    id = Column(
+    id = mapped_column(
         Integer,
         ForeignKey("User.id", ondelete="CASCADE", name="fk_admin_user_id"),
         primary_key=True,

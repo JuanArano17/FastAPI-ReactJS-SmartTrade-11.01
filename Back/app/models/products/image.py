@@ -1,19 +1,19 @@
-from sqlalchemy import Column, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy.orm import relationship, mapped_column
 from app.base import Base
 
 
 class Image(Base):
     __tablename__ = "Image"
 
-    id = Column(Integer, primary_key=True, index=True)
-    id_product = Column(
+    id = mapped_column(Integer, primary_key=True, index=True)
+    id_product = mapped_column(
         Integer,
         ForeignKey("Product.id", ondelete="CASCADE", name="fk_image_product_id"),
         nullable=False,
     )
     # should url be unique?
-    url = Column(String, nullable=False)
+    url = mapped_column(String, nullable=False)
 
     product = relationship("Product", back_populates="images")
 

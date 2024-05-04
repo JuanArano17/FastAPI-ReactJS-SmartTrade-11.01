@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Date, ForeignKey, Integer, String, Float
-from sqlalchemy.orm import relationship
+from sqlalchemy import Date, ForeignKey, Integer, String, Float
+from sqlalchemy.orm import relationship, mapped_column
 
 from app.models.users.types.user import User
 
@@ -7,17 +7,17 @@ from app.models.users.types.user import User
 class Buyer(User):
     __tablename__ = "Buyer"
 
-    id = Column(
+    id = mapped_column(
         Integer,
         ForeignKey("User.id", ondelete="CASCADE", name="fk_buyer_user_id"),
         primary_key=True,
         index=True,
     )
-    birth_date = Column(Date, nullable=False)
-    eco_points = Column(Float, nullable=False)
-    dni = Column(String(255), nullable=False, unique=True)
-    billing_address = Column(String(255))
-    payment_method = Column(String(255))
+    birth_date = mapped_column(Date, nullable=False)
+    eco_points = mapped_column(Float, nullable=False)
+    dni = mapped_column(String(255), nullable=False, unique=True)
+    billing_address = mapped_column(String(255))
+    payment_method = mapped_column(String(255))
 
     addresses = relationship(
         "Address", back_populates="buyer", cascade="all, delete-orphan"

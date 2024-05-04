@@ -1,19 +1,21 @@
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy.orm import mapped_column
+
 from app.models.products.product import Product
 
 
 class Electronics(Product):
     __tablename__ = "Electronics"
 
-    id = Column(
+    id = mapped_column(
         Integer,
         ForeignKey("Product.id", ondelete="CASCADE", name="fk_product_id"),
         nullable=False,
         primary_key=True,
     )
-    brand = Column(String(255), nullable=False)
-    type = Column(String(255), nullable=False)
-    capacity = Column(String(255), nullable=False)
+    brand = mapped_column(String(255), nullable=False)
+    type = mapped_column(String(255), nullable=False)
+    capacity = mapped_column(String(255), nullable=False)
 
     __mapper_args__ = {
         "polymorphic_identity": "Electronics",

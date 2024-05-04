@@ -1,29 +1,29 @@
-from sqlalchemy import Boolean, Float, ForeignKey, Integer, Column, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import Boolean, Float, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship, mapped_column
 from app.base import Base
 
 
 class SellerProduct(Base):
     __tablename__ = "SellerProduct"
 
-    id = Column(Integer, primary_key=True, index=True)
-    id_product = Column(
+    id = mapped_column(Integer, primary_key=True, index=True)
+    id_product = mapped_column(
         Integer,
         ForeignKey(
             "Product.id", ondelete="CASCADE", name="fk_seller_product_product_id"
         ),
     )
-    id_seller = Column(
+    id_seller = mapped_column(
         Integer,
         ForeignKey("Seller.id", ondelete="CASCADE", name="fk_seller_product_seller_id"),
     )
-    quantity = Column(Integer, nullable=False)
-    price = Column(Float, nullable=False)
-    shipping_costs = Column(Float, nullable=False)
-    state = Column(String, nullable=False)
-    justification = Column(String)
-    eco_points = Column(Float, nullable=False)
-    age_restricted = Column (Boolean)
+    quantity = mapped_column(Integer, nullable=False)
+    price = mapped_column(Float, nullable=False)
+    shipping_costs = mapped_column(Float, nullable=False)
+    state = mapped_column(String, nullable=False)
+    justification = mapped_column(String)
+    eco_points = mapped_column(Float, nullable=False)
+    age_restricted = mapped_column(Boolean)
 
     product = relationship("Product", back_populates="seller_products")
     in_wish_lists = relationship("InWishList", back_populates="seller_product")
