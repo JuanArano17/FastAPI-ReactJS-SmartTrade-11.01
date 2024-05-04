@@ -74,9 +74,7 @@ const BuyerRegistration = () => {
                         console.error('Hubo un error al registrar la tarjeta:', cardError);
                     }
                 }
-                setTimeout(() => {
-                    history.push("/");
-                }, 2000);
+                history.push("/");
             } catch (error) {
                 console.error('Hubo un error al registrar al usuario:', error);
             }
