@@ -37,5 +37,10 @@ class SellerProduct(Base):
 
     def notify_observers(self, new_quantity: int):
         for cart_item in self.in_shopping_carts:
-            if cart_item.quantity > new_quantity:
-                cart_item.quantity = new_quantity
+            #if self.sizes==[]:
+                if cart_item.quantity > new_quantity:
+                    cart_item.quantity = new_quantity
+            #else:
+            #    pass 
+                #logic for clothes observer
+            

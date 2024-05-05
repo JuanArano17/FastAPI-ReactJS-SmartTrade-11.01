@@ -31,6 +31,7 @@ from app.service.users.types.user import UserService
 from app.schemas.users.types.admin import AdminCreate
 from app.service.users.types.admin import AdminService
 from app.schemas.products.categories.variations.size import SizeCreate
+from app.models.users.in_shopping_cart import InShoppingCart
 
 
 session = get_db()
@@ -667,11 +668,12 @@ for _ in range(num_cart_items):
 
     # Choose a buyer ID
     id_buyer = random.choice(buyer_ids)
-    while in_shopping_cart_service.cart_repo.get_by_id(
-        id_buyer=id_buyer, id_seller_product=id_seller_product
+    counter=0
+    while in_shopping_cart_service.cart_repo.get_where(
+        InShoppingCart.id_buyer==id_buyer, InShoppingCart.id_seller_product==id_seller_product
     ):
         id_buyer = random.choice(buyer_ids)
-
+    
     # Create an InShoppingCart object
     in_shopping_cart = InShoppingCartCreate(
         id_seller_product=id_seller_product, quantity=quantity
@@ -685,7 +687,12 @@ for _ in range(num_cart_items):
         size_ids=[]
         for size in seller_product.sizes:
             size_ids.append(size.id)
+
         id_size=random.choice(size_ids)
+        random_size=seller_product_serv.size_repo.get_by_id(id_size)
+        while random_size.quantity<quantity:
+            id_size=random.choice(size_ids)
+            random_size=seller_product_serv.size_repo.get_by_id(id_size)
         in_shopping_cart_service.add(
         id_buyer=id_buyer, shopping_cart_product=in_shopping_cart, id_size=id_size
         )

@@ -46,7 +46,7 @@ def get_engine() -> Engine:
     return engine
 
 
-engine = create_engine(get_db_url(), pool_size=50, echo=False)
+engine = create_engine(get_db_url(), pool_size=50, echo=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

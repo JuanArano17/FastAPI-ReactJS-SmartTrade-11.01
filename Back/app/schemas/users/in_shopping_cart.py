@@ -12,11 +12,13 @@ class InShoppingCartCreate(InShoppingCartBase):
 
 class InShoppingCartUpdate(InShoppingCartBase):
     id_size : Optional[int] = None
+    quantity: Optional[PositiveInt] = None
 
 
 class InShoppingCart(InShoppingCartBase):
     model_config = ConfigDict(from_attributes=True)
 
+    id: int
     id_buyer: int
     id_size: Optional[int]=None
     id_seller_product: int
@@ -25,6 +27,7 @@ class InShoppingCart(InShoppingCartBase):
 class CompleteShoppingCart(InShoppingCartBase):
     model_config = ConfigDict(from_attributes=True)
 
+    id:int
     id_buyer: int
     size: Optional[Size]=None
     seller_product: SellerProductRead

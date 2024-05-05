@@ -46,6 +46,7 @@ async def create_cart_item(
     """
 
     seller_product=seller_product_service.get_by_id(seller_product_id=shopping_cart_product.id_seller_product)
+
     if seller_product.sizes==[]:
         return shopping_cart_service.add_by_user(current_user, shopping_cart_product)
     else:
@@ -66,36 +67,36 @@ async def delete_all_cart_item(
 
 
 @cart_token_router.put(
-    "/{seller_product_id}",
+    "/{shopping_cart_id}",
     response_model=CompleteShoppingCart,
     response_model_exclude_unset=True,
     response_model_exclude_none=True,
 )
-async def update_quantity(
+async def update(
     *,
     current_user: CurrentUserDep,
-    seller_product_id: int,
+    shopping_cart_id: int,
     cart_item: InShoppingCartUpdate,
     shopping_cart_service: ShoppingCartServiceDep,
 ):
     """
-    Update the quantity of an item in the shopping cart.
+    Update an item in the shopping cart.
     """
     return shopping_cart_service.update_by_user(
         current_user,
-        seller_product_id,
+        shopping_cart_id,
         cart_item,
     )
 
 
-@cart_token_router.delete("/{seller_product_id}")
+@cart_token_router.delete("/{shopping_cart_id}")
 async def delete_item(
     *,
     current_user: CurrentUserDep,
-    seller_product_id: int,
+    shopping_cart_id: int,
     shopping_cart_service: ShoppingCartServiceDep,
 ):
     """
     Delete an item from shopping cart.
     """
-    return shopping_cart_service.delete_one_by_user(current_user, seller_product_id)
+    return shopping_cart_service.delete_one_by_user(current_user, shopping_cart_id)
