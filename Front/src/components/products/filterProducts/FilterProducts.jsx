@@ -64,7 +64,7 @@ const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => 
     return (
         <Grid container spacing={2} alignItems="center" justifyContent="center">
             <Grid item xs={3}>
-                <FormControl variant="outlined" fullWidth sx={{
+            <FormControl variant="outlined" fullWidth sx={{
                     mb: 2, height: '56px', // Set the height of the FormControl to match the button
                     '.MuiOutlinedInput-root': {
                         borderRadius: '15px', bgcolor: '#81cc5c', color: '#fff', '&:hover': { bgcolor: '#629c44' },
@@ -103,7 +103,7 @@ const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => 
                 <Slider
                     value={priceRange}
                     onChange={handlePriceChange}
-                    valueLabelDisplay="auto"
+                    valueLabelDisplay="on"
                     aria-labelledby="range-slider"
                     min={0}
                     max={maxPrice}

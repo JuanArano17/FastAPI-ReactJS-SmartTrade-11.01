@@ -30,12 +30,12 @@ const SearchBar = () => {
                             ),
                         }}
                         sx={{
-                            width: { xs: '100%', sm: '80%', md: '60%' }, // Ajusta el tamaño según el ancho de la pantalla
+                            width: '80%', // Ajusta el tamaño según el ancho de la pantalla
                             "& .MuiInputBase-root": {
                                 height: 50, 
                             },
                             "& .MuiOutlinedInput-notchedOutline": {
-                                borderRadius: '32px', 
+                                borderRadius: '15px', 
                                 boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.4)', 
                             }
                         }}
