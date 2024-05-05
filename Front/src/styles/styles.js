@@ -3,7 +3,7 @@ const styles = {
         display: 'flex',
         flexDirection: 'column',
         minHeight: '100vh',
-        paddingTop: '75px'  
+        paddingTop: '100px'  
     },
     paperContainer: {
         p: 4,

@@ -4,12 +4,14 @@ import RecyclingIcon from "@mui/icons-material/Recycling";
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
-import { Link, useHistory } from "react-router-dom";
+import StarIcon from '@mui/icons-material/Star';
+import { Link, useHistory, useLocation } from "react-router-dom";
 import SearchBar from "./searchbar/SearchBar";
 import { useLogout } from "../../utils/hooks/useLogout";
 
 const TopBar = () => {
   const history = useHistory();
+  const location = useLocation();
   const logout = useLogout();
   const isLoggedIn = Boolean(localStorage.getItem('accessToken'));
 
@@ -25,68 +27,113 @@ const TopBar = () => {
     history.push("/wish-list");
   };
 
+  const buttonColors = {
+    home: '#357a38',
+    shoppingCart: '#357a38',
+    wishList: '#ffcc00',
+    login: '#357a38',
+    register: '#357a38',
+    logout: '#357a38',
+  };
+
+  const indicatorStyle = (path) => ({
+    borderBottom: location.pathname === path ? `4px solid ${buttonColors[pathToButtonColorKey(path)]}` : 'none',
+    paddingBottom: '10px',  // Adjust padding to accommodate the border without shifting the button
+  });
+
+  const pathToButtonColorKey = (path) => ({
+    "/": "home",
+    "/shopping-cart": "shoppingCart",
+    "/wish-list": "wishList",
+    "/login": "login",
+    "/register": "register",
+    "/logout": "logout"
+  })[path] || 'home';
+
   return (
-    <AppBar position="fixed" sx={{ backgroundColor: '#ffffff', color: '#444444', boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)' }} elevation={0}>
-      <Toolbar>
+    <AppBar position="fixed" sx={{ height: '80px', backgroundColor: '#ffffff', color: '#444444', boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)', zIndex: 10 }} elevation={0}>
+      <Toolbar sx={{ height: '100%', display: 'flex', alignItems: 'center' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: '40px', marginRight: 'auto' }}>
           <Tooltip title="Go Home">
-            <IconButton size="large" edge="start" color="success" aria-label="recycle" onClick={handleLogoClick}>
-              <RecyclingIcon sx={{ color: 'darkgreen' }} />
+            <IconButton size="large" edge="start" color="inherit" onClick={handleLogoClick} sx={{ color: buttonColors.home, ...indicatorStyle("/") }}>
+              <RecyclingIcon />
+              <Typography variant="h6" sx={{ color: '#629c44' }} noWrap>
+                Smart Trade
+              </Typography>
             </IconButton>
           </Tooltip>
-          <Typography variant="h6" color="#629c44" noWrap>
-            Smart Trade
-          </Typography>
         </Box>
-
         {isLoggedIn ? (
           <>
             <SearchBar />
             <Tooltip title="View Cart">
               <Button
-                startIcon={<AddShoppingCartIcon sx={{ color: 'darkgreen' }} />}
+                size="large"
+                startIcon={<AddShoppingCartIcon />}
                 variant="text"
-                sx={{ color: 'darkgreen', borderRadius: '50%' }}
                 onClick={handleShoppingCart}
-              >
-              </Button>
+                sx={{
+                  color: buttonColors.shoppingCart,
+                  fontSize: '1.2em',
+                  ...indicatorStyle('/shopping-cart')
+                }}
+              />
             </Tooltip>
             <Tooltip title="View Wish List">
               <Button
-                startIcon={<StarBorderIcon sx={{ color: 'darkgreen' }} />}
+                size="large"
+                startIcon={location.pathname === '/wish-list' ? <StarIcon sx={{ color: buttonColors.wishList }} /> : <StarBorderIcon sx={{ color: buttonColors.wishList }} />}
                 variant="text"
-                sx={{ color: 'darkgreen', borderRadius: '50%' }}
                 onClick={handleWishList}
-              >
-              </Button>
+                sx={{
+                  color: buttonColors.wishList,
+                  fontSize: '1.2em',
+                  ...indicatorStyle('/wish-list')
+                }}
+              />
             </Tooltip>
             <Tooltip title="Logout">
               <Button
-                startIcon={<ExitToAppIcon sx={{ color: 'darkgreen' }} />}
+                size="large"
+                startIcon={<ExitToAppIcon />}
                 variant="text"
-                sx={{ color: 'darkgreen', borderRadius: '50%' }}
                 onClick={logout}
-              >
-              </Button>
+                sx={{
+                  color: buttonColors.logout,
+                  fontSize: '1.2em',
+                  ...indicatorStyle('/logout')
+                }}
+              />
             </Tooltip>
           </>
         ) : (
           <>
-            <Link to="/login">
+            <Link to="/login" style={{ textDecoration: 'none' }}>
               <Tooltip title="Login">
                 <Button
+                  size="large"
                   variant="text"
-                  sx={{ color: 'darkgreen', borderRadius: '50%', marginRight: '20px' }}
+                  sx={{
+                    color: buttonColors.login,
+                    marginRight: '20px',
+                    fontSize: '1.2em',
+                    ...indicatorStyle('/login')
+                  }}
                 >
                   Login
                 </Button>
               </Tooltip>
             </Link>
-            <Link to="/register">
+            <Link to="/register" style={{ textDecoration: 'none' }}>
               <Tooltip title="Register">
                 <Button
+                  size="large"
                   variant="text"
-                  sx={{ color: 'darkgreen', borderRadius: '50%' }}
+                  sx={{
+                    color: buttonColors.register,
+                    fontSize: '1.2em',
+                    ...indicatorStyle('/register')
+                  }}
                 >
                   Register
                 </Button>

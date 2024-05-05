@@ -3,6 +3,7 @@ export const useLogout = () => {
     const history = useHistory();
     const logout = () => {
         localStorage.removeItem('accessToken');
+        localStorage.removeItem('type');
         history.push('/');
     };
     return logout;
