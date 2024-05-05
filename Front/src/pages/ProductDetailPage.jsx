@@ -43,34 +43,39 @@ const ProductDetailPage = () => {
     const handleBackToCatalog = () => {
         history.push('/catalog'); // Asegúrate de usar la ruta correcta para el catálogo
     };
-
+    
     const handleAddToCart = async () => {
-        const quantity = 1;
         try {
-            await addCartItem(productData.id, quantity, selectedSize);
+            const quantity = 1;
+            if (productData.category === 'Clothes') {
+                console.log('SIZE:', selectedSize)
+                await addCartItem(productData.id, quantity, selectedSize);
+            } else {
+                await addCartItem(productData.id, quantity);
+            }
             console.log('Producto añadido al carrito con tamaño: ', selectedSize);
         } catch (error) {
             console.error('Error al añadir producto al carrito', error);
         }
     };
 
-    const handleSizeChange = (size) => {
-        setSelectedSize(size);
-    };
+    const handleSizeChange = (sizeId) => {
+        setSelectedSize(sizeId);
+    };    
 
     const renderSizeButtons = (sizes) => {
         return sizes.map(size => (
             <Button
                 key={size.id}
-                variant={selectedSize === size.size ? "contained" : "outlined"}
-                onClick={() => handleSizeChange(size.size)}
+                variant={selectedSize === size.id ? "contained" : "outlined"}
+                onClick={() => handleSizeChange(size.id)} 
                 sx={{
                     m: 1,
-                    color: selectedSize === size.size ? 'white' : 'green',
+                    color: selectedSize === size.id ? 'white' : 'green',
                     borderColor: 'green',
-                    backgroundColor: selectedSize === size.size ? 'green' : 'white',
+                    backgroundColor: selectedSize === size.id ? 'green' : 'white',
                     '&:hover': {
-                        backgroundColor: selectedSize === size.size ? 'darkgreen' : '#f4f4f4',
+                        backgroundColor: selectedSize === size.id ? 'darkgreen' : '#f4f4f4',
                     }
                 }}
             >

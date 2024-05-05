@@ -39,6 +39,7 @@ const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => 
             const isAgeAppropriate = userAge >= 18 || !product.age_restricted;
             return matchesSearchTerm && matchesCategory && matchesPrice && isAgeAppropriate;
         });
+        console.log("filtered: ", result)
         setSearchFilteredProducts(result);
     }, [selectedCategory, priceRange, products, searchTerm, userAge]);
 

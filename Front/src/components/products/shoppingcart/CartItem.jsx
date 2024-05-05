@@ -7,10 +7,11 @@ import styles from "../../../styles/styles";
 import imagePlaceholder from "../../../images/img_mundo.png";
 import { updateCartItemQuantity, deleteCartItem } from '../../../api/services/products/ShoppingCartService';
 
-const CartItem = ({ item, setCartItems, quantity }) => {
+const CartItem = ({ item, size, setCartItems, quantity }) => {
     const updateQuantity = async (newQuantity) => {
-        if (newQuantity > 0 && newQuantity <= item.stock) {
+        if (newQuantity > 0 && newQuantity <= item.seller_product.stock) {
             try {
+                console.log('itemx asd', item);
                 await updateCartItemQuantity(item.id, newQuantity);
                 setCartItems();
             } catch (error) {
@@ -28,8 +29,7 @@ const CartItem = ({ item, setCartItems, quantity }) => {
         }
     };
 
-    // Utiliza la primera imagen del array o una imagen de reserva si el array está vacío
-    const imageUrl = item.images && item.images.length > 0 ? item.images[0] : imagePlaceholder;
+    const imageUrl = item.seller_product.images && item.seller_product.images.length > 0 ? item.seller_product.images[0] : imagePlaceholder;
 
     return (
         <Grid item xs={12} sx={styles.cartItem}>
@@ -38,11 +38,16 @@ const CartItem = ({ item, setCartItems, quantity }) => {
                     <DeleteIcon />
                 </IconButton>
                 <Box sx={{ minWidth: '160px', maxWidth: '160px', minHeight: '160px', maxHeight: '160px', overflow: 'hidden', marginRight: '16px', borderRadius: '40px' }}>
-                    <img src={imageUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '40px' }} />
+                    <img src={imageUrl} alt={item.seller_product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '40px' }} />
                 </Box>
                 <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', justifyContent: 'space-between', textAlign: 'left' }}>
-                    <Typography variant="subtitle1" noWrap>{item.name}</Typography>
-                    <Typography variant="body2" color="textSecondary" noWrap>{item.description}</Typography>
+                    <Typography variant="subtitle1" noWrap>{item.seller_product.name}</Typography>
+                    <Typography variant="body2" color="textSecondary" noWrap>{item.seller_product.description}</Typography>
+                    {item.seller_product.category === 'Clothes' && size && (
+                        <Typography variant="body2" sx={{ color: 'textSecondary', mt: 1 }}>
+                            Size: {size.size}
+                        </Typography>
+                    )}
                     <Box sx={{ display: 'flex', alignItems: 'center', marginTop: 'auto' }}>
                         <IconButton onClick={() => updateQuantity(quantity - 1)} disabled={quantity <= 1}>
                             <RemoveIcon />
@@ -50,13 +55,13 @@ const CartItem = ({ item, setCartItems, quantity }) => {
                         <TextField
                             value={quantity}
                             onChange={(e) => updateQuantity(parseInt(e.target.value, 10))}
-                            inputProps={{ min: 1, max: item.stock }}
+                            inputProps={{ min: 1, max: item.seller_product.stock }}
                             sx={{ mx: 1, maxWidth: "55px" }}
                         />
-                        <IconButton onClick={() => updateQuantity(quantity + 1)} disabled={quantity >= item.stock}>
+                        <IconButton onClick={() => updateQuantity(quantity + 1)} disabled={quantity >= item.seller_product.stock}>
                             <AddIcon />
                         </IconButton>
-                        <Typography variant="body2" sx={{ ml: 2 }}>Subtotal: ${(item.price * quantity).toFixed(2)}</Typography>
+                        <Typography variant="body2" sx={{ ml: 2 }}>Subtotal: ${(item.seller_product.price * quantity).toFixed(2)}</Typography>
                     </Box>
                 </Box>
             </Paper>
