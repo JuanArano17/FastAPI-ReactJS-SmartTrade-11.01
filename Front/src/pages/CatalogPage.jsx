@@ -17,15 +17,7 @@ const CatalogPage = () => {
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const productsPerPage = 12;
-
     const history = useHistory();
-
-    useEffect(() => {
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-            history.push('/');
-        }
-    }, [history]);
 
     useEffect(() => {
         setSearchTerm(search || "");
@@ -71,8 +63,18 @@ const CatalogPage = () => {
                 <Paper elevation={3} sx={styles.paperContainer}>
                     <Grid container spacing={3}>
                         {currentProducts && currentProducts.map((product) => (
-                            <Grid item xs={12} sm={4} md={4} lg={4} key={`${product.id}`}>
-                                <Button onClick={() => handleProductClick(product.id)} sx={{ width: '100%', height: '100%', padding: 0 }}>
+                            <Grid sx={{ marginBottom: '40px'}} item xs={12} sm={4} md={4} lg={4} key={`${product.id}`}>
+                                <Button
+                                    onClick={() => handleProductClick(product.id)}
+                                    sx={{
+                                        width: '100%',
+                                        height: '100%',
+                                        padding: 0,
+                                        '&:hover': {
+                                            backgroundColor: 'transparent', // Esto quita el fondo gris al hacer hover
+                                            boxShadow: 'none' // Elimina cualquier sombra adicional al hacer hover
+                                        }
+                                    }}>
                                     <SummarizedProduct product={product} />
                                 </Button>
                             </Grid>

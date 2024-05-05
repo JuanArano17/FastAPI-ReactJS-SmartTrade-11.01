@@ -1,3 +1,4 @@
+import axios from 'axios';
 import axiosInstance from '../AxiosInstance'; 
 const registerUserBuyerService = async (buyerData) => {
     const validBuyerData = {
@@ -51,6 +52,8 @@ const loginUserService = async (userData) => {
             }
         });
         localStorage.setItem('accessToken', response.data.access_token);
+        const myData = await myInfoService();
+        localStorage.setItem('type', myData.type);
         return response.data;
     } catch (error) {
         console.error('Hubo un error al loguear el usuario:', error.response ? error.response.data : error);

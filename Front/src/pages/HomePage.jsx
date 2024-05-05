@@ -10,13 +10,6 @@ import { useHistory } from 'react-router-dom';
 
 const HomePage = () => {
     const history = useHistory();
-    useEffect(() => {
-        const token = localStorage.getItem('accessToken');
-        if (token) {
-            history.push('/catalog');
-        }
-        console.log('token', token);
-    }, [history]);
 
     return (
         <Box sx={{ ...styles.mainBox, backgroundColor: '#f0f0f0' }}>

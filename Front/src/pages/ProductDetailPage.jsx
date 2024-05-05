@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Box, Container, Typography, Grid, Button, Paper, Divider, CircularProgress, Rating, ButtonBase } from '@mui/material';
+import { useParams, useHistory } from 'react-router-dom';
+import { Box, Container, Typography, Grid, Button, Paper, Divider, CircularProgress, Rating, ButtonBase, IconButton } from '@mui/material';
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
 import styles from '../styles/styles';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { getProductSellerById } from '../api/services/products/ProductsService';
 import { addCartItem } from '../api/services/products/ShoppingCartService';
 import FavoriteButton from '../components/favorite-button/FavoriteButton';
@@ -11,17 +12,23 @@ import FavoriteButton from '../components/favorite-button/FavoriteButton';
 const ProductDetailPage = () => {
     const { id } = useParams();
     const [productData, setProductData] = useState(null);
+    const [selectedSize, setSelectedSize] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [imageIndex, setImageIndex] = useState(0);
+    const history = useHistory();
 
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
                 const response = await getProductSellerById(id);
+                console.log("Product by id: ", response);
                 if (response) {
                     setProductData(response);
+                    if (response.sizes && response.sizes.length > 0) {
+                        setSelectedSize(response.sizes[0].size); // Default to first size
+                    }
                     setLoading(false);
                     setError(null);
                 }
@@ -33,17 +40,47 @@ const ProductDetailPage = () => {
         fetchProducts();
     }, [id]);
 
+    const handleBackToCatalog = () => {
+        history.push('/catalog'); // Asegúrate de usar la ruta correcta para el catálogo
+    };
+
     const handleAddToCart = async () => {
         const quantity = 1;
         try {
-            await addCartItem(productData.id, quantity);
-            console.log('Producto añadido al carrito');
+            await addCartItem(productData.id, quantity, selectedSize);
+            console.log('Producto añadido al carrito con tamaño: ', selectedSize);
         } catch (error) {
             console.error('Error al añadir producto al carrito', error);
         }
     };
+
+    const handleSizeChange = (size) => {
+        setSelectedSize(size);
+    };
+
+    const renderSizeButtons = (sizes) => {
+        return sizes.map(size => (
+            <Button
+                key={size.id}
+                variant={selectedSize === size.size ? "contained" : "outlined"}
+                onClick={() => handleSizeChange(size.size)}
+                sx={{
+                    m: 1,
+                    color: selectedSize === size.size ? 'white' : 'green',
+                    borderColor: 'green',
+                    backgroundColor: selectedSize === size.size ? 'green' : 'white',
+                    '&:hover': {
+                        backgroundColor: selectedSize === size.size ? 'darkgreen' : '#f4f4f4',
+                    }
+                }}
+            >
+                {size.size}
+            </Button>
+        ));
+    };
+
     const renderAdditionalAttributes = (productData) => {
-        const commonAttributes = ['name', 'description', 'eco_points', 'id_product', 'id_seller', 'spec_sheet', 'stock', 'id', 'images', 'seller_products'];
+        const commonAttributes = ['id_product', 'id_seller', 'spec_sheet', 'stock', 'id', 'images', 'seller_products', 'justification', 'age_restricted', 'sizes', 'state'];
         return Object.keys(productData)
             .filter(key => !commonAttributes.includes(key))
             .map(key => (
@@ -65,24 +102,44 @@ const ProductDetailPage = () => {
     if (error) {
         return <Typography color="error">{error}</Typography>;
     }
+
     const handleImageChange = (newIndex) => {
         setImageIndex(newIndex);
     };
+
     return (
         <Box sx={styles.mainBox}>
             <TopBar showSearchBar={true} showLogoutButton={true} />
             <Container sx={styles.mainContainer}>
                 {productData && (
                     <Paper elevation={3} sx={{ ...styles.paperContainer, position: 'relative' }}>
-                        <FavoriteButton productId={productData.id} ></FavoriteButton>
+                        <IconButton onClick={handleBackToCatalog} sx={{ position: 'absolute', left: '10px', top: '10px' }}>
+                            <ArrowBackIcon />
+                        </IconButton>
+                        <FavoriteButton productId={productData.id} />
                         <Grid container spacing={2}>
                             <Grid item xs={12} md={5} sx={{ display: 'flex', justifyContent: 'center' }}>
-                                <Box sx={{ width: '100%', height: 300, display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
+                                <Box sx={{
+                                    width: 600,
+                                    height: 600,
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    overflow: 'hidden',
+                                    borderRadius: '40px',
+                                }}>
                                     <ButtonBase onClick={() => handleImageChange((imageIndex + 1) % productData.images.length)} disabled={productData.images.length <= 1}>
                                         <img
                                             src={productData.images[imageIndex]}
                                             alt={`Image ${imageIndex + 1} of ${productData.name}`}
-                                            style={{ maxWidth: '100%', maxHeight: '100%', width: 'auto', height: 'auto' }}
+                                            style={{
+                                                height: '100%',
+                                                width: '100%',
+                                                objectFit: 'cover',  // Cubre el contenedor sin distorsionar
+                                                objectPosition: 'center center',  // Centra la imagen en el contenedor
+                                                borderRadius: '40px',  // borderRadius a la imagen
+                                                boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.7)'  // Sombra a la imagen
+                                            }}
                                         />
                                     </ButtonBase>
                                 </Box>
@@ -99,7 +156,15 @@ const ProductDetailPage = () => {
                                 <Typography variant="h5" sx={{ my: 2 }}>
                                     Precio: ${productData.price}
                                 </Typography>
-                                <Button variant="contained" sx={{ mb: 2 }} onClick={handleAddToCart}>
+                                <Box sx={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap' }}>
+                                    {productData.sizes && renderSizeButtons(productData.sizes)}
+                                </Box>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    sx={{ mt: 2, display: 'block', marginLeft: 'auto', marginRight: 'auto', borderRadius: '40px', background: 'darkgreen' }}
+                                    onClick={handleAddToCart}
+                                >
                                     Add to Cart
                                 </Button>
                             </Grid>

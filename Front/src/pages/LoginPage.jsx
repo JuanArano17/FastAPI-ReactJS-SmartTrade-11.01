@@ -19,12 +19,6 @@ const LoginPage = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const history = useHistory();
-  useEffect(() => {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-          history.push('/');
-      }
-  }, [history]);
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === "checkbox") {

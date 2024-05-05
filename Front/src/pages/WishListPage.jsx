@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
 import { Box, Container, Typography, Grid } from '@mui/material';
 import TopBar from '../components/topbar/TopBar';
 import WishListItem from '../components/products/wishlist/WishListItem';
@@ -26,14 +25,7 @@ const WishListPage = () => {
 
         fetchWishData();
     }, []);
-    const history = useHistory();
 
-    useEffect(() => {
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-            history.push('/');
-        }
-    }, [history]);
     return (
         <Box sx={styles.mainBox}>
             <TopBar showLogoutButton={true} />
