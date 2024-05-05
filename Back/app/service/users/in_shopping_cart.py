@@ -219,60 +219,13 @@ class InShoppingCartService:
         seller_product = self.seller_product_service.get_by_id(cart_item.id_seller_product)
         
         if(seller_product.sizes==[]):
-            if(new_data.id_size):
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="This shopping cart item shouldn't have a size assigned",
-                )
-            
             if new_data.quantity > seller_product.quantity:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Not enough seller products",
-                )
-            
-            if self.cart_repo.get_where(
-            InShoppingCart.id_buyer == new_data.id_buyer,
-            InShoppingCart.id_seller_product == new_data.id_seller_product,
-            ):
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Product already in shopping cart",
-                )
+                )    
         else:
-            if(new_data.id_size):
-                size=self.seller_product_service.size_repo.get_by_id(new_data.id_size)
-                if(not size):
-                    raise HTTPException(
-                                status_code=status.HTTP_400_BAD_REQUEST,
-                                detail="Could not find size",
-                                )
-                same_items=self.cart_repo.get_where(InShoppingCart.id_buyer==cart_item.id_buyer, InShoppingCart.id_seller_product
-                                                               == cart_item.id_seller_product)
-                
-                size=self.seller_product_service.size_repo.get_by_id(new_data.id_size)
-                if same_items and new_data.id_size!=cart_item.id_size:
-                    for item in same_items:
-                        size2=self.seller_product_service.size_repo.get_by_id(item.id_size)
-                        if(size2.size==size.size):
-                            raise HTTPException(
-                            status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="Product already in shopping cart",
-                            )
-                        
-                if(new_data.id_size!=cart_item.id_size):
-                    if cart_item.id_seller_product!=size.seller_product_id:
-                        raise HTTPException(
-                            status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="This size doesn't belong to this product",
-                            )
-                    
-                if(not new_data.quantity):
-                    if size.quantity<cart_item.quantity:
-                        new_data.quantity=size.quantity
-            
-            else: 
-                size=self.seller_product_service.size_repo.get_by_id(cart_item.id_size)
+            size=self.seller_product_service.size_repo.get_by_id(cart_item.id_size)
 
             if new_data.quantity and new_data.quantity > size.quantity:
                     raise HTTPException(

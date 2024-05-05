@@ -11,7 +11,6 @@ class InShoppingCartCreate(InShoppingCartBase):
     id_seller_product: int
 
 class InShoppingCartUpdate(InShoppingCartBase):
-    id_size : Optional[int] = None
     quantity: Optional[PositiveInt] = None
 
 
