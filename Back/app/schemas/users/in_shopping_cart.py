@@ -1,5 +1,5 @@
 from typing import Optional
-from Back.app.schemas.products.categories.variations.size import Size
+from app.schemas.products.categories.variations.size import Size
 from app.schemas.products.seller_product import SellerProductRead
 from pydantic import BaseModel, ConfigDict, PositiveInt
 
