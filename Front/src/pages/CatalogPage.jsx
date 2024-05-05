@@ -71,8 +71,8 @@ const CatalogPage = () => {
                                         height: '100%',
                                         padding: 0,
                                         '&:hover': {
-                                            backgroundColor: 'transparent', // Esto quita el fondo gris al hacer hover
-                                            boxShadow: 'none' // Elimina cualquier sombra adicional al hacer hover
+                                            backgroundColor: 'transparent',
+                                            boxShadow: 'none' 
                                         }
                                     }}>
                                     <SummarizedProduct product={product} />

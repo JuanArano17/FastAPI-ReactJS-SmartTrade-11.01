@@ -38,7 +38,7 @@ const ShoppingCartPage = () => {
                 </Typography>
                 <Grid container spacing={2}>
                     {cartItems.map((item) => (
-                        <CartItem key={item.seller_product.id} item={item.seller_product} quantity={item.quantity} setCartItems={fetchCartData} />
+                        <CartItem key={item.seller_product.id} item={item} quantity={item.quantity} size={item.size} setCartItems={fetchCartData} />
                     ))}
                     <Grid item xs={12}>
                         <CartTotal total={calculateTotal()} />
