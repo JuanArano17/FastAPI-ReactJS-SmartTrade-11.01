@@ -106,6 +106,8 @@ class AddressService:
     ) -> Address:
         self._check_is_buyer(user)
         address = self.get_one_by_user(user, address_id)
+        if new_data.default:
+            self._update_old_default_address(address.id_buyer)
         return self.address_repo.update(address, new_data)
 
     def delete_by_id(self, address_id):

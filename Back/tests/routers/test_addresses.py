@@ -11,7 +11,7 @@ from app.service.users.types.buyer import BuyerService
 
 
 def fake_address():
-    return {
+    return { 
         "street": "Test Street",
         "floor": 3,
         "door": "A",
@@ -19,7 +19,7 @@ def fake_address():
         "city": "Madrid",
         "postal_code": "43211",
         "country": "ESP",
-        "default": True,
+        "default": True
     }
 
 
@@ -53,12 +53,9 @@ def test_create_address(
     access_token = login_response.json()["access_token"]
 
     headers = {"Authorization": f"Bearer {access_token}"}
-
-    address_data = fake_address()
-
-    response = client.post("/addresses/me/", json=address_data, headers=headers)
+    data = fake_address()
+    response = client.post("/addresses", json=data, headers=headers)
     content = response.json()
-    print(content)
     assert response.status_code == status.HTTP_200_OK
 
     assert content["street"] == data["street"]
@@ -81,10 +78,18 @@ def test_create_address_invalid_data(client: TestClient, buyer_service: BuyerSer
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
     data = fake_address()
     data["country"] = "España"  # Invalid country format
 
-    response = client.post(f"/buyers/{buyer.id}/addresses", json=data)
+    response = client.post(f"/addresses", json=data, headers=headers)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "detail" in response.json()
 
@@ -98,29 +103,37 @@ def test_default_address_change(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
     data = fake_address()
     address = address_service.add(buyer.id, AddressCreate(**data))
 
     address2 = fake_address()
     address2["default"] = True
-    response = client.post(f"/buyers/{buyer.id}/addresses", json=address2)
+    response = client.post(f"/addresses", json=address2, headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content1 = response.json()
     assert content1["default"] == True
-    response = client.get(f"/buyers/{buyer.id}/addresses/{address.id}")
+    response = client.get(f"/addresses/{address.id}", headers=headers)
     content = response.json()
     assert content["default"] == False
     address3 = fake_address()
     address3["default"] = True
-    response = client.post(f"/buyers/{buyer.id}/addresses", json=address3)
+    response = client.post(f"/addresses", json=address3, headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["default"] == True
-    response = client.get(f"/buyers/{buyer.id}/addresses/{address.id}")
+    response = client.get(f"addresses/{address.id}", headers=headers)
     content = response.json()
     assert content["default"] == False
     address2_id = content1["id"]
-    response = client.get(f"/buyers/{buyer.id}/addresses/{address2_id}")
+    response = client.get(f"/addresses/{address2_id}", headers=headers)
     content = response.json()
     assert content["default"] == False
 
@@ -134,10 +147,18 @@ def test_get_address_by_id(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
     data = fake_address()
     address = address_service.add(buyer.id, AddressCreate(**data))
 
-    response = client.get(f"/buyers/{buyer.id}/addresses/{address.id}")
+    response = client.get(f"/addresses/{address.id}", headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["street"] == data["street"]
@@ -160,7 +181,16 @@ def test_get_address_not_found(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
-    response = client.get(f"/buyers/{buyer.id}/addresses/999")
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+
+    response = client.get(f"/addresses/999", headers=headers)
     assert response.status_code == status.HTTP_404_NOT_FOUND
     content = response.json()
     assert content["detail"] == "Address with id 999 not found."
@@ -178,6 +208,7 @@ def test_get_addresses(
             name="John",
             surname="Wepkins",
             dni="12345678A",
+            birth_date = "1993-02-02",
             eco_points=0,
             billing_address="Street Whatever 123",
             payment_method="Bizum",
@@ -190,6 +221,7 @@ def test_get_addresses(
             name="Maria",
             surname="Carey",
             dni="87654321B",
+            birth_date = "1993-02-02",
             eco_points=0,
             billing_address="Street Molotia 2",
             payment_method="Bizum",
@@ -238,8 +270,25 @@ def test_get_addresses(
         ),
     )
 
-    response = client.get(f"/buyers/{maria.id}/addresses/")
-    response1 = client.get(f"/buyers/{john.id}/addresses/")
+    login_data = {"username": maria.email, "password": "mypass@123"}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    response = client.get(f"/addresses/", headers=headers)
+
+    login_data = {"username": john.email, "password": "arandompassword"}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    response1 = client.get(f"/addresses/", headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert len(content) == 1
@@ -260,6 +309,14 @@ def test_update_address(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
     data = fake_address()
     address = address_service.add(buyer.id, AddressCreate(**data))
     # new_data = data.copy()
@@ -273,7 +330,7 @@ def test_update_address(
         "country": "CAN",
         "default": False,
     }
-    response = client.put(f"/buyers/{buyer.id}/addresses/{address.id}", json=new_data)
+    response = client.put(f"/addresses/{address.id}", json=new_data, headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["street"] == new_data["street"]
@@ -295,6 +352,14 @@ def test_update_default(
 ):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
+
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
 
     data = fake_address()
     address = address_service.add(buyer.id, AddressCreate(**data))
@@ -318,12 +383,12 @@ def test_update_default(
         "default": True,
     }
 
-    response = client.put(f"/buyers/{buyer.id}/addresses/{address2.id}", json=new_data)
+    response = client.put(f"/addresses/{address2.id}", json=new_data, headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["default"] == True
 
-    response = client.get(f"/buyers/{buyer.id}/addresses/{address.id}")
+    response = client.get(f"/addresses/{address.id}", headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content["default"] == False
@@ -338,12 +403,20 @@ def test_update_address_invalid_data(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
     data = fake_address()
     address = address_service.add(buyer.id, AddressCreate(**data))
     new_data = data.copy()
     new_data["country"] = "España"  # Wrong country format
 
-    response = client.put(f"/buyers/{buyer.id}/addresses/{address.id}", json=new_data)
+    response = client.put(f"/addresses/{address.id}", json=new_data, headers=headers)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "detail" in response.json()
 
@@ -357,10 +430,18 @@ def test_delete_address(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
     data = fake_address()
     address = address_service.add(buyer.id, AddressCreate(**data))
 
-    response = client.delete(f"/buyers/{buyer.id}/addresses/{address.id}")
+    response = client.delete(f"/addresses/{address.id}", headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content is None or content == {}
@@ -374,7 +455,16 @@ def test_delete_address(
 def test_delete_address_not_found(client: TestClient, buyer_service: BuyerService):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
-    response = client.delete(f"/buyers/{buyer.id}/addresses/999")
+
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    response = client.delete(f"/addresses/999", headers=headers)
     assert response.status_code == status.HTTP_404_NOT_FOUND
     content = response.json()
     assert content["detail"] == "Address with id 999 not found."
@@ -392,6 +482,7 @@ def test_delete_addresses(
             name="John",
             surname="Wepkins",
             dni="12345678A",
+            birth_date = "1993-02-02",
             eco_points=0,
             billing_address="Street Whatever 123",
             payment_method="Bizum",
@@ -439,7 +530,15 @@ def test_delete_addresses(
         ),
     )
 
-    response = client.delete(f"/buyers/{john.id}/addresses")
+    login_data = {"username": john.email, "password": "arandompassword"}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    response = client.delete(f"/addresses", headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content is None or content == {}

@@ -53,9 +53,6 @@ async def create_cart_item(
          return shopping_cart_service.add_by_user(current_user, shopping_cart_product, id_size)
 
 
-    
-
-
 @cart_token_router.delete("/")
 async def delete_all_cart_item(
     current_user: CurrentUserDep, shopping_cart_service: ShoppingCartServiceDep
