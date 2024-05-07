@@ -6,6 +6,7 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import StarIcon from '@mui/icons-material/Star';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'; 
+import StorefrontIcon from '@mui/icons-material/Storefront';
 import { Link, useHistory, useLocation } from "react-router-dom";
 import SearchBar from "./searchbar/SearchBar";
 import { useLogout } from "../../utils/hooks/useLogout";
@@ -34,6 +35,10 @@ const TopBar = () => {
     history.push("/profile");
   };
 
+  const handleProductsClick = () => {
+    history.push("/seller-products");
+  };
+
   const buttonColors = {
     home: '#357a38',
     shoppingCart: '#357a38',
@@ -41,7 +46,8 @@ const TopBar = () => {
     login: '#357a38',
     register: '#357a38',
     logout: '#357a38',
-    profile: '#357a38'  
+    profile: '#357a38',
+    products: '#357a38'  // Definir el color del botón de productos
   };
 
   const indicatorStyle = (path) => ({
@@ -56,7 +62,8 @@ const TopBar = () => {
     "/login": "login",
     "/register": "register",
     "/logout": "logout",
-    "/profile": "profile"  
+    "/profile": "profile",
+    "/seller-products": "products"
   })[path] || 'home';
 
   return (
@@ -75,6 +82,21 @@ const TopBar = () => {
         {isLoggedIn && (
           <>
             <SearchBar />
+            <Tooltip title="Your Products">
+              <Button
+                size="large"
+                startIcon={<StorefrontIcon />}
+                variant="text"
+                onClick={handleProductsClick}
+                sx={{
+                  color: buttonColors.products,
+                  fontSize: '1.2em',
+                  ...indicatorStyle('/seller-products')
+                }}
+              >
+                Products
+              </Button>
+            </Tooltip>
             <Tooltip title="Profile">
               <Button
                 size="large"

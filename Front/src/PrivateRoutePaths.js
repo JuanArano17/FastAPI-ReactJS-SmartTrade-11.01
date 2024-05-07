@@ -37,3 +37,8 @@ export const profilePaths = {
     Buyer: '/profile',
     Seller: '/profile',
 };
+export const sellerproductsPaths = {
+    Admin: '/admin',
+    Unknown: '/',
+    Seller: '/sellerproducts',
+};
