@@ -59,11 +59,11 @@ const CatalogPage = () => {
         <Box sx={styles.mainBox}>
             <TopBar showSearchBar={true} showLogoutButton={true} />
             <Container sx={styles.mainContainer}>
-                <FilterProducts products={products} setSearchFilteredProducts={setSearchFilteredProducts} searchTerm={searchTerm} />
                 <Paper elevation={3} sx={styles.paperContainer}>
-                    <Grid container spacing={3}>
+                    <FilterProducts products={products} setSearchFilteredProducts={setSearchFilteredProducts} searchTerm={searchTerm} />
+                    <Grid container spacing={3} mt={2}>
                         {currentProducts && currentProducts.map((product) => (
-                            <Grid sx={{ marginBottom: '40px'}} item xs={12} sm={4} md={4} lg={4} key={`${product.id}`}>
+                            <Grid sx={{ marginBottom: '40px' }} item xs={12} sm={4} md={4} lg={4} key={`${product.id}`}>
                                 <Button
                                     onClick={() => handleProductClick(product.id)}
                                     sx={{
@@ -72,7 +72,7 @@ const CatalogPage = () => {
                                         padding: 0,
                                         '&:hover': {
                                             backgroundColor: 'transparent',
-                                            boxShadow: 'none' 
+                                            boxShadow: 'none'
                                         }
                                     }}>
                                     <SummarizedProduct product={product} />
@@ -80,10 +80,10 @@ const CatalogPage = () => {
                             </Grid>
                         ))}
                     </Grid>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                        <Pagination count={totalPages} page={currentPage} onChange={handleChangePage} />
+                    </Box>
                 </Paper>
-                <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
-                    <Pagination count={totalPages} page={currentPage} onChange={handleChangePage} />
-                </Box>
             </Container>
             <Footer />
         </Box>

@@ -1,17 +1,27 @@
 import React from 'react';
 import { Box, Typography, Grid, Paper } from '@mui/material';
 import styles from "../../../styles/styles";
+import { useHistory } from 'react-router-dom'; 
 import imagePlaceholder from "../../../images/img_mundo.png";
 import FavoriteButton from '../../favorite-button/FavoriteButton';
 
 const WishItem = ({ item, onRemove }) => {
+    const history = useHistory();
+    const handleRedirect = () => {
+        history.push(`/catalog/product/${item.id}`);
+    };
     const imageSrc = Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : imagePlaceholder;
     return (
-        <Grid item xs={12} sx={styles.cartItem}>
+        <Grid onClick={handleRedirect} item xs={12} sx={styles.cartItem}>
             <Paper elevation={3} sx={{ ...styles.cartItemPaper, 
             position: 'relative', 
             display: 'flex', 
-            boxShadow: '0px 4px 20px rgba(0, 128, 0, 0.4)',}}>
+            cursor: 'pointer',
+            boxShadow: '0px 4px 20px rgba(0, 128, 0, 0.4)',
+            '&:hover': {
+                boxShadow: `0px 4px 20px rgba(0, 128, 0, 0.7)`,  // Cambia al color eco_points al hacer hover
+            }
+            }}>
                 <FavoriteButton
                     productId={item.id}
                     onToggle={() => onRemove(item.id)}

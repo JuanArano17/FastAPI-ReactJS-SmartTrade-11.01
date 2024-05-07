@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { Box, Container, Typography, Grid, Button, Paper, Divider, CircularProgress, Rating, ButtonBase, IconButton } from '@mui/material';
+import { Box, Container, Typography, Grid, Button, Paper, Divider, CircularProgress, Rating, ButtonBase, IconButton, Snackbar } from '@mui/material';
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
 import styles from '../styles/styles';
@@ -11,6 +11,7 @@ import FavoriteButton from '../components/favorite-button/FavoriteButton';
 
 const ProductDetailPage = () => {
     const { id } = useParams();
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', backgroundColor:'' });
     const [productData, setProductData] = useState(null);
     const [selectedSize, setSelectedSize] = useState('');
     const [loading, setLoading] = useState(true);
@@ -43,32 +44,37 @@ const ProductDetailPage = () => {
     const handleBackToCatalog = () => {
         history.push('/catalog'); // Asegúrate de usar la ruta correcta para el catálogo
     };
-    
+
     const handleAddToCart = async () => {
         try {
             const quantity = 1;
             if (productData.category === 'Clothes') {
-                console.log('SIZE:', selectedSize)
                 await addCartItem(productData.id, quantity, selectedSize);
             } else {
                 await addCartItem(productData.id, quantity);
             }
-            console.log('Producto añadido al carrito con tamaño: ', selectedSize);
+            setSnackbar({ open: true, message: "Producto añadido al carrito!", backgroundColor: "green" });
         } catch (error) {
             console.error('Error al añadir producto al carrito', error);
+            setSnackbar({ open: true, message: "El producto no ha podido ser añadido.", backgroundColor: "red" });
         }
     };
 
+    const handleCloseSnackbar = () => {
+        setSnackbar({ open: false, message: '', backgroundColor: '' });
+    };
+    
+
     const handleSizeChange = (sizeId) => {
         setSelectedSize(sizeId);
-    };    
+    };
 
     const renderSizeButtons = (sizes) => {
         return sizes.map(size => (
             <Button
                 key={size.id}
                 variant={selectedSize === size.id ? "contained" : "outlined"}
-                onClick={() => handleSizeChange(size.id)} 
+                onClick={() => handleSizeChange(size.id)}
                 sx={{
                     m: 1,
                     color: selectedSize === size.id ? 'white' : 'green',
@@ -86,18 +92,26 @@ const ProductDetailPage = () => {
 
     const renderAdditionalAttributes = (productData) => {
         const commonAttributes = ['id_product', 'id_seller', 'spec_sheet', 'stock', 'id', 'images', 'seller_products', 'justification', 'age_restricted', 'sizes', 'state'];
-        return Object.keys(productData)
-            .filter(key => !commonAttributes.includes(key))
-            .map(key => (
-                <Paper key={key} elevation={1} sx={{ margin: '10px 0', padding: '10px' }}>
-                    <Typography variant="body2" color="text.secondary" component="span">
-                        {`${key.charAt(0).toUpperCase() + key.slice(1)}: `}
-                    </Typography>
-                    <Typography variant="body2" component="span" sx={{ fontWeight: 'bold' }}>
-                        {productData[key]}
-                    </Typography>
-                </Paper>
-            ));
+        return (
+            <Grid container spacing={2} sx={{ fontSize: '1.1rem', mt: 2 }}>
+                {Object.keys(productData)
+                    .filter(key => !commonAttributes.includes(key))
+                    .map(key => (
+                        <React.Fragment key={key}>
+                            <Grid item xs={6}>
+                                <Typography variant="h5" color="text.secondary" component="span">
+                                    {`${key.charAt(0).toUpperCase() + key.slice(1)}:`}
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Typography variant="h5" component="span" sx={{ fontWeight: 'bold' }}>
+                                    {productData[key]}
+                                </Typography>
+                            </Grid>
+                        </React.Fragment>
+                    ))}
+            </Grid>
+        );
     };
 
     if (loading) {
@@ -176,20 +190,34 @@ const ProductDetailPage = () => {
                         </Grid>
                         <Divider sx={styles.ThickDivider}></Divider>
                         <Box sx={{ textAlign: 'left' }}>
-                            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                                 Product characteristics
                             </Typography>
                             {renderAdditionalAttributes(productData)}
                         </Box>
                         <Divider sx={styles.ThickDivider}></Divider>
                         <Box sx={{ textAlign: 'left' }}>
-                            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                                 Similar Products
                             </Typography>
                         </Box>
                     </Paper>
                 )}
             </Container>
+            <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                message={snackbar.message}
+                ContentProps={{
+                    sx: { align: 'auto', backgroundColor: snackbar.backgroundColor }
+                }}
+                action={
+                    <Button color="inherit" size="small" onClick={handleCloseSnackbar}>
+                        OK
+                    </Button>
+                }
+            />
             <Footer />
         </Box>
     );

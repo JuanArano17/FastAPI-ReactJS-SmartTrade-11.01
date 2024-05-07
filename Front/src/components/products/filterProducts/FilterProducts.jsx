@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Slider, Select, MenuItem, FormControl, InputLabel, Button, Grid } from '@mui/material';
+import { Typography, Slider, Select, MenuItem, FormControl, InputLabel, Button, Grid, Box } from '@mui/material';
 import { myInfoService } from '../../../api/services/user/AuthService';
 
 const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => {
@@ -63,20 +63,20 @@ const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => 
     };
 
     return (
-        <Grid container spacing={2} alignItems="center" justifyContent="center">
-            <Grid item xs={3}>
-            <FormControl variant="outlined" fullWidth sx={{
-                    mb: 2, height: '56px', // Set the height of the FormControl to match the button
+        <Grid container spacing={2} alignItems="center" justifyContent="space-between">
+            <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                <FormControl variant="outlined" fullWidth sx={{
+                    mb: 2, height: '56px',
                     '.MuiOutlinedInput-root': {
                         borderRadius: '15px', bgcolor: '#81cc5c', color: '#fff', '&:hover': { bgcolor: '#629c44' },
                         '.MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' },
-                        fontFamily: '"Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif' // Font family
+                        fontFamily: '"Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif'
                     }
                 }}>
                     <InputLabel htmlFor="category-select" sx={{
                         color: '#fff',
-                        fontFamily: '"Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif', // Font family
-                        textTransform: 'capitalize' // First letter capitalized
+                        fontFamily: '"Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif',
+                        textTransform: 'capitalize'
                     }}>Category</InputLabel>
                     <Select
                         value={selectedCategory}
@@ -86,7 +86,7 @@ const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => 
                         sx={{
                             bgcolor: '#81cc5c', color: '#fff', '&:hover': { bgcolor: '#629c44' },
                             '.MuiOutlinedInput-notchedOutline': { borderColor: 'transparent' },
-                            fontFamily: '"Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif' // Font family
+                            fontFamily: '"Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif'
                         }}
                     >
                         <MenuItem value="">All</MenuItem>
@@ -96,10 +96,11 @@ const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => 
                     </Select>
                 </FormControl>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={1}></Grid> {/* Espaciador */}
+            <Grid item xs={6} sx={{ display: 'flex', justifyContent: 'center' }}>
                 <Typography gutterBottom sx={{
-                    fontFamily: '"Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif', // Font family
-                    textTransform: 'capitalize' // First letter capitalized
+                    fontFamily: '"Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif',
+                    textTransform: 'capitalize'
                 }}>Price Range</Typography>
                 <Slider
                     value={priceRange}
@@ -109,36 +110,34 @@ const FilterProducts = ({ products, setSearchFilteredProducts, searchTerm }) => 
                     min={0}
                     max={maxPrice}
                     sx={{
-                        color: '#629c44', // Changes the color of the track
+                        color: '#629c44',
                         '& .MuiSlider-thumb': {
-                            bgcolor: 'white', // Changes thumb color to white for better contrast
+                            bgcolor: 'white',
                             '&:hover': {
-                                bgcolor: '#81cc5c', // Color when thumb is hovered
-                            },
-                            fontFamily: '"Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif' // Font family
+                                bgcolor: '#81cc5c',
+                            }
                         },
                         '& .MuiSlider-valueLabel': {
-                            bgcolor: 'transparent', // Makes the value label background transparent
-                            color: '#629c44', // Color of the text in the value label
-                            fontFamily: '"Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif' // Font family
+                            bgcolor: 'transparent',
+                            color: '#629c44'
                         }
                     }}
                 />
             </Grid>
-            <Grid item xs={3}>
-                <Button variant="contained" onClick={clearFilters} fullWidth sx={{
+            <Grid item xs={1}></Grid> {/* Espaciador */}
+            <Grid item xs={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Button variant="contained" onClick={clearFilters} sx={{
                     minWidth: '120px',
                     borderRadius: '15px',
                     backgroundColor: '#81cc5c',
                     color: '#fff',
                     '&:hover': { backgroundColor: '#629c44', borderColor: '#f5f5f5' },
-                    fontFamily: '"Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif', // Font family
-                    textTransform: 'capitalize', // First letter capitalized
-                    height: '56px' // Set the height to match the FormControl
+                    fontFamily: '"Arial Rounded MT Bold", "Helvetica Rounded", Arial, sans-serif',
+                    textTransform: 'capitalize',
+                    height: '56px'
                 }}>Clear Filters</Button>
             </Grid>
         </Grid>
-
     );
 };
 
