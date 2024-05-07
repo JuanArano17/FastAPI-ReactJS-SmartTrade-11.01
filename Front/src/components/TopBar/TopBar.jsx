@@ -16,7 +16,9 @@ const TopBar = () => {
   const location = useLocation();
   const logout = useLogout();
   const isLoggedIn = Boolean(localStorage.getItem('accessToken'));
-
+  const userType = localStorage.getItem('type');
+  console.log("isLoggedIn:", isLoggedIn); // Debug: verificar si el usuario está logueado
+  console.log("userType:", userType);
   const handleLogoClick = () => {
     history.push("/");
   };
@@ -77,7 +79,7 @@ const TopBar = () => {
             </IconButton>
           </Tooltip>
         </Box>
-        {isLoggedIn ? (
+        {isLoggedIn && (
           <>
             <SearchBar />
             <Tooltip title="Your Products">
@@ -108,32 +110,36 @@ const TopBar = () => {
                 }}
               />
             </Tooltip>
-            <Tooltip title="View Wish List">
-              <Button
-                size="large"
-                startIcon={location.pathname === '/wish-list' ? <StarIcon sx={{ color: buttonColors.wishList }} /> : <StarBorderIcon sx={{ color: buttonColors.wishList }} />}
-                variant="text"
-                onClick={handleWishList}
-                sx={{
-                  color: buttonColors.wishList,
-                  fontSize: '1.2em',
-                  ...indicatorStyle('/wish-list')
-                }}
-              />
-            </Tooltip>
-            <Tooltip title="View Cart">
-              <Button
-                size="large"
-                startIcon={<AddShoppingCartIcon />}
-                variant="text"
-                onClick={handleShoppingCart}
-                sx={{
-                  color: buttonColors.shoppingCart,
-                  fontSize: '1.2em',
-                  ...indicatorStyle('/shopping-cart')
-                }}
-              />
-            </Tooltip>
+            {userType === 'Buyer' && (
+              <>
+                <Tooltip title="View Wish List">
+                  <Button
+                    size="large"
+                    startIcon={location.pathname === '/wish-list' ? <StarIcon sx={{ color: buttonColors.wishList }} /> : <StarBorderIcon sx={{ color: buttonColors.wishList }} />}
+                    variant="text"
+                    onClick={handleWishList}
+                    sx={{
+                      color: buttonColors.wishList,
+                      fontSize: '1.2em',
+                      ...indicatorStyle('/wish-list')
+                    }}
+                  />
+                </Tooltip>
+                <Tooltip title="View Cart">
+                  <Button
+                    size="large"
+                    startIcon={<AddShoppingCartIcon />}
+                    variant="text"
+                    onClick={handleShoppingCart}
+                    sx={{
+                      color: buttonColors.shoppingCart,
+                      fontSize: '1.2em',
+                      ...indicatorStyle('/shopping-cart')
+                    }}
+                  />
+                </Tooltip>
+              </>
+            )}
             <Tooltip title="Logout">
               <Button
                 size="large"
@@ -148,7 +154,8 @@ const TopBar = () => {
               />
             </Tooltip>
           </>
-        ) : (
+        )}
+        {!isLoggedIn && (
           <>
             <Link to="/login" style={{ textDecoration: 'none' }}>
               <Tooltip title="Login">
