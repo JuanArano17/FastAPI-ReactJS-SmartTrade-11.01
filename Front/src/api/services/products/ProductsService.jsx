@@ -67,4 +67,46 @@ const editSellerProductById = async (product) => {
         console.error('Hubo un error al editar el producto', error.response ? error.response.data : error);
     }
 }
-export { getAllProducts, getProductById, getAllProductsSeller, getProductSellerById, editSellerProductById}
+const createSellerProduct = async (product, sellerId) => {
+    try {
+        console.log("Intentando crear un nuevo producto de vendedor...");
+        const response = await axiosInstance.post(`/seller_products?seller_id=${sellerId}`, {
+            quantity: parseInt(product.quantity, 10) || 0,
+            price: parseFloat(product.price) || 0.0,
+            shipping_costs: parseFloat(product.shipping_costs) || 0.0,
+            sizes: product.sizes || [],
+            id_product: parseInt(product.id_product, 10) || 0
+        });
+        console.log("Producto creado correctamente", response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Hubo un error al crear el producto', error.response ? error.response.data : error);
+        throw error;
+    }
+};
+
+const getAllSellerProducts = async () => {
+    try {
+        console.log("Intentando conseguir todos los productos...");
+        const response = await axiosInstance.get('/seller_products/me/');
+        console.log("respuesta api", response);
+        return response.data;
+    } catch (error) {
+        console.error('Hubo un error al obtener los seller productos', error.response ? error.response.data : error);
+        throw error;
+    }
+};
+const deleteSellerProduct = async (seller_product_id) => {
+    try {
+  
+      const sellerproductResponse = await axiosInstance.delete(`/seller_products/${seller_product_id}`);
+      console.log('Se ha eliminado el seller product con éxito:', sellerproductResponse.data);
+      return sellerproductResponse.data;
+    } catch (error) {
+      console.error('Error al eliminar seller product:', error);
+      throw error;
+    }
+  };
+
+
+export { getAllProducts, getProductById, getAllProductsSeller, getProductSellerById, editSellerProductById, createSellerProduct, getAllSellerProducts, deleteSellerProduct}

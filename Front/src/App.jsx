@@ -11,8 +11,9 @@ import ShoppingCartPage from './pages/ShoppingCartPage';
 import AdminPage from './pages/AdminPage';
 import ValidateProductPage from './pages/ValidateProductPage';
 import WishListPage from './pages/WishListPage';
-import { adminPaths, buyerPaths, catalogPaths, forgotPasswordPaths, homePaths, loginPaths, profilePaths, registerPaths } from './PrivateRoutePaths';
+import { adminPaths, buyerPaths, catalogPaths, forgotPasswordPaths, homePaths, loginPaths, profilePaths, registerPaths, sellerproductsPaths } from './PrivateRoutePaths';
 import PrivateRouter from './components/router/PrivateRouter';
+import SellerProductsPage from './pages/SellerProductsPage';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <PrivateRouter path="/catalog/:search" component={CatalogPage} allowedTypes={['Buyer', 'Seller']} redirectPaths={catalogPaths} />
           <PrivateRouter path="/catalog" component={CatalogPage} allowedTypes={['Buyer', 'Seller']} redirectPaths={catalogPaths} />
           <PrivateRouter path="/forgotPassword" component={ForgotPasswordPage} allowedTypes={['Unknown']} redirectPaths={forgotPasswordPaths} />
+          <PrivateRouter path="/seller-products" component={SellerProductsPage} allowedTypes={['Seller']} redirectPaths={sellerproductsPaths} />
           <PrivateRouter path="/shopping-cart" component={ShoppingCartPage} allowedTypes={['Buyer']} redirectPaths={buyerPaths} />
           <PrivateRouter path="/wish-list" component={WishListPage} allowedTypes={['Buyer']} redirectPaths={buyerPaths} />
           <PrivateRouter path="/admin/validate-product/:id" component={ValidateProductPage} allowedTypes={['Admin']} redirectPaths={adminPaths} />
