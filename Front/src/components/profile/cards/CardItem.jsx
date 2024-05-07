@@ -89,10 +89,6 @@ const CardItem = ({ id, card_number, card_name, card_exp_date, card_security_num
             <Typography variant="subtitle1"><strong>Expiration Date</strong></Typography>
             <Typography variant="body2">{card_exp_date}</Typography>
           </Grid>
-          <Grid item xs={6}>
-            <Typography variant="subtitle1"><strong>CVV</strong></Typography>
-            <Typography variant="body2">{card_security_num}</Typography>
-          </Grid>
         </Grid>
       </CardContent>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>

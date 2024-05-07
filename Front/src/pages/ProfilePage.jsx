@@ -6,14 +6,35 @@ import PersonalInfo from '../components/profile/personal-info/PersonalInfo';
 import ShippingAddresses from '../components/profile/shipping-addresses/ShippingAddresses';
 import Cards from '../components/profile/cards/Cards';
 import styles from '../styles/styles';
+import { myInfoService } from '../api/services/user/AuthService';
 
 const ProfilePage = () => {
   const [tabValue, setTabValue] = useState(0);
+  const [userInfo, setUserInfo] = useState(null);
+
+  useEffect(() => {
+    myInfoService()
+      .then(data => {
+        setUserInfo(data);
+      })
+      .catch(error => {
+        console.error('Error fetching user info', error);
+      });
+  }, []);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
-  
+
+  // Construir dinámicamente las pestañas en función del tipo de usuario
+  const renderTabs = () => {
+    const tabs = [<Tab label="Personal Info" />];
+    if (userInfo && userInfo.type === 'Buyer') {
+      tabs.push(<Tab label="Shipping Addresses" />);
+      tabs.push(<Tab label="Cards" />);
+    }
+    return tabs;
+  };
 
   return (
     <Box sx={styles.mainBox}>
@@ -24,15 +45,17 @@ const ProfilePage = () => {
             Profile Page
           </Typography>
           <AppBar position="static" color="default">
-            <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth"aria-label="profile tabs">
-              <Tab label="Personal Info" />
-              <Tab label="Shipping Addresses" />
-              <Tab label="Cards" />
+            <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" aria-label="profile tabs">
+              {renderTabs()}
             </Tabs>
           </AppBar>
           {tabValue === 0 && <PersonalInfo />}
-          {tabValue === 1 && <ShippingAddresses />}
-          {tabValue === 2 && <Cards />}
+          {userInfo && userInfo.type === 'Buyer' && (
+            <>
+              {tabValue === 1 && <ShippingAddresses />}
+              {tabValue === 2 && <Cards />}
+            </>
+          )}
         </Paper>
       </Container>
       <Footer />
@@ -41,4 +64,3 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
-

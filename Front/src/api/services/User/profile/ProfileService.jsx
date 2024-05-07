@@ -87,8 +87,8 @@ const deleteAddressItem = async (address_id) => {
   }
 };
 const createAddress = async (addressData) => {
+  console.log('Intentando crear direccion: ', addressData)
   try {
-
     const response = await axiosInstance.post('/addresses/', addressData);
     console.log('Dirección creada con éxito:', response.data);
     return response.data;
@@ -99,7 +99,6 @@ const createAddress = async (addressData) => {
 };
 const createCard = async (cardData) => {
   try {
-
     const response = await axiosInstance.post('/cards/me', cardData);
     console.log('card creada con éxito:', response.data);
     return response.data;
