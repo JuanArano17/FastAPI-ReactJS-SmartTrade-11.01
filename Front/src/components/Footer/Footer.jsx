@@ -1,10 +1,15 @@
 import React from "react";
 import { Box, Container, Typography, Link, Grid } from "@mui/material";
 
-const Footer = () => {
+const Footer = ({style}) => {
     const currentYear = new Date().getFullYear();
     return (
-        <Box component="footer" sx={{ bgcolor: "#cbe8ba", py: 6 }}>
+        <Box component="footer" 
+            sx={{ 
+                bgcolor: "#cbe8ba", 
+                py: 6, 
+                boxShadow: '0px -5px 10px -3px rgba(106, 120, 98, 0.3)' // Modificación aquí para sombra hacia arriba
+            }}>
             <Container maxWidth="lg">
                 <Grid container spacing={4} justifyContent="center">
                     <Typography color="#444444" gutterBottom sx={{ fontSize: '16px', display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>

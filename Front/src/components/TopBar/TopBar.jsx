@@ -1,76 +1,149 @@
-import React, { useState, useEffect } from "react";
-import {
-    AppBar,
-    Toolbar,
-    Typography,
-    Button,
-    IconButton,
-    TextField,
-    Box,
-    InputAdornment,
-} from "@mui/material";
-import SearchIcon from '@mui/icons-material/Search';
-import RecyclingIcon from '@mui/icons-material/Recycling';
-import PropTypes from 'prop-types';
+import React from "react";
+import { AppBar, Toolbar, Typography, Button, IconButton, Box, Tooltip } from "@mui/material";
+import RecyclingIcon from "@mui/icons-material/Recycling";
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import StarIcon from '@mui/icons-material/Star';
+import { Link, useHistory, useLocation } from "react-router-dom";
+import SearchBar from "./searchbar/SearchBar";
+import { useLogout } from "../../utils/hooks/useLogout";
 
-const TopBar = ({ toggleSearchBar }) => {
-    const [searchBar, setSearchBar] = useState(toggleSearchBar);
+const TopBar = () => {
+  const history = useHistory();
+  const location = useLocation();
+  const logout = useLogout();
+  const isLoggedIn = Boolean(localStorage.getItem('accessToken'));
 
-    useEffect(() => {
-        setSearchBar(toggleSearchBar);
-    }, [toggleSearchBar]);
+  const handleLogoClick = () => {
+    history.push("/");
+  };
 
-    return (
-        <AppBar position="static" color="default" elevation={0}>
-            <Toolbar>
-                <Box sx={{ display: 'flex', alignItems: 'center', marginLeft:'40px', marginRight: 'auto' }}>
-                    <IconButton
-                        size="large"
-                        edge="start"
-                        color="inherit"
-                        aria-label="recycle"
-                    >
-                        <RecyclingIcon />
-                    </IconButton>
-                    <Typography variant="h6" color="#629c44" noWrap>
-                        Smart Trade
-                    </Typography>
-                </Box>
+  const handleShoppingCart = () => {
+    history.push("/shopping-cart");
+  };
 
-                {searchBar && (
-                    <Box sx={{ flexGrow: 1, justifyContent: 'center', display: 'flex' }}>
-                        <TextField
-                            fullWidth
-                            variant="outlined"
-                            placeholder="Search"
-                            InputProps={{
-                                startAdornment: (
-                                    <InputAdornment position="start">
-                                        <SearchIcon />
-                                    </InputAdornment>
-                                ),
-                                style: { borderRadius: 32 } // Puede necesitar ajuste
-                            }}
-                            sx={{ maxWidth: '40%' }} // Ajusta esto según la anchura deseada de tu barra de búsqueda
-                        />
-                    </Box>
-                )}
+  const handleWishList = () => {
+    history.push("/wish-list");
+  };
 
-                <Box sx={{ marginRight: '40px', marginLeft: 'auto', display: 'flex' }}>
-                    <Button variant="contained" sx={{ bgcolor:'#444444', borderRadius: 32, marginRight: '20px'}}>
-                        Login
-                    </Button>
-                    <Button variant="contained" sx={{ color:'#444444', bgcolor:'#ffffff', borderRadius: 32 }}>
-                        Register
-                    </Button>
-                </Box>
-            </Toolbar>
-        </AppBar>
-    );
-}
+  const buttonColors = {
+    home: '#357a38',
+    shoppingCart: '#357a38',
+    wishList: '#ffcc00',
+    login: '#357a38',
+    register: '#357a38',
+    logout: '#357a38',
+  };
 
-TopBar.propTypes = {
-    toggleSearchBar: PropTypes.bool.isRequired
+  const indicatorStyle = (path) => ({
+    borderBottom: location.pathname === path ? `4px solid ${buttonColors[pathToButtonColorKey(path)]}` : 'none',
+    paddingBottom: '10px',  // Adjust padding to accommodate the border without shifting the button
+  });
+
+  const pathToButtonColorKey = (path) => ({
+    "/": "home",
+    "/shopping-cart": "shoppingCart",
+    "/wish-list": "wishList",
+    "/login": "login",
+    "/register": "register",
+    "/logout": "logout"
+  })[path] || 'home';
+
+  return (
+    <AppBar position="fixed" sx={{ height: '80px', backgroundColor: '#ffffff', color: '#444444', boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)', zIndex: 10 }} elevation={0}>
+      <Toolbar sx={{ height: '100%', display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', marginLeft: '40px', marginRight: 'auto' }}>
+          <Tooltip title="Go Home">
+            <IconButton size="large" edge="start" color="inherit" onClick={handleLogoClick} sx={{ color: buttonColors.home, ...indicatorStyle("/") }}>
+              <RecyclingIcon />
+              <Typography variant="h6" sx={{ color: '#629c44' }} noWrap>
+                Smart Trade
+              </Typography>
+            </IconButton>
+          </Tooltip>
+        </Box>
+        {isLoggedIn ? (
+          <>
+            <SearchBar />
+            <Tooltip title="View Cart">
+              <Button
+                size="large"
+                startIcon={<AddShoppingCartIcon />}
+                variant="text"
+                onClick={handleShoppingCart}
+                sx={{
+                  color: buttonColors.shoppingCart,
+                  fontSize: '1.2em',
+                  ...indicatorStyle('/shopping-cart')
+                }}
+              />
+            </Tooltip>
+            <Tooltip title="View Wish List">
+              <Button
+                size="large"
+                startIcon={location.pathname === '/wish-list' ? <StarIcon sx={{ color: buttonColors.wishList }} /> : <StarBorderIcon sx={{ color: buttonColors.wishList }} />}
+                variant="text"
+                onClick={handleWishList}
+                sx={{
+                  color: buttonColors.wishList,
+                  fontSize: '1.2em',
+                  ...indicatorStyle('/wish-list')
+                }}
+              />
+            </Tooltip>
+            <Tooltip title="Logout">
+              <Button
+                size="large"
+                startIcon={<ExitToAppIcon />}
+                variant="text"
+                onClick={logout}
+                sx={{
+                  color: buttonColors.logout,
+                  fontSize: '1.2em',
+                  ...indicatorStyle('/logout')
+                }}
+              />
+            </Tooltip>
+          </>
+        ) : (
+          <>
+            <Link to="/login" style={{ textDecoration: 'none' }}>
+              <Tooltip title="Login">
+                <Button
+                  size="large"
+                  variant="text"
+                  sx={{
+                    color: buttonColors.login,
+                    marginRight: '20px',
+                    fontSize: '1.2em',
+                    ...indicatorStyle('/login')
+                  }}
+                >
+                  Login
+                </Button>
+              </Tooltip>
+            </Link>
+            <Link to="/register" style={{ textDecoration: 'none' }}>
+              <Tooltip title="Register">
+                <Button
+                  size="large"
+                  variant="text"
+                  sx={{
+                    color: buttonColors.register,
+                    fontSize: '1.2em',
+                    ...indicatorStyle('/register')
+                  }}
+                >
+                  Register
+                </Button>
+              </Tooltip>
+            </Link>
+          </>
+        )}
+      </Toolbar>
+    </AppBar>
+  );
 };
 
 export default TopBar;
