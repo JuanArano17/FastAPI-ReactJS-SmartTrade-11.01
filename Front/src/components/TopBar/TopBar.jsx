@@ -5,6 +5,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import StarIcon from '@mui/icons-material/Star';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle'; 
 import { Link, useHistory, useLocation } from "react-router-dom";
 import SearchBar from "./searchbar/SearchBar";
 import { useLogout } from "../../utils/hooks/useLogout";
@@ -27,6 +28,10 @@ const TopBar = () => {
     history.push("/wish-list");
   };
 
+  const handleProfileClick = () => {
+    history.push("/profile");
+  };
+
   const buttonColors = {
     home: '#357a38',
     shoppingCart: '#357a38',
@@ -34,11 +39,12 @@ const TopBar = () => {
     login: '#357a38',
     register: '#357a38',
     logout: '#357a38',
+    profile: '#357a38'  
   };
 
   const indicatorStyle = (path) => ({
     borderBottom: location.pathname === path ? `4px solid ${buttonColors[pathToButtonColorKey(path)]}` : 'none',
-    paddingBottom: '10px',  // Adjust padding to accommodate the border without shifting the button
+    paddingBottom: '10px',
   });
 
   const pathToButtonColorKey = (path) => ({
@@ -47,7 +53,8 @@ const TopBar = () => {
     "/wish-list": "wishList",
     "/login": "login",
     "/register": "register",
-    "/logout": "logout"
+    "/logout": "logout",
+    "/profile": "profile"  
   })[path] || 'home';
 
   return (
@@ -66,16 +73,16 @@ const TopBar = () => {
         {isLoggedIn ? (
           <>
             <SearchBar />
-            <Tooltip title="View Cart">
+            <Tooltip title="Profile">
               <Button
                 size="large"
-                startIcon={<AddShoppingCartIcon />}
+                startIcon={<AccountCircleIcon />}
                 variant="text"
-                onClick={handleShoppingCart}
+                onClick={handleProfileClick}
                 sx={{
-                  color: buttonColors.shoppingCart,
+                  color: buttonColors.profile,
                   fontSize: '1.2em',
-                  ...indicatorStyle('/shopping-cart')
+                  ...indicatorStyle('/profile')
                 }}
               />
             </Tooltip>
@@ -89,6 +96,19 @@ const TopBar = () => {
                   color: buttonColors.wishList,
                   fontSize: '1.2em',
                   ...indicatorStyle('/wish-list')
+                }}
+              />
+            </Tooltip>
+            <Tooltip title="View Cart">
+              <Button
+                size="large"
+                startIcon={<AddShoppingCartIcon />}
+                variant="text"
+                onClick={handleShoppingCart}
+                sx={{
+                  color: buttonColors.shoppingCart,
+                  fontSize: '1.2em',
+                  ...indicatorStyle('/shopping-cart')
                 }}
               />
             </Tooltip>
