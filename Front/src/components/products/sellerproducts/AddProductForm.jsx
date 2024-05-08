@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, TextField, Button, Typography, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 import { createSellerProduct } from '../../../api/services/products/ProductsService';
-
+import {getProfileInfo }from '../../../api/services/user/profile/ProfileService';
 const AddProductForm = ({ onSave }) => {
   const [product, setProduct] = useState({
     type: '',
@@ -42,7 +42,10 @@ const AddProductForm = ({ onSave }) => {
       }
     });
     try {
-      await createSellerProduct(formData);
+      console.log(formData.data);
+      const userInfo = await getProfileInfo();
+      console.log("info",userInfo.id);
+      await createSellerProduct(formData,userInfo.id);
       onSave();
     } catch (error) {
       console.error('Error creating product:', error);

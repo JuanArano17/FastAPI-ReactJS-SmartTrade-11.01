@@ -67,23 +67,7 @@ const editSellerProductById = async (product) => {
         console.error('Hubo un error al editar el producto', error.response ? error.response.data : error);
     }
 }
-const createSellerProduct = async (product, sellerId) => {
-    try {
-        console.log("Intentando crear un nuevo producto de vendedor...");
-        const response = await axiosInstance.post(`/seller_products?seller_id=${sellerId}`, {
-            quantity: parseInt(product.quantity, 10) || 0,
-            price: parseFloat(product.price) || 0.0,
-            shipping_costs: parseFloat(product.shipping_costs) || 0.0,
-            sizes: product.sizes || [],
-            id_product: parseInt(product.id_product, 10) || 0
-        });
-        console.log("Producto creado correctamente", response.data);
-        return response.data;
-    } catch (error) {
-        console.error('Hubo un error al crear el producto', error.response ? error.response.data : error);
-        throw error;
-    }
-};
+
 
 const getAllSellerProducts = async () => {
     try {
@@ -98,15 +82,51 @@ const getAllSellerProducts = async () => {
 };
 const deleteSellerProduct = async (seller_product_id) => {
     try {
-  
-      const sellerproductResponse = await axiosInstance.delete(`/seller_products/${seller_product_id}`);
-      console.log('Se ha eliminado el seller product con éxito:', sellerproductResponse.data);
-      return sellerproductResponse.data;
+
+        const sellerproductResponse = await axiosInstance.delete(`/seller_products/${seller_product_id}`);
+        console.log('Se ha eliminado el seller product con éxito:', sellerproductResponse.data);
+        return sellerproductResponse.data;
     } catch (error) {
-      console.error('Error al eliminar seller product:', error);
+        console.error('Error al eliminar seller product:', error);
+        throw error;
+    }
+};
+const createSellerProduct = async (product, seller_id) => {
+    try {
+        console.log("Intentando crear un nuevo producto de vendedor...");
+        const response = await axiosInstance.post(`/seller_products?seller_id=${seller_id}`, {
+            quantity: parseInt(product.quantity, 10) || 0,
+            price: parseFloat(product.price) || 0.0,
+            shipping_costs: parseFloat(product.shipping_costs) || 0.0,
+            sizes: product.sizes || [],
+            id_product: parseInt(product.id_product, 10) || 0
+        });
+        console.log("Producto creado correctamente", response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Hubo un error al crear el producto', error.response ? error.response.data : error);
+        throw error;
+    }
+};
+const createProduct = async (productData, categoryId) => {
+    try {
+        const response = await axiosInstance.post(`/products?category_name=${categoryId}`, productData);
+        return response.data;
+    } catch (error) {
+        console.error('Error al crear el producto:', error);
+        throw error;
+    }
+};
+const editSellerProduct = async (product) => {
+    try {
+      const response = await axiosInstance.put(`/seller_products/${product.id}`, product);
+      return response.data;
+    } catch (error) {
+      console.error('Error al editar el producto:', error);
       throw error;
     }
   };
+  
 
 
-export { getAllProducts, getProductById, getAllProductsSeller, getProductSellerById, editSellerProductById, createSellerProduct, getAllSellerProducts, deleteSellerProduct}
+export { getAllProducts, getProductById, getAllProductsSeller, getProductSellerById, editSellerProductById, createSellerProduct, getAllSellerProducts, deleteSellerProduct, createProduct, editSellerProduct}
