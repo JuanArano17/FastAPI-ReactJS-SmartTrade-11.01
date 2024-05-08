@@ -119,8 +119,22 @@ const getAllProductsForAutocomplete = async () => {
     }
 };
 const createSellerProduct = async (productData, seller_id) => {
+    
+    
+    console.log("data",productData);
+    
+    const validData = {
+        quantity : productData.quantity,
+        price : productData.price,
+        shipping_costs : productData.shippingCosts,
+        id_product: productData.productId,
+        sizes: [],
+    }
+    
     try {
-        const response = await axiosInstance.post(`/seller_products?seller_id=${seller_id}`,productData);
+        console.log("productdata",productData);
+        console.log("valioddata",validData);
+        const response = await axiosInstance.post(`/seller_products/?seller_id=${seller_id}`,validData);
         console.log(response.data);
         return response.data;
     } catch (error) {

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Container, Paper, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { TextField, Button, Container, Paper, Typography, FormControl, InputLabel, Select, MenuItem, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
-import { getAllProductsForAutocomplete } from '../../../api/services/products/ProductsService'; // Import correcto
+import { getAllProductsForAutocomplete, createSellerProduct } from '../../../api/services/products/ProductsService';
+import { getLoggedInfo } from '../../../api/services/user/profile/ProfileService';
 
 const categoryAttributes = {
   Book: [{ name: 'author', label: 'Author', type: 'text' }, { name: 'pages', label: 'Pages', type: 'number' }],
@@ -17,9 +18,9 @@ function AddProductForm() {
   const [isNewProduct, setIsNewProduct] = useState(true);
   const [product, setProduct] = useState({
     productId: '',
-    quantity: '',
-    price: '',
-    shippingCosts: '',
+    quantity: 0,
+    price: 0,
+    shippingCosts: 0,
     category: '',
     name: '',
     description: '',
@@ -29,7 +30,7 @@ function AddProductForm() {
     attributes: {}
   });
   const [products, setProducts] = useState([]);
-
+  const [dialogOpen, setDialogOpen] = useState(false);
   useEffect(() => {
     const fetchProducts = async () => {
       const fetchedProducts = await getAllProductsForAutocomplete();
@@ -42,35 +43,58 @@ function AddProductForm() {
     setIsNewProduct(event.target.value === 'new');
     setProduct({ ...product, category: '', attributes: {} }); // Reset category and attributes on switch
   };
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
+
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    if (name in product.attributes) {
-      setProduct({
-        ...product,
-        attributes: {
-          ...product.attributes,
-          [name]: value
-        }
-      });
-    } else {
-      setProduct({ ...product, [name]: value });
-    }
+    setProduct({
+      ...product,
+      [name]: name === 'quantity' || name === 'price' || name === 'shippingCosts' ? parseInt(value, 10) : value
+    });
   };
 
   const handleAutocompleteChange = (event, newValue) => {
     if (newValue) {
+      const selectedProductData = {
+        productId: newValue.id,
+        name: newValue.name,
+        price: parseInt(newValue.price, 10),
+        quantity: parseInt(newValue.quantity || 0, 10),
+        shippingCosts: parseInt(newValue.shippingCosts || 0, 10)
+      };
       setProduct({
         ...product,
-        productId: newValue.id, // Asumiendo que cada producto tiene un 'id'
-        name: newValue.name, // Asumiendo que cada producto tiene un 'name'
-        price: newValue.price // Asumiendo que cada producto tiene un 'price'
+        ...selectedProductData
       });
     } else {
-      setProduct({ ...product, productId: '', name: '', price: '' }); // Reset when cleared
+      setProduct({
+        ...product,
+        productId: '',
+        name: '',
+        price: 0,
+        quantity: 0,
+        shippingCosts: 0
+      });
     }
   };
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const sellerData = await getLoggedInfo();
+      const response = await createSellerProduct(product, sellerData.id);
+      console.log('Producto creado:', response);
+    } catch (error) {
+      if (error.response && error.response.status === 409) {
+        setDialogOpen(true);
+      } else {
+        console.error('Error al crear el producto:', error);
+      }
+    }
+  };
   return (
     <Container component="main" maxWidth="sm">
       <Paper elevation={6} style={{ padding: '20px', marginTop: '20px' }}>
@@ -224,10 +248,29 @@ function AddProductForm() {
           fullWidth
           variant="contained"
           color="primary"
+          onClick={handleSubmit}
           style={{ margin: '24px 0px 8px' }}
         >
           Submit
         </Button>
+        <Dialog
+          open={dialogOpen}
+          onClose={handleCloseDialog}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">{"Error de Duplicación"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              Este producto ya está en su lista de productos. Por favor, verifique o agregue un producto diferente.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDialog} color="primary" autoFocus>
+              Cerrar
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Paper>
     </Container>
   );
