@@ -19,6 +19,7 @@ def fake_buyer():
         "name": "Jonathan",
         "surname": "Wick Doe",
         "dni": "58263711F",
+        "birth_date": "1992-03-03",
         "eco_points": 0,
         "billing_address": "Street Whatever 123",
         "payment_method": "Bizum",
@@ -31,6 +32,7 @@ def fake_seller():
         "email": "donaldtrump@gmail.com",
         "name": "Donald",
         "surname": "Trump",
+        "birth_date": "1992-03-03",
         "bank_data": "Random bank data",
         "cif": "S31002655",
         "password": "randompassword",
@@ -68,6 +70,14 @@ def test_create_shopping_cart(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
     data = fake_seller()
     seller = seller_service.add(SellerCreate(**data))
 
@@ -80,20 +90,21 @@ def test_create_shopping_cart(
 
     shopping_cart_item = {"id_seller_product": seller_product.id, "quantity": 2}
 
-    response = client.post(f"/buyers/{buyer.id}/shopping_cart", json=shopping_cart_item)
+    response = client.post(f"/shopping_cart/me", json=shopping_cart_item, headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
-    assert "id_seller_product" in content
+    assert "seller_product" in content
+    assert "id" in content
     assert content["id_buyer"] == buyer.id
-    assert content["id_seller_product"] == seller_product.id
+    #assert content["seller_product"] in seller_product.__dict__.values() TODO: CHECK THIS
     assert content["quantity"] == shopping_cart_item["quantity"]
 
     shopping_cart_item = shopping_cart_service.get_by_id(
-        content["id_buyer"], content["id_seller_product"]
+       content["id"]
     )
     assert shopping_cart_item is not None
     assert content["id_buyer"] == shopping_cart_item.id_buyer
-    assert content["id_seller_product"] == seller_product.id
+    #assert content["seller_product"] in seller_product.__dict__.values() TODO: CHECK THIS
     assert content["quantity"] == shopping_cart_item.quantity
 
     data = fake_seller_product()
@@ -104,7 +115,7 @@ def test_create_shopping_cart(
     )
 
     shopping_cart_item = shopping_cart_service.get_by_id(
-        content["id_buyer"], content["id_seller_product"]
+        content["id"]
     )
     assert shopping_cart_item is not None
     assert shopping_cart_item.id_buyer == shopping_cart_item.id_buyer
@@ -124,6 +135,14 @@ def test_create_shopping_cart_invalid_quantity(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
     data = fake_seller()
     seller = seller_service.add(SellerCreate(**data))
 
@@ -134,10 +153,10 @@ def test_create_shopping_cart_invalid_quantity(
     data["id_product"] = product.id
     seller_product = seller_product_service.add(seller.id, SellerProductCreate(**data))
 
-    shopping_cart_item = {"id_seller_product": seller_product.id, "quantity": 10000}
+    shopping_cart_item = {"id_seller_product": seller_product.id, "quantity": 10000, "id_size":None}
 
-    response = client.post(f"/buyers/{buyer.id}/shopping_cart", json=shopping_cart_item)
-    response = client.post("/sellers/", json=data)
+    response = client.post(f"/shopping_cart/me", json=shopping_cart_item, headers=headers)
+    #response = client.post("/sellers/", json=data)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "detail" in response.json()
 

@@ -87,7 +87,7 @@ def test_create_address_invalid_data(client: TestClient, buyer_service: BuyerSer
     headers = {"Authorization": f"Bearer {access_token}"}
 
     data = fake_address()
-    data["country"] = "España"  # Invalid country format
+    data["postal_code"] = "fiwofwniewnfw"  # Invalid zip code format
 
     response = client.post(f"/addresses", json=data, headers=headers)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
@@ -414,7 +414,7 @@ def test_update_address_invalid_data(
     data = fake_address()
     address = address_service.add(buyer.id, AddressCreate(**data))
     new_data = data.copy()
-    new_data["country"] = "España"  # Wrong country format
+    new_data["postal_code"] = "fiwofwniewnfw"  # Invalid zip code format
 
     response = client.put(f"/addresses/{address.id}", json=new_data, headers=headers)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

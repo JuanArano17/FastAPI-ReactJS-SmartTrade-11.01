@@ -32,7 +32,9 @@ from app.schemas.users.types.admin import AdminCreate
 from app.service.users.types.admin import AdminService
 from app.schemas.products.categories.variations.size import SizeCreate
 from app.models.users.in_shopping_cart import InShoppingCart
-
+from schemas.users.country import CountryCreate
+from service.users.country import CountryService
+import pycountry
 
 session = get_db()
 user_service = UserService(session=session)
@@ -74,8 +76,10 @@ refund_product_service = RefundProductService(
     seller_product_service=seller_product_serv,
     product_line_service=product_line_service,
 )
+country_service = CountryService(session=session)
 
 admin_service = AdminService(session=session, user_service=user_service)
+
 
 
 # Initialize Faker with a specific seed (for consistency)
@@ -110,6 +114,11 @@ num_approved = 100
 # Session = sessionmaker(bind=engine)
 # session = Session()
 
+all_countries = list(pycountry.countries)
+for country in all_countries:
+    country=CountryCreate(name=country.name)
+    country_service.add(country)
+
 admin_service.add(
     AdminCreate(
         email="admin@example.com", name="Robert", surname="House", password="admin"
@@ -118,6 +127,9 @@ admin_service.add(
 
 used_emails = []
 used_dnis = []
+
+
+
 # Create 100 buyers with consistent random data
 for i in range(num_buyers):
     # Generate random data for each buyer
@@ -234,7 +246,7 @@ for i in range(num_addresses):
     adit_info = faker.text(max_nb_chars=69)
     city = faker.city()
     postal_code = faker.postcode()
-    country = faker.country_code(representation="alpha-3")
+    country =  random.choice(all_countries).name
     default = random.choice([True, False])
 
     # Create a AddressCreate object

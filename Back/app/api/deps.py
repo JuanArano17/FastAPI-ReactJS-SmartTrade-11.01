@@ -27,6 +27,7 @@ from app.service.orders.refund_product import RefundProductService
 from app.service.products.image import ImageService
 from app.service.users.in_shopping_cart import InShoppingCartService
 from app.service.users.in_wish_list import InWishListService
+from app.service.users.country import CountryService
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login/access-token")
@@ -75,9 +76,12 @@ def get_current_active_admin(current_user: CurrentUserDep):
 def get_user_service(session: SessionDep):
     return UserService(session=session)
 
-
 UserServiceDep = Annotated[UserService, Depends(get_user_service)]
 
+def get_country_service(session: SessionDep):
+    return CountryService(session=session)
+
+CountryServiceDep = Annotated[CountryService, Depends(get_country_service)]
 
 def get_buyer_service(session: SessionDep, user_service: UserServiceDep):
     return BuyerService(session=session, user_service=user_service)
