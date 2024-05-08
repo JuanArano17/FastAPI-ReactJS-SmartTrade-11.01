@@ -28,13 +28,14 @@ const ProfilePage = () => {
 
   // Construir dinámicamente las pestañas en función del tipo de usuario
   const renderTabs = () => {
-    const tabs = [<Tab label="Personal Info" />];
+    const tabs = [<Tab key="personal-info" label="Personal Info" />];
     if (userInfo && userInfo.type === 'Buyer') {
-      tabs.push(<Tab label="Shipping Addresses" />);
-      tabs.push(<Tab label="Cards" />);
+      tabs.push(<Tab key="shipping-addresses" label="Shipping Addresses" />);
+      tabs.push(<Tab key="cards" label="Cards" />);
     }
     return tabs;
   };
+
 
   return (
     <Box sx={styles.mainBox}>
