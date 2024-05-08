@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardContent, Typography, IconButton, Grid, TextField, Button } from '@mui/material';
+import { Card, CardContent, Typography, IconButton, Grid, TextField, Button, Snackbar, Alert } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { validateCardNumber, validateCardExpiration, validateCVV } from '../../../utils/CardFormValidations';
@@ -14,6 +14,7 @@ const CardItem = ({ id, card_number, card_name, card_exp_date, card_security_num
         card_exp_date: validateCardExpiration(card_exp_date),
         card_security_num: validateCVV(card_security_num)
     });
+    const [updateError, setUpdateError] = useState('');
 
     const handleEditChange = (event) => {
         const { name, value } = event.target;
@@ -27,16 +28,22 @@ const CardItem = ({ id, card_number, card_name, card_exp_date, card_security_num
                 card_number: validateCardNumber(value),
                 card_exp_date: validateCardExpiration(value),
                 card_security_num: validateCVV(value)
-            }[name]  // Use the specific validator based on the field name
+            }[name]
         });
     };
 
     const handleUpdate = async () => {
         if (Object.values(formValidity).every(Boolean)) {
-            await onUpdate(id, editedCard);
-            setIsEditing(false);
+            try {
+                await onUpdate(id, editedCard);
+                setIsEditing(false);
+                setUpdateError(''); // Clear any previous errors on successful update
+            } catch (error) {
+                console.error('API Error on update:', error);
+                setUpdateError('Failed to update card. Please try again.');
+            }
         } else {
-            console.error('Validation failed. Update not allowed.');
+            setUpdateError('Please correct the errors before updating.');
         }
     };
 
@@ -50,6 +57,10 @@ const CardItem = ({ id, card_number, card_name, card_exp_date, card_security_num
             card_exp_date: validateCardExpiration(card_exp_date),
             card_security_num: validateCVV(card_security_num)
         });
+    };
+
+    const handleCloseSnackbar = () => {
+        setUpdateError('');
     };
 
     if (isEditing) {
@@ -105,6 +116,11 @@ const CardItem = ({ id, card_number, card_name, card_exp_date, card_security_num
                         </Button>
                     </Grid>
                 </Grid>
+                <Snackbar open={!!updateError} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+                    <Alert onClose={handleCloseSnackbar} severity="error" sx={{ width: '100%' }}>
+                        {updateError}
+                    </Alert>
+                </Snackbar>
             </Card>
         );
     }
