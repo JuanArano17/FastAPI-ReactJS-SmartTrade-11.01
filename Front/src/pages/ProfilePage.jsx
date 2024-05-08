@@ -35,6 +35,7 @@ const ProfilePage = () => {
     return tabs;
   };
 
+
   return (
     <Box sx={styles.mainBox}>
       <TopBar showLogoutButton={true} />
