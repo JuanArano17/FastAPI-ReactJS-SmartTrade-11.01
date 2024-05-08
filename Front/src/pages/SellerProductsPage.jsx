@@ -6,7 +6,7 @@ import Footer from '../components/footer/Footer';
 import AddProductForm from '../components/products/sellerproducts/AddProductForm';
 import ProductList from '../components/products/sellerproducts/ProductList';
 import styles from '../styles/styles';
-import { deleteSellerProduct, getAllSellerProducts } from '../api/services/products/ProductsService';
+import { editSellerProduct,deleteSellerProduct, getAllSellerProducts } from '../api/services/products/ProductsService';
 
 const SellerProductsPage = () => {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -30,10 +30,27 @@ const SellerProductsPage = () => {
     setShowAddForm(true);
   };
 
-  const handleSaveProduct = () => {
-    setShowAddForm(false);
-    // Aquí podrías recargar los productos si es necesario
+  const handleAddProduct = async () => {
+    try {
+      
+    }catch(error){
+
+    }
   };
+
+  const handleEditProduct = async (updatedProduct) => {
+    try {
+      const savedProduct = await editSellerProduct(updatedProduct);
+      setSellerProducts(prevProducts =>
+        prevProducts.map(product =>
+          product.id === savedProduct.id ? { ...product, ...savedProduct } : product
+        )
+      );
+    } catch (error) {
+      console.error('Error saving product:', error);
+    }
+  };
+  
 
 
   const handleDeleteProduct = async (seller_product_id) => {
@@ -43,11 +60,6 @@ const SellerProductsPage = () => {
     } catch (error) {
       console.error('Error al eliminar la dirección:', error);
     }
-  };
-
-  const handleEditProduct = (productId) => {
-    // Aquí deberías agregar la lógica para editar un producto
-    console.log('Edit product:', productId);
   };
 
   return (
@@ -62,10 +74,10 @@ const SellerProductsPage = () => {
             <Button startIcon={<AddIcon />} variant="contained" onClick={handleAddProductClick}>
               Add Product
             </Button>
-            <ProductList products={sellerproducts} onDelete={handleDeleteProduct} onEdit={handleEditProduct} />
+            <ProductList products={sellerproducts} onDelete={handleDeleteProduct} onEdit={handleEditProduct} onSave={handleEditProduct} />
           </>
         ) : (
-          <AddProductForm onSave={handleSaveProduct} />
+          <AddProductForm onSave={handleAddProduct} />
         )}
       </Container>
       <Footer />
