@@ -170,7 +170,7 @@ def test_create_shopping_cart_invalid_quantity(
     data["id_product"] = product.id
     seller_product = seller_product_service.add(seller.id, SellerProductCreate(**data))
 
-    shopping_cart_item = {"id_seller_product": seller_product.id, "quantity": 10000}
+    shopping_cart_item = {"id_seller_product": seller_product.id, "quantity": 10000, "id_size":None}
 
     response = client.post(f"/shopping_cart/me", json=shopping_cart_item, headers=headers)
     assert response.status_code == status.HTTP_400_BAD_REQUEST
