@@ -37,7 +37,7 @@ const renderTabs = () => {
 };
 
   return (
-    <Box>
+    <Box sx={styles.mainBox}>
       <TopBar showLogoutButton={true} />
       <Container component="main" maxWidth="md" sx={styles.mainContainer}>
         <Paper elevation={3} sx={styles.paperContainer}>
