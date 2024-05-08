@@ -91,23 +91,6 @@ const deleteSellerProduct = async (seller_product_id) => {
         throw error;
     }
 };
-const createSellerProduct = async (product, seller_id) => {
-    try {
-        console.log("Intentando crear un nuevo producto de vendedor...");
-        const response = await axiosInstance.post(`/seller_products?seller_id=${seller_id}`, {
-            quantity: parseInt(product.quantity, 10) || 0,
-            price: parseFloat(product.price) || 0.0,
-            shipping_costs: parseFloat(product.shipping_costs) || 0.0,
-            sizes: product.sizes || [],
-            id_product: parseInt(product.id_product, 10) || 0
-        });
-        console.log("Producto creado correctamente", response.data);
-        return response.data;
-    } catch (error) {
-        console.error('Hubo un error al crear el producto', error.response ? error.response.data : error);
-        throw error;
-    }
-};
 const createProduct = async (productData, categoryId) => {
     try {
         const response = await axiosInstance.post(`/products?category_name=${categoryId}`, productData);
@@ -119,14 +102,32 @@ const createProduct = async (productData, categoryId) => {
 };
 const editSellerProduct = async (product) => {
     try {
-      const response = await axiosInstance.put(`/seller_products/${product.id}`, product);
-      return response.data;
+        const response = await axiosInstance.put(`/seller_products/${product.id}`, product);
+        return response.data;
     } catch (error) {
-      console.error('Error al editar el producto:', error);
-      throw error;
+        console.error('Error al editar el producto:', error);
+        throw error;
     }
-  };
-  
+};
+const getAllProductsForAutocomplete = async () => {
+    try {
+        const response = await axiosInstance.get('products/');
+        return response.data;
+    } catch (error) {
+        console.error('Error al obtener los productos para autocompletado', error.response ? error.response.data : error);
+        throw error;
+    }
+};
+const createSellerProduct = async (productData, seller_id) => {
+    try {
+        const response = await axiosInstance.post(`/seller_products?seller_id=${seller_id}`,productData);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error al crear el seller producto:', error);
+        throw error;
+    }
+};
 
 
-export { getAllProducts, getProductById, getAllProductsSeller, getProductSellerById, editSellerProductById, createSellerProduct, getAllSellerProducts, deleteSellerProduct, createProduct, editSellerProduct}
+export { createSellerProduct, getAllProductsForAutocomplete, getAllProducts, getProductById, getAllProductsSeller, getProductSellerById, editSellerProductById,  getAllSellerProducts, deleteSellerProduct, createProduct, editSellerProduct }

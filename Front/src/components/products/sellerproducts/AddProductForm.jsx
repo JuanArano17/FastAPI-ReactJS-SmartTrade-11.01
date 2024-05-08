@@ -1,136 +1,236 @@
-import React, { useState } from 'react';
-import { Box, TextField, Button, Typography, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
-import { createSellerProduct } from '../../../api/services/products/ProductsService';
-import {getProfileInfo }from '../../../api/services/user/profile/ProfileService';
-const AddProductForm = ({ onSave }) => {
+import React, { useState, useEffect } from 'react';
+import { TextField, Button, Container, Paper, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
+import { getAllProductsForAutocomplete } from '../../../api/services/products/ProductsService'; // Import correcto
+
+const categoryAttributes = {
+  Book: [{ name: 'author', label: 'Author', type: 'text' }, { name: 'pages', label: 'Pages', type: 'number' }],
+  Clothes: [{ name: 'materials', label: 'Materials', type: 'text' }, { name: 'type', label: 'Type', type: 'text' }],
+  Electrodomestics: [{ name: 'brand', label: 'Brand', type: 'text' }, { name: 'powerSource', label: 'Power Source', type: 'text' }],
+  Electronics: [{ name: 'capacity', label: 'Capacity', type: 'text' }],
+  Food: [{ name: 'ingredients', label: 'Ingredients', type: 'text' }],
+  Game: [{ name: 'publisher', label: 'Publisher', type: 'text' }, { name: 'platform', label: 'Platform', type: 'text' }, { name: 'size', label: 'Size', type: 'text' }],
+  HouseUtilities: [{ name: 'brand', label: 'Brand', type: 'text' }]
+};
+
+function AddProductForm() {
+  const [isNewProduct, setIsNewProduct] = useState(true);
   const [product, setProduct] = useState({
-    type: '',
+    productId: '',
+    quantity: '',
+    price: '',
+    shippingCosts: '',
+    category: '',
     name: '',
     description: '',
     specSheet: '',
-    quantity: '',
-    price: '',
-    image: null,
-    // Additional fields for various product types
-    author: '',
-    pages: '',
-    materials: '',
-    brand: '',
-    powerSource: '',
-    capacity: '',
-    ingredients: '',
-    publisher: '',
-    platform: '',
-    size: '',
+    images: '',
+    stock: '',
+    attributes: {}
   });
+  const [products, setProducts] = useState([]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setProduct({ ...product, [name]: value });
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const fetchedProducts = await getAllProductsForAutocomplete();
+      setProducts(fetchedProducts);
+    };
+    fetchProducts();
+  }, []);
+
+  const handleSwitch = (event) => {
+    setIsNewProduct(event.target.value === 'new');
+    setProduct({ ...product, category: '', attributes: {} }); // Reset category and attributes on switch
   };
 
-  const handleImageChange = (e) => {
-    setProduct({ ...product, image: e.target.files[0] });
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    if (name in product.attributes) {
+      setProduct({
+        ...product,
+        attributes: {
+          ...product.attributes,
+          [name]: value
+        }
+      });
+    } else {
+      setProduct({ ...product, [name]: value });
+    }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    Object.keys(product).forEach(key => {
-      if (key !== 'image' || product[key] !== null) {
-        formData.append(key, product[key]);
-      }
-    });
-    try {
-      console.log(formData.data);
-      const userInfo = await getProfileInfo();
-      console.log("info",userInfo.id);
-      await createSellerProduct(formData,userInfo.id);
-      onSave();
-    } catch (error) {
-      console.error('Error creating product:', error);
+  const handleAutocompleteChange = (event, newValue) => {
+    if (newValue) {
+      setProduct({
+        ...product,
+        productId: newValue.id, // Asumiendo que cada producto tiene un 'id'
+        name: newValue.name, // Asumiendo que cada producto tiene un 'name'
+        price: newValue.price // Asumiendo que cada producto tiene un 'price'
+      });
+    } else {
+      setProduct({ ...product, productId: '', name: '', price: '' }); // Reset when cleared
     }
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-      <Typography variant="h6">Add New Product</Typography>
-      <FormControl fullWidth margin="normal">
-        <InputLabel>Type</InputLabel>
-        <Select
-          label="Type"
-          name="type"
-          value={product.type}
-          onChange={handleChange}
+    <Container component="main" maxWidth="sm">
+      <Paper elevation={6} style={{ padding: '20px', marginTop: '20px' }}>
+        <Typography component="h1" variant="h5">
+          {isNewProduct ? 'Add New Product' : 'Add Existing Product'}
+        </Typography>
+        <FormControl fullWidth margin="normal">
+          <InputLabel>Type</InputLabel>
+          <Select
+            name="type"
+            value={isNewProduct ? 'new' : 'existing'}
+            label="Type"
+            onChange={handleSwitch}
+          >
+            <MenuItem value="new">New Product</MenuItem>
+            <MenuItem value="existing">Existing Product</MenuItem>
+          </Select>
+        </FormControl>
+        {!isNewProduct ? (
+          <>
+            <Autocomplete
+              options={products}
+              getOptionLabel={(option) => option.name}
+              style={{ width: '100%' }}
+              onChange={handleAutocompleteChange}
+              renderInput={(params) => <TextField {...params} label="Search Product" variant="outlined" />}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Quantity"
+              name="quantity"
+              value={product.quantity}
+              onChange={handleChange}
+              type="number"
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Price"
+              name="price"
+              value={product.price}
+              onChange={handleChange}
+              type="number"
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Shipping Costs"
+              name="shippingCosts"
+              value={product.shippingCosts}
+              onChange={handleChange}
+              type="number"
+            />
+          </>
+        ) : (
+          <>
+            <FormControl fullWidth margin="normal">
+              <InputLabel>Category</InputLabel>
+              <Select
+                name="category"
+                value={product.category}
+                label="Category"
+                onChange={handleChange}
+              >
+                {Object.keys(categoryAttributes).map(category => (
+                  <MenuItem key={category} value={category}>{category}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            {product.category && categoryAttributes[product.category].map(attr => (
+              <TextField
+                key={attr.name}
+                margin="normal"
+                required
+                fullWidth
+                label={attr.label}
+                name={attr.name}
+                value={product.attributes[attr.name] || ''}
+                onChange={handleChange}
+                type={attr.type}
+              />
+            ))}
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Product Name"
+              name="name"
+              value={product.name}
+              onChange={handleChange}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Description"
+              name="description"
+              value={product.description}
+              onChange={handleChange}
+              multiline
+              rows={4}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Price"
+              name="price"
+              value={product.price}
+              onChange={handleChange}
+              type="number"
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Spec Sheet"
+              name="specSheet"
+              value={product.specSheet}
+              onChange={handleChange}
+              type="text"
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Images URL"
+              name="images"
+              value={product.images}
+              onChange={handleChange}
+              type="text"
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Stock"
+              name="stock"
+              value={product.stock}
+              onChange={handleChange}
+              type="number"
+            />
+          </>
+        )}
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          color="primary"
+          style={{ margin: '24px 0px 8px' }}
         >
-          <MenuItem value="Book">Book</MenuItem>
-          <MenuItem value="Clothes">Clothes</MenuItem>
-          <MenuItem value="Electrodomestics">Electrodomestics</MenuItem>
-          <MenuItem value="Electronics">Electronics</MenuItem>
-          <MenuItem value="Food">Food</MenuItem>
-          <MenuItem value="Game">Game</MenuItem>
-          <MenuItem value="HouseUtilities">House Utilities</MenuItem>
-        </Select>
-      </FormControl>
-      
-      {/* Common fields */}
-      <TextField fullWidth label="Name" name="name" value={product.name} onChange={handleChange} margin="normal" />
-      <TextField fullWidth label="Description" name="description" value={product.description} onChange={handleChange} margin="normal" />
-      <TextField fullWidth label="Spec Sheet" name="specSheet" value={product.specSheet} onChange={handleChange} margin="normal" />
-      <TextField fullWidth type="number" label="Quantity" name="quantity" value={product.quantity} onChange={handleChange} margin="normal" />
-      <TextField fullWidth label="Price" name="price" value={product.price} onChange={handleChange} margin="normal" />
-      
-      {/* Dynamic fields based on product type */}
-      {product.type === 'Book' && (
-        <>
-          <TextField fullWidth label="Author" name="author" value={product.author} onChange={handleChange} margin="normal" />
-          <TextField fullWidth type="number" label="Pages" name="pages" value={product.pages} onChange={handleChange} margin="normal" />
-        </>
-      )}
-      {product.type === 'Clothes' && (
-        <>
-          <TextField fullWidth label="Materials" name="materials" value={product.materials} onChange={handleChange} margin="normal" />
-          <TextField fullWidth label="Type" name="type" value={product.type} onChange={handleChange} margin="normal" />
-        </>
-      )}
-      {product.type === 'Electrodomestics' && (
-        <>
-          <TextField fullWidth label="Brand" name="brand" value={product.brand} onChange={handleChange} margin="normal" />
-          <TextField fullWidth label="Power Source" name="powerSource" value={product.powerSource} onChange={handleChange} margin="normal" />
-        </>
-      )}
-      {product.type === 'Electronics' && (
-        <>
-          <TextField fullWidth label="Capacity" name="capacity" value={product.capacity} onChange={handleChange} pattern="^(\d+(\.\d+)?)(\s*[GgMmKk][Bb])?$" margin="normal" />
-        </>
-      )}
-      {product.type === 'Food' && (
-        <>
-          <TextField fullWidth label="Ingredients" name="ingredients" value={product.ingredients} onChange={handleChange} margin="normal" />
-        </>
-      )}
-      {product.type === 'Game' && (
-        <>
-          <TextField fullWidth label="Publisher" name="publisher" value={product.publisher} onChange={handleChange} margin="normal" />
-          <TextField fullWidth label="Platform" name="platform" value={product.platform} onChange={handleChange} margin="normal" />
-          <TextField fullWidth label="Size" name="size" value={product.size} onChange={handleChange} margin="normal" />
-        </>
-      )}
-      {product.type === 'HouseUtilities' && (
-        <>
-          <TextField fullWidth label="Brand" name="brand" value={product.brand} onChange={handleChange} margin="normal" />
-        </>
-      )}
-
-      <Button variant="contained" component="label" fullWidth sx={{ mt: 2 }}>
-        Upload Image
-        <input type="file" hidden onChange={handleImageChange} />
-      </Button>
-      <Button type="submit" fullWidth variant="contained" sx={{ mt: 2, mb: 2 }}>
-        Add Product
-      </Button>
-    </Box>
+          Submit
+        </Button>
+      </Paper>
+    </Container>
   );
-};
+}
 
 export default AddProductForm;
