@@ -5,6 +5,7 @@ from sqlalchemy_utils import database_exists, create_database
 from dotenv import load_dotenv
 
 # Base = declarative_base()
+from app.models.users.country import Country
 from app.models.users.types.user import User
 from app.models.users.types.admin import Admin
 from app.models.users.types.buyer import Buyer

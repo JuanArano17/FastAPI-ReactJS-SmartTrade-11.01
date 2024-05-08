@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.api.routers import countries
 from app.api.routers import admin
 from app.api.routers import orders
 from app.api.routers import cards
@@ -36,3 +37,4 @@ api_router.include_router(shopping_cart.cart_token_router)
 api_router.include_router(seller_product.seller_prod_router)
 api_router.include_router(seller_product.seller_router)
 api_router.include_router(admin.router)
+api_router.include_router(countries.router)
