@@ -16,17 +16,9 @@ const getLoggedInfo = async () => {
 
 const getProfileInfo = async () => {
   try {
-
-    console.log("Intentando conseguir el tipo de usuario...");
     const userResponse = await axiosInstance.get(`/users/me/`);
-
     const userType = userResponse.data.type;
     const userId = userResponse.data.id;
-
-    console.log("Tipo de usuario:", userType);
-    console.log("Id del usuario:", userId);
-
-
     if (userType === 'Buyer') {
       const buyerInfoResponse = await axiosInstance.get(`buyers/${userId}`);
       return buyerInfoResponse.data;
@@ -60,50 +52,32 @@ const deleteCardItem = async (card_id) => {
     throw error;
   }
 };
-
-
 const getAddresssesInfo = async () => {
   try {
-    console.log("intentando conseguir direcciones");
-
     const addressesResponse = await axiosInstance.get(`addresses`);
-    console.log('Direcciones:', addressesResponse.data);
     return addressesResponse.data;
   } catch (error) {
     console.error('Error al conseguir direcciones del usuario:', error);
     throw error;
   }
 };
-
-const deleteAddressItem = async (address_id) => {
-  try {
-
-    const addressResponse = await axiosInstance.delete(`/addresses/${address_id}`);
-    console.log('Se ha eliminado la dirección con éxito:', addressResponse.data);
-    return addressResponse.data;
-  } catch (error) {
-    console.error('Error al eliminar dirección:', error);
-    throw error;
-  }
-};
 const createAddress = async (addressData) => {
-  console.log('Intentando crear direccion: ', addressData)
+  const validateAddressData = {
+    street: addressData.street,
+    floor: addressData.floor || null,
+    door: addressData.door,
+    adit_info: addressData.additionalInfo || null,
+    city: addressData.city,
+    postal_code: addressData.postalCode,
+    country: addressData.country,
+    default: addressData.isDefault, 
+  }
   try {
-    const response = await axiosInstance.post('/addresses/', addressData);
+    const response = await axiosInstance.post('/addresses/', validateAddressData);
     console.log('Dirección creada con éxito:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error al crear la dirección:', error.response?.data || error.message);
-    throw error;
-  }
-};
-const createCard = async (cardData) => {
-  try {
-    const response = await axiosInstance.post('/cards/me', cardData);
-    console.log('card creada con éxito:', response.data);
-    return response.data;
-  } catch (error) {
-    console.error('Error al crear la card:', error.response?.data || error.message);
     throw error;
   }
 };
@@ -117,6 +91,27 @@ const updateAddress = async (addressId, addressData) => {
     throw error;
   }
 };
+const deleteAddressItem = async (address_id) => {
+  try {
+
+    const addressResponse = await axiosInstance.delete(`/addresses/${address_id}`);
+    console.log('Se ha eliminado la dirección con éxito:', addressResponse.data);
+    return addressResponse.data;
+  } catch (error) {
+    console.error('Error al eliminar dirección:', error);
+    throw error;
+  }
+};
+const createCard = async (cardData) => {
+  try {
+    const response = await axiosInstance.post('/cards/me', cardData);
+    console.log('card creada con éxito:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error al crear la card:', error.response?.data || error.message);
+    throw error;
+  }
+};
 const updateCard = async (cardId, cardData) => {
   try {
     const response = await axiosInstance.put(`/cards/me/${cardId}`, cardData);
@@ -127,7 +122,6 @@ const updateCard = async (cardId, cardData) => {
     throw error;
   }
 };
-
 const updateSellerInfo = async (sellerId, sellerData) => {
   try {
     console.log(sellerData);
@@ -138,7 +132,6 @@ const updateSellerInfo = async (sellerId, sellerData) => {
     throw error;
   }
 };
-
 const updateBuyerInfo = async (buyerId, buyerData) => {
   try {
     console.log(buyerId);
@@ -150,7 +143,4 @@ const updateBuyerInfo = async (buyerId, buyerData) => {
     throw error;
   }
 };
-
-
-
 export { getProfileInfo, getCardInfo, deleteCardItem, getAddresssesInfo, deleteAddressItem, getLoggedInfo, createAddress, createCard, updateAddress, updateCard, updateSellerInfo, updateBuyerInfo };

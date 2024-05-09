@@ -1,77 +1,101 @@
-import React, { useState } from 'react';
-import { Card, CardContent, Typography, IconButton, Grid, TextField, Button } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, Typography, IconButton, Grid, TextField, Button, Checkbox, FormControlLabel, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { validateField } from '../../../utils/ShippingAddressValidation';
+import getCountries from '../../../api/services/country/CountriesService';  // Asegúrate de tener esta función implementada
 
 const ShippingAddressItem = ({ id, street, floor, door, postal_code, city, country, adit_info, isDefault, onDelete, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedAddress, setEditedAddress] = useState({
     street, floor, door, city, postal_code, country, adit_info, isDefault
   });
+  const [errors, setErrors] = useState({});
+  const [countries, setCountries] = useState([]);
+
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const fetchedCountries = await getCountries(); // Obtener la lista de países
+        setCountries(fetchedCountries);
+      } catch (error) {
+        console.error('Failed to fetch countries:', error);
+      }
+    };
+
+    fetchCountries();
+  }, []);
 
   const handleEditChange = (event) => {
-    const { name, value, checked } = event.target;
+    const { name, value, checked, type } = event.target;
+    const newValue = type === 'checkbox' ? checked : value;
+    const error = validateField(name, newValue);
     setEditedAddress(prev => ({
       ...prev,
-      [name]: name === 'isDefault' ? checked : value
+      [name]: newValue
+    }));
+    setErrors(prev => ({
+      ...prev,
+      [name]: error
     }));
   };
 
   const handleUpdate = async () => {
-    await onUpdate(id, editedAddress);
-    setIsEditing(false);
+    const isValid = Object.values(errors).every(error => !error);
+    if (isValid) {
+      await onUpdate(id, editedAddress);
+      setIsEditing(false);
+    }
   };
 
   if (isEditing) {
     return (
       <Card sx={{ mb: 2, p: 2 }}>
         <Grid container spacing={2}>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              label="Street"
-              name="street"
-              value={editedAddress.street}
-              onChange={handleEditChange}
-            />
-            <TextField
-              fullWidth
-              label="Floor"
-              name="floor"
-              value={editedAddress.floor}
-              onChange={handleEditChange}
-            />
-            <TextField
-              fullWidth
-              label="Door"
-              name="door"
-              value={editedAddress.door}
-              onChange={handleEditChange}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth
-              label="City"
-              name="city"
-              value={editedAddress.city}
-              onChange={handleEditChange}
-            />
-            <TextField
-              fullWidth
-              label="Postal Code"
-              name="postal_code"
-              value={editedAddress.postal_code}
-              onChange={handleEditChange}
-            />
-            <TextField
-              fullWidth
-              label="Country"
-              name="country"
-              value={editedAddress.country}
-              onChange={handleEditChange}
-            />
-          </Grid>
+          {Object.entries(editedAddress).map(([key, value]) => {
+            if (key === 'isDefault') {
+              return (
+                <Grid item xs={12} key={key}>
+                  <FormControlLabel
+                    control={<Checkbox checked={!!value} onChange={handleEditChange} name={key} />}
+                    label="Default Address"
+                  />
+                </Grid>
+              );
+            } else if (key === 'country') {
+              return (
+                <Grid item xs={6} key={key}>
+                  <FormControl fullWidth>
+                    <InputLabel>Country</InputLabel>
+                    <Select
+                      value={value}
+                      onChange={handleEditChange}
+                      name={key}
+                      label="Country"
+                    >
+                      {countries.map((countryName, index) => (
+                        <MenuItem key={index} value={countryName}>{countryName}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              );
+            } else {
+              return (
+                <Grid item xs={6} key={key}>
+                  <TextField
+                    fullWidth
+                    label={key.replace('_', ' ').replace('adit_info', 'Additional Info')}
+                    name={key}
+                    value={value || ''}
+                    onChange={handleEditChange}
+                    error={!!errors[key]}
+                    helperText={errors[key] || ' '}
+                  />
+                </Grid>
+              );
+            }
+          })}
           <Grid item xs={12}>
             <Button onClick={handleUpdate} color="primary" variant="contained">
               Save
@@ -89,26 +113,12 @@ const ShippingAddressItem = ({ id, street, floor, door, postal_code, city, count
     <Card sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
       <CardContent>
         <Grid container>
-          <Grid item xs={6}>
-            <Typography variant="subtitle1"><strong>Street</strong></Typography>
-            <Typography variant="body2">{street}</Typography>
-            <Typography variant="subtitle1"><strong>Floor</strong></Typography>
-            <Typography variant="body2">{floor}</Typography>
-            <Typography variant="subtitle1"><strong>Door</strong></Typography>
-            <Typography variant="body2">{door}</Typography>
-            <Typography variant="subtitle1"><strong>City</strong></Typography>
-            <Typography variant="body2">{city}</Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="subtitle1"><strong>Postal Code</strong></Typography>
-            <Typography variant="body2">{postal_code}</Typography>
-            <Typography variant="subtitle1"><strong>Country</strong></Typography>
-            <Typography variant="body2">{country}</Typography>
-            <Typography variant="subtitle1"><strong>Additional Information</strong></Typography>
-            <Typography variant="body2">{adit_info}</Typography>
-            <Typography variant="subtitle1"><strong>Default</strong></Typography>
-            <Typography variant="body2">{isDefault ? 'Yes' : 'No'}</Typography>
-          </Grid>
+          {Object.entries({ street, floor, door, city, postal_code, country, adit_info, isDefault }).map(([key, value]) => (
+            <Grid item xs={6} key={key}>
+              <Typography variant="subtitle1"><strong>{key.replace('_', ' ').replace('adit_info', 'Additional Info')}</strong></Typography>
+              <Typography variant="body2">{value ? value.toString() : 'N/A'}</Typography>
+            </Grid>
+          ))}
         </Grid>
       </CardContent>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
