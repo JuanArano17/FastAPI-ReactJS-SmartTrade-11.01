@@ -1,18 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, Button, Container, Paper, Typography, FormControl, InputLabel, Select, MenuItem, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
-import { getAllProductsForAutocomplete, createSellerProduct } from '../../../api/services/products/ProductsService';
+import ImageUpload from './ImageUpload';
+import { createNewProduct, getAllProductsForAutocomplete, createExistingSellerProduct } from '../../../api/services/products/ProductsService';
 import { getLoggedInfo } from '../../../api/services/user/profile/ProfileService';
-
-const categoryAttributes = {
-  Book: [{ name: 'author', label: 'Author', type: 'text' }, { name: 'pages', label: 'Pages', type: 'number' }],
-  Clothes: [{ name: 'materials', label: 'Materials', type: 'text' }, { name: 'type', label: 'Type', type: 'text' }],
-  Electrodomestics: [{ name: 'brand', label: 'Brand', type: 'text' }, { name: 'powerSource', label: 'Power Source', type: 'text' }],
-  Electronics: [{ name: 'capacity', label: 'Capacity', type: 'text' }],
-  Food: [{ name: 'ingredients', label: 'Ingredients', type: 'text' }],
-  Game: [{ name: 'publisher', label: 'Publisher', type: 'text' }, { name: 'platform', label: 'Platform', type: 'text' }, { name: 'size', label: 'Size', type: 'text' }],
-  HouseUtilities: [{ name: 'brand', label: 'Brand', type: 'text' }]
-};
 
 function AddProductForm() {
   const [isNewProduct, setIsNewProduct] = useState(true);
@@ -25,12 +16,24 @@ function AddProductForm() {
     name: '',
     description: '',
     specSheet: '',
-    images: '',
+    images: [],
     stock: '',
     attributes: {}
   });
   const [products, setProducts] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [images, setImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const categoryAttributes = {
+    Book: [{ name: 'author', label: 'Author', type: 'text' }, { name: 'pages', label: 'Pages', type: 'number' }],
+    Clothes: [{ name: 'materials', label: 'Materials', type: 'text' }, { name: 'type', label: 'Type', type: 'text' }],
+    Electrodomestics: [{ name: 'brand', label: 'Brand', type: 'text' }, { name: 'power_source', label: 'Power Source', type: 'text' }, { name: 'type', label: 'Type', type: 'text' }],
+    Electronics: [{ name: 'capacity', label: 'Capacity', type: 'text' }, { name: 'brand', label: 'Brand', type: 'text' }, { name: 'type', label: 'Type', type: 'text' }],
+    Food: [{ name: 'ingredients', label: 'Ingredients', type: 'text' }, { name: 'brand', label: 'Brand', type: 'text' }, { name: 'type', label: 'Type', type: 'text' }],
+    Game: [{ name: 'publisher', label: 'Publisher', type: 'text' }, { name: 'platform', label: 'Platform', type: 'text' }, { name: 'size', label: 'Size', type: 'text' }],
+    HouseUtilities: [{ name: 'brand', label: 'Brand', type: 'text' }, { name: 'type', label: 'Type', type: 'text' }]
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
       const fetchedProducts = await getAllProductsForAutocomplete();
@@ -41,59 +44,86 @@ function AddProductForm() {
 
   const handleSwitch = (event) => {
     setIsNewProduct(event.target.value === 'new');
-    setProduct({ ...product, category: '', attributes: {} }); // Reset category and attributes on switch
+    setProduct({ ...product, category: '', attributes: {} });
   };
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
-  };
-
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setProduct({
-      ...product,
+    setProduct(prevState => ({
+      ...prevState,
       [name]: name === 'quantity' || name === 'price' || name === 'shippingCosts' ? parseInt(value, 10) : value
-    });
+    }));
   };
 
   const handleAutocompleteChange = (event, newValue) => {
     if (newValue) {
-      const selectedProductData = {
+      setProduct(prevState => ({
+        ...prevState,
         productId: newValue.id,
         name: newValue.name,
         price: parseInt(newValue.price, 10),
         quantity: parseInt(newValue.quantity || 0, 10),
         shippingCosts: parseInt(newValue.shippingCosts || 0, 10)
-      };
-      setProduct({
-        ...product,
-        ...selectedProductData
-      });
+      }));
     } else {
-      setProduct({
-        ...product,
+      setProduct(prevState => ({
+        ...prevState,
         productId: '',
         name: '',
         price: 0,
         quantity: 0,
         shippingCosts: 0
-      });
+      }));
     }
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    try {
-      const sellerData = await getLoggedInfo();
-      const response = await createSellerProduct(product, sellerData.id);
-      console.log('Producto creado:', response);
-    } catch (error) {
-      if (error.response && error.response.status === 409) {
-        setDialogOpen(true);
-      } else {
-        console.error('Error al crear el producto:', error);
+
+    if (isNewProduct) {
+      try {
+        const sellerData = await getLoggedInfo();
+        const newProductData = {
+          ...product,
+          attributes: Object.keys(product.attributes).reduce((acc, key) => {
+            acc[key] = product.attributes[key];
+            return acc;
+          }, {}),
+          images: images 
+        };
+        const response = await createNewProduct(newProductData, product.category, sellerData.id);
+
+        if (response && response.data && response.data.id) {
+          console.log('Nuevo producto creado:', response.data);
+          
+          const sellerProductData = {
+            ...newProductData,
+            productId: response.data.id
+          };
+          const sellerProductResponse = await createExistingSellerProduct(sellerProductData, sellerData.id);
+          console.log('Producto asociado al vendedor con éxito:', sellerProductResponse);
+        }
+      } catch (error) {
+        console.error('Error al crear el producto o al asociarlo:', error);
+        if (error.response && error.response.status === 409) {
+          setDialogOpen(true);
+        }
+      }
+    } else {
+      try {
+        const sellerData = await getLoggedInfo();
+        const response = await createExistingSellerProduct(product, sellerData.id, sellerData.id);
+        console.log('Producto existente añadido:', response);
+      } catch (error) {
+        console.error('Error al añadir producto existente:', error);
+        if (error.response && error.response.status === 409) {
+          setDialogOpen(true);
+        }
       }
     }
+  };
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
   };
   return (
     <Container component="main" maxWidth="sm">
@@ -176,7 +206,7 @@ function AddProductForm() {
                 fullWidth
                 label={attr.label}
                 name={attr.name}
-                value={product.attributes[attr.name] || ''}
+                value={product.attributes[attr.name]}
                 onChange={handleChange}
                 type={attr.type}
               />
@@ -225,24 +255,30 @@ function AddProductForm() {
               margin="normal"
               required
               fullWidth
-              label="Images URL"
-              name="images"
-              value={product.images}
+              label="Shipping Costs"
+              name="shippingCosts"
+              value={product.shippingCosts}
               onChange={handleChange}
-              type="text"
+              type="number"
             />
             <TextField
               margin="normal"
               required
               fullWidth
-              label="Stock"
-              name="stock"
-              value={product.stock}
+              label="Quantity"
+              name="quantity"
+              value={product.quantity}
               onChange={handleChange}
               type="number"
             />
           </>
         )}
+        <ImageUpload
+          images={images}
+          setImages={setImages}
+          imagePreviews={imagePreviews}
+          setImagePreviews={setImagePreviews}
+        />
         <Button
           type="submit"
           fullWidth
