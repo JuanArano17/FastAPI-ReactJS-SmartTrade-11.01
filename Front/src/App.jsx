@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Switch } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
+import ProfilePage from './pages/ProfilePage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import CatalogPage from './pages/CatalogPage';
@@ -10,7 +11,7 @@ import ShoppingCartPage from './pages/ShoppingCartPage';
 import AdminPage from './pages/AdminPage';
 import ValidateProductPage from './pages/ValidateProductPage';
 import WishListPage from './pages/WishListPage';
-import { adminPaths, buyerPaths, catalogPaths, forgotPasswordPaths, homePaths, loginPaths, registerPaths } from './PrivateRoutePaths';
+import { adminPaths, buyerPaths, catalogPaths, forgotPasswordPaths, homePaths, loginPaths, profilePaths, registerPaths } from './PrivateRoutePaths';
 import PrivateRouter from './components/router/PrivateRouter';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <PrivateRouter path="/home" component={HomePage} allowedTypes={['Unknown']} redirectPaths={homePaths} />
           <PrivateRouter path="/register" component={RegisterPage} allowedTypes={['Unknown']} redirectPaths={registerPaths} />
           <PrivateRouter path="/login" component={LoginPage} allowedTypes={['Unknown']} redirectPaths={loginPaths} />
+          <PrivateRouter path="/profile" component={ProfilePage} allowedTypes={['Buyer', 'Seller']} redirectPaths={profilePaths} />
           <PrivateRouter path="/catalog/product/:id" component={ProductDetailPage} allowedTypes={['Buyer', 'Seller']} redirectPaths={catalogPaths} />
           <PrivateRouter path="/catalog/:search" component={CatalogPage} allowedTypes={['Buyer', 'Seller']} redirectPaths={catalogPaths} />
           <PrivateRouter path="/catalog" component={CatalogPage} allowedTypes={['Buyer', 'Seller']} redirectPaths={catalogPaths} />

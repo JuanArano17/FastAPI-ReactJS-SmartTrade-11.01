@@ -23,7 +23,6 @@ const ForgotPasswordPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateEmail(email)) {
-      // Lógica para enviar el correo electrónico de recuperación de contraseña
       console.log("Email enviado para recuperar contraseña.");
     } else {
       setError("Por favor ingrese un email válido para continuar.");

@@ -170,19 +170,6 @@ class InShoppingCartService:
             detail=f"Cart item with id {id} not found.",
         )
 
-    # def _get_by_id(self, id_buyer, id_seller_product) -> CompleteShoppingCart:
-    #     cart_item = self.cart_repo.get_by_id(id_buyer=id_buyer, id_seller_product=id_seller_product)
-
-    #     if not cart_item:
-    #         raise HTTPException(
-    #             status_code=status.HTTP_404_NOT_FOUND,
-    #             detail=f"Cart item with id_seller_product={id_seller_product} and id_buyer={id_buyer} not found.",
-    #         )
-
-    #     seller_product = self.seller_product_service.get_by_id(id_seller_product)
-    #     complete_seller_product = self.seller_product_service.map_seller_product_to_read_schema(seller_product)
-    #     return CompleteShoppingCart(**cart_item.__dict__, seller_product=complete_seller_product)
-
     def get_by_id_buyer(self, id_buyer) -> list[InShoppingCart]:
         return self.cart_repo.get_by_id_buyer(id_buyer=id_buyer)
 

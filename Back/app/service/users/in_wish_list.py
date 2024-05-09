@@ -125,6 +125,7 @@ class InWishListService:
         return wish_list
 
     def delete_by_id(self, id_seller_product, id_buyer):
+        self.get_by_id(id_seller_product, id_buyer)
         self.wishlist_repo.delete_by_id(
             id_buyer=id_buyer, id_seller_product=id_seller_product
         )

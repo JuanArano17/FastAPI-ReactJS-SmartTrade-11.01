@@ -19,7 +19,7 @@ const WishItem = ({ item, onRemove }) => {
             cursor: 'pointer',
             boxShadow: '0px 4px 20px rgba(0, 128, 0, 0.4)',
             '&:hover': {
-                boxShadow: `0px 4px 20px rgba(0, 128, 0, 0.7)`,  // Cambia al color eco_points al hacer hover
+                boxShadow: `0px 4px 20px rgba(0, 128, 0, 0.7)`,  
             }
             }}>
                 <FavoriteButton

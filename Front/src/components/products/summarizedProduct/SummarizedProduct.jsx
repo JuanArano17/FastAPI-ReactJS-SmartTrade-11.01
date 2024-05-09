@@ -24,10 +24,10 @@ const SummarizedProduct = ({ product }) => {
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 borderRadius: '40px',
-                boxShadow: '0px 4px 20px rgba(128, 128, 128, 0.4)',  // Gris por defecto para simular profundidad
+                boxShadow: '0px 4px 20px rgba(128, 128, 128, 0.4)',  
                 height: '100%',
                 '&:hover': {
-                    boxShadow: `0px 4px 20px ${boxShadowColor}`,  // Cambia al color eco_points al hacer hover
+                    boxShadow: `0px 4px 20px ${boxShadowColor}`, 
                 }
             }}
         >

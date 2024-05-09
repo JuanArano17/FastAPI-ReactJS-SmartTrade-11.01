@@ -8,7 +8,7 @@ const Footer = ({style}) => {
             sx={{ 
                 bgcolor: "#cbe8ba", 
                 py: 6, 
-                boxShadow: '0px -5px 10px -3px rgba(106, 120, 98, 0.3)' // Modificación aquí para sombra hacia arriba
+                boxShadow: '0px -5px 10px -3px rgba(106, 120, 98, 0.3)' 
             }}>
             <Container maxWidth="lg">
                 <Grid container spacing={4} justifyContent="center">

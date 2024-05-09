@@ -24,7 +24,7 @@ const FavoriteButton = ({ productId, onToggle }) => {
     }, [productId]);
 
     const handleToggleFavorite = async (event) => {
-        event.stopPropagation(); // Detiene la propagación del evento para que no llegue al botón padre.
+        event.stopPropagation(); 
         setLoading(true);
         try {
             if (!isFavorite) {

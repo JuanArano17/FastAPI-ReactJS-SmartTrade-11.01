@@ -12,6 +12,13 @@ const styles = {
         mt: '25px',
         mb: '15px'
     },
+    profilePagePaperContainer: {
+        p: 4,
+        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.6)',
+        borderRadius: '40px',
+        mt: '25px',
+        mb: '15px',
+    },
     registerButton: {
         mt: 3,
         mb: 2,
@@ -112,8 +119,8 @@ const styles = {
         marginBottom: 2,
         padding: '16px',
         alignItems: 'center',
-        borderRadius: '40px', // Asegúrate que esta línea existe y tiene el valor deseado
-        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)', // Sombra para un efecto visual
+        borderRadius: '40px',
+        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)',
     },    
     cartItem: {
         borderRadius: '40px',
