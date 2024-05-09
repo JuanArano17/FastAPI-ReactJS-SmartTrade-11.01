@@ -3,7 +3,7 @@ import { Card, CardContent, Typography, IconButton, Grid, TextField, Button, Che
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { validateField } from '../../../utils/ShippingAddressValidation';
-import getCountries from '../../../api/services/country/CountriesService';  // Asegúrate de tener esta función implementada
+import getCountries from '../../../api/services/country/CountriesService'; 
 
 const ShippingAddressItem = ({ id, street, floor, door, postal_code, city, country, adit_info, isDefault, onDelete, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -16,7 +16,7 @@ const ShippingAddressItem = ({ id, street, floor, door, postal_code, city, count
   useEffect(() => {
     const fetchCountries = async () => {
       try {
-        const fetchedCountries = await getCountries(); // Obtener la lista de países
+        const fetchedCountries = await getCountries(); 
         setCountries(fetchedCountries);
       } catch (error) {
         console.error('Failed to fetch countries:', error);

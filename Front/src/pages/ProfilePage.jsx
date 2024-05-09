@@ -25,8 +25,7 @@ const ProfilePage = () => {
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
-
-  // Construir dinámicamente las pestañas en función del tipo de usuario
+  
 const renderTabs = () => {
     const tabs = [<Tab key="personal-info" label="Personal Info" />];
     if (userInfo && userInfo.type === 'Buyer') {

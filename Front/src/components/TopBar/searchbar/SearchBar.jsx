@@ -30,7 +30,7 @@ const SearchBar = () => {
                             ),
                         }}
                         sx={{
-                            width: '80%', // Ajusta el tamaño según el ancho de la pantalla
+                            width: '80%', 
                             "& .MuiInputBase-root": {
                                 height: 50, 
                             },

@@ -37,7 +37,7 @@ const CardItem = ({ id, card_number, card_name, card_exp_date, card_security_num
             try {
                 await onUpdate(id, editedCard);
                 setIsEditing(false);
-                setUpdateError(''); // Clear any previous errors on successful update
+                setUpdateError(''); 
             } catch (error) {
                 console.error('API Error on update:', error);
                 setUpdateError('Failed to update card. Please try again.');
@@ -50,7 +50,7 @@ const CardItem = ({ id, card_number, card_name, card_exp_date, card_security_num
     const cancelEdit = () => {
         setIsEditing(false);
         setEditedCard({
-            card_number, card_name, card_exp_date, card_security_num  // Reset to initial values
+            card_number, card_name, card_exp_date, card_security_num 
         });
         setFormValidity({
             card_number: validateCardNumber(card_number),

@@ -42,7 +42,7 @@ const AddCard = ({ onSave }) => {
     if (isFormValid) {
       try {
         await onSave(card);
-        setApiError(''); // Clear any previous errors on successful save
+        setApiError(''); 
       } catch (error) {
         console.error("API Error on save:", error);
         setApiError('Failed to save card. Please try again.');
