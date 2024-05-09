@@ -28,7 +28,7 @@ const ProductDetailPage = () => {
                 if (response) {
                     setProductData(response);
                     if (response.sizes && response.sizes.length > 0) {
-                        setSelectedSize(response.sizes[0].size); // Default to first size
+                        setSelectedSize(response.sizes[0].size); 
                     }
                     setLoading(false);
                     setError(null);
@@ -42,7 +42,7 @@ const ProductDetailPage = () => {
     }, [id]);
 
     const handleBackToCatalog = () => {
-        history.push('/catalog'); // Asegúrate de usar la ruta correcta para el catálogo
+        history.push('/catalog'); 
     };
 
     const handleAddToCart = async () => {
@@ -154,10 +154,10 @@ const ProductDetailPage = () => {
                                             style={{
                                                 height: '100%',
                                                 width: '100%',
-                                                objectFit: 'cover',  // Cubre el contenedor sin distorsionar
-                                                objectPosition: 'center center',  // Centra la imagen en el contenedor
-                                                borderRadius: '40px',  // borderRadius a la imagen
-                                                boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.7)'  // Sombra a la imagen
+                                                objectFit: 'cover',  
+                                                objectPosition: 'center center',  
+                                                borderRadius: '40px',  
+                                                boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.7)' 
                                             }}
                                         />
                                     </ButtonBase>

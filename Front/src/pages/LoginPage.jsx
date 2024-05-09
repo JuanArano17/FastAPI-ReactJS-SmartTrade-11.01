@@ -92,7 +92,7 @@ const LoginPage = () => {
                   autoComplete="email"
                   value={formData.email}
                   onChange={handleChange}
-                  error={!isEmailValid} // Mostrar error si el correo electrónico no es válido
+                  error={!isEmailValid}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -108,7 +108,7 @@ const LoginPage = () => {
                   autoComplete="current-password"
                   value={formData.password}
                   onChange={handleChange}
-                  error={!isPasswordValid} // Mostrar error si la contraseña no es válida
+                  error={!isPasswordValid} 
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">

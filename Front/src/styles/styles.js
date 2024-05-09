@@ -112,8 +112,8 @@ const styles = {
         marginBottom: 2,
         padding: '16px',
         alignItems: 'center',
-        borderRadius: '40px', // Asegúrate que esta línea existe y tiene el valor deseado
-        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)', // Sombra para un efecto visual
+        borderRadius: '40px',
+        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)',
     },    
     cartItem: {
         borderRadius: '40px',
