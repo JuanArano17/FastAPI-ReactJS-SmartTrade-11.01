@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { TableCell, TableRow, IconButton, TextField, Button, Checkbox } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import PendingIcon from '@mui/icons-material/Pending';
+import styles from '../../../styles/styles'
 
 function ProductListItem({ product, onDelete, onEdit, onSave, index }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -9,7 +13,7 @@ function ProductListItem({ product, onDelete, onEdit, onSave, index }) {
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
-    setEditedProduct({ ...editedProduct, [name]: value });
+    setEditedProduct(prev => ({ ...prev, [name]: value }));
   };
 
   const saveEdit = () => {
@@ -17,21 +21,21 @@ function ProductListItem({ product, onDelete, onEdit, onSave, index }) {
     setIsEditing(false);
   };
 
-  // Determine row color based on the product state
-  const getRowColor = () => {
-    if (product.state === 'approved') {
-      return '#c8e6c9'; // green
-    } else if (product.state === 'rejected') {
-      return '#ffcdd2'; // red
-    } else {
-      return index % 2 === 0 ? 'white' : '#f7f7f7'; // default colors
+  const canPublish = product.state === 'Approved';
+
+  const toggleEditing = () => {
+    setIsEditing(!isEditing);
+    if (!isEditing && product.state === 'Rejected') {
+      setEditedProduct(prev => ({ ...prev, state: 'Pending' })); // Set state to 'Pending' when editing a 'Rejected' product
     }
   };
 
+  console.log('Product state:', product.state);  // Debug: log the product state
+
   return (
-    <TableRow sx={{ backgroundColor: getRowColor() }}>
+    <TableRow sx={{ backgroundColor: index % 2 === 0 ? 'white' : '#f7f7f7' }}>
       <TableCell>
-        <img src={product.image || "/placeholder-image.png"} alt={product.name} style={{ width: 50, height: 50 }} />
+        <img src={product.images || "/placeholder-image.png"} alt={product.name} style={{ width: 100, height: 100 }} />
       </TableCell>
       <TableCell>
         {isEditing ? (
@@ -57,6 +61,9 @@ function ProductListItem({ product, onDelete, onEdit, onSave, index }) {
             size="small"
           />
         ) : (
+          product.state === 'Approved' ? <CheckCircleIcon color="success" /> :
+          product.state === 'Rejected' ? <CancelIcon color="error" /> :
+          product.state === 'Pending' ? <PendingIcon color="info"/> :
           product.state
         )}
       </TableCell>
@@ -64,20 +71,24 @@ function ProductListItem({ product, onDelete, onEdit, onSave, index }) {
         {isEditing ? (
           <Checkbox
             checked={editedProduct.publish}
-            onChange={(e) => setEditedProduct({ ...editedProduct, publish: e.target.checked })}
+            onChange={(e) => setEditedProduct(prev => ({ ...prev, publish: e.target.checked }))}
+            disabled={!canPublish}  
           />
         ) : (
-          <Checkbox checked={product.publish} />
+          <Checkbox
+            checked={product.publish}
+            disabled={!canPublish}  
+          />
         )}
       </TableCell>
       <TableCell>
         <IconButton onClick={() => onDelete(product.id)}>
           <DeleteIcon />
         </IconButton>
-        <IconButton onClick={() => setIsEditing(!isEditing)}>
+        <IconButton onClick={toggleEditing}>
           <EditIcon />
         </IconButton>
-        {isEditing && <Button onClick={saveEdit}>Save</Button>}
+        {isEditing && <Button sx={styles.greenRoundedButton} onClick={saveEdit}>Save</Button>}
       </TableCell>
     </TableRow>
   );
