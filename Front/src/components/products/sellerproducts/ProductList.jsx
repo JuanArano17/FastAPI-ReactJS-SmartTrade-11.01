@@ -13,6 +13,7 @@ const ProductList = ({ products, onDelete, onEdit, onSave }) => {
             <TableCell>Quantity</TableCell>
             <TableCell>Price</TableCell>
             <TableCell>Shipping Costs</TableCell>
+            <TableCell>State</TableCell>
             <TableCell>Publish</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
