@@ -112,8 +112,8 @@ const styles = {
         marginBottom: 2,
         padding: '16px',
         alignItems: 'center',
-        borderRadius: '40px', // Asegúrate que esta línea existe y tiene el valor deseado
-        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)', // Sombra para un efecto visual
+        borderRadius: '40px', 
+        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)', 
     },    
     cartItem: {
         borderRadius: '40px',
@@ -122,5 +122,19 @@ const styles = {
         width: 100,
         marginRight: 16
     },
+    addButton: {
+        position: 'relative',
+        right: -540,
+        top: -15,
+        backgroundColor: '#629c44', 
+        color: '#ffffff', 
+        '&:hover': {
+          backgroundColor: '#507a34', 
+        },
+        borderRadius: '50%', 
+        minWidth: '56px', 
+        height: '56px',
+        boxShadow: '0 4px 8px rgba(0,0,0,0.2)' 
+      },
 }
 export default styles;

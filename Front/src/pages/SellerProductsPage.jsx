@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Container, Typography } from '@mui/material';
+import { Box, Button, Container, Typography,Fab  } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'; 
 import AddProductForm from '../components/products/sellerproducts/AddProductForm';
 import ProductList from '../components/products/sellerproducts/ProductList';
 import styles from '../styles/styles';
@@ -26,8 +27,8 @@ const SellerProductsPage = () => {
     fetchSellerProducts();
   }, []);
 
-  const handleAddProductClick = () => {
-    setShowAddForm(true);
+  const toggleAddForm = () => {
+    setShowAddForm(prev => !prev);
   };
 
   const handleAddProduct = async () => {
@@ -69,16 +70,22 @@ const SellerProductsPage = () => {
         <Typography variant="h4" gutterBottom sx={{ mb: 2, color: '#629c44' }}>
           Your Products
         </Typography>
-        {!showAddForm ? (
-          <>
-            <Button startIcon={<AddIcon />} variant="contained" onClick={handleAddProductClick}>
-              Add Product
-            </Button>
+        <Box sx={{ position: 'relative', marginBottom: 2 }}>
+          {showAddForm ? (
+            <Fab color="secondary" sx={styles.addButton} onClick={toggleAddForm}>
+              <ArrowBackIcon />
+            </Fab>
+          ) : (
+            <Fab color="primary" sx={styles.addButton} onClick={toggleAddForm}>
+              <AddIcon />
+            </Fab>
+          )}
+          {!showAddForm ? (
             <ProductList products={sellerproducts} onDelete={handleDeleteProduct} onEdit={handleEditProduct} onSave={handleEditProduct} />
-          </>
-        ) : (
-          <AddProductForm onSave={handleAddProduct} />
-        )}
+          ) : (
+            <AddProductForm onSave={toggleAddForm} />
+          )}
+        </Box>
       </Container>
       <Footer />
     </Box>

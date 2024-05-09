@@ -1,32 +1,31 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Checkbox, IconButton } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import ProductListItem from './ProductListItem';
 
 const ProductList = ({ products, onDelete, onEdit, onSave }) => {
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple product table">
-        <TableHead>
+        <TableHead style={{ backgroundColor: '#cbe8ba' }}>
           <TableRow>
             <TableCell>Image</TableCell>
             <TableCell>Name</TableCell>
-            <TableCell>More info</TableCell>
-            <TableCell>Stock</TableCell>
+            <TableCell>Quantity</TableCell>
             <TableCell>Price</TableCell>
+            <TableCell>Shipping Costs</TableCell>
             <TableCell>Publish</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {products.map((product) => (
+          {products.map((product, index) => (
             <ProductListItem
               key={product.id}
               product={product}
+              index={index}
               onDelete={onDelete}
               onEdit={onEdit}
-              onSave={onSave}  
+              onSave={onSave}
             />
           ))}
         </TableBody>
