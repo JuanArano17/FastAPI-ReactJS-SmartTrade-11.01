@@ -94,9 +94,26 @@ def test_create_shopping_cart(
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert "seller_product" in content
+    assert content["seller_product"]["id"] == seller_product.id
+    assert content["seller_product"]["id_product"] == product.id
+    assert content["seller_product"]["id_seller"] == seller.id
+    assert content["seller_product"]["state"] == "Pending"
+    assert "description" not in content["seller_product"]
+    assert "justification" not in content["seller_product"]
+    assert content["seller_product"]["age_restricted"] == seller_product.age_restricted
+    assert content["seller_product"]["name"] == product.name
+    assert content["seller_product"]["spec_sheet"] == product.spec_sheet
+    assert content["seller_product"]["eco_points"] == seller_product.eco_points
+    assert content["seller_product"]["stock"] == product.stock
+    assert content["seller_product"]["author"] == product.author
+    assert content["seller_product"]["pages"] == product.pages
+    assert content["seller_product"]["category"] == product.category
+    assert content["seller_product"]["images"] == product.images
+    assert content["seller_product"]["price"] == seller_product.price
+    assert content["seller_product"]["shipping_costs"] == seller_product.shipping_costs
+    assert content["seller_product"]["quantity"] == seller_product.quantity
     assert "id" in content
     assert content["id_buyer"] == buyer.id
-    #assert content["seller_product"] in seller_product.__dict__.values() TODO: CHECK THIS
     assert content["quantity"] == shopping_cart_item["quantity"]
 
     shopping_cart_item = shopping_cart_service.get_by_id(
@@ -153,11 +170,10 @@ def test_create_shopping_cart_invalid_quantity(
     data["id_product"] = product.id
     seller_product = seller_product_service.add(seller.id, SellerProductCreate(**data))
 
-    shopping_cart_item = {"id_seller_product": seller_product.id, "quantity": 10000, "id_size":None}
+    shopping_cart_item = {"id_seller_product": seller_product.id, "quantity": 10000}
 
     response = client.post(f"/shopping_cart/me", json=shopping_cart_item, headers=headers)
-    #response = client.post("/sellers/", json=data)
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert "detail" in response.json()
 
 
@@ -167,9 +183,17 @@ def test_create_shopping_cart_invalid_seller_product(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
-    data = {"id_seller_product": 999}
+    login_data = {"username": data["email"], "password": data["password"]}
 
-    response = client.post(f"/buyers/{buyer.id}/shopping_cart", json=data)
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    data = {"id_seller_product": 999, "quantity":1}
+
+    response = client.post(f"/shopping_cart/me", json=data, headers=headers)
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert "detail" in response.json()
 
@@ -184,6 +208,14 @@ def test_create_duplicate_shopping_cart(
 ):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
+
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
 
     data = fake_seller()
     seller = seller_service.add(SellerCreate(**data))
@@ -204,7 +236,7 @@ def test_create_duplicate_shopping_cart(
 
     data = {"id_seller_product": shopping_cart_item.id_seller_product, "quantity": 1}
 
-    response = client.post(f"/buyers/{buyer.id}/shopping_cart", json=data)
+    response = client.post(f"/shopping_cart/me", json=data, headers=headers)
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert "detail" in response.json()
 
@@ -228,6 +260,14 @@ def test_get_shopping_cart(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
     data = fake_seller()
     seller1 = seller_service.add(SellerCreate(**data))
 
@@ -276,24 +316,24 @@ def test_get_shopping_cart(
         buyer.id, shopping_cart_product=shopping_cart_item3
     )
 
-    response = client.get(f"/buyers/{buyer.id}/shopping_cart/")
+    response = client.get(f"/shopping_cart/me", headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert len(content) == 3
     assert shopping_cart_item.id_seller_product in [
-        shopping_cart["id_seller_product"] for shopping_cart in content
+        shopping_cart["seller_product"]["id"] for shopping_cart in content
     ]
     assert shopping_cart_item.id_buyer in [
         shopping_cart["id_buyer"] for shopping_cart in content
     ]
     assert shopping_cart_item2.id_seller_product in [
-        shopping_cart["id_seller_product"] for shopping_cart in content
+        shopping_cart["seller_product"]["id"] for shopping_cart in content
     ]
     assert shopping_cart_item2.id_buyer in [
         shopping_cart["id_buyer"] for shopping_cart in content
     ]
     assert shopping_cart_item3.id_seller_product in [
-        shopping_cart["id_seller_product"] for shopping_cart in content
+        shopping_cart["seller_product"]["id"] for shopping_cart in content
     ]
     assert shopping_cart_item3.id_buyer in [
         shopping_cart["id_buyer"] for shopping_cart in content
@@ -312,6 +352,14 @@ def test_delete_shopping_cart_item(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
     data = fake_seller()
     seller = seller_service.add(SellerCreate(**data))
 
@@ -329,7 +377,7 @@ def test_delete_shopping_cart_item(
         buyer.id, shopping_cart_product=shopping_cart_item
     )
 
-    response = client.delete(f"/buyers/{buyer.id}/shopping_cart/{seller_product.id}")
+    response = client.delete(f"/shopping_cart/me/{shopping_cart_item.id}", headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content is None or content == {}
@@ -351,6 +399,14 @@ def test_delete_shopping_cart_item_not_found(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
     data = fake_seller()
     seller = seller_service.add(SellerCreate(**data))
 
@@ -361,10 +417,10 @@ def test_delete_shopping_cart_item_not_found(
     data["id_product"] = product.id
     seller_product = seller_product_service.add(seller.id, SellerProductCreate(**data))
 
-    response = client.delete(f"/buyers/{buyer.id}/shopping_cart/{seller_product.id}")
+    response = client.delete(f"/shopping_cart/me/999", headers=headers)
     assert response.status_code == status.HTTP_404_NOT_FOUND
     content = response.json()
-    assert content["detail"] == "Seller product with id 999 not found."
+    assert content["detail"] == "Cart item with id 999 not found."
 
 
 def test_delete_shopping_cart(
@@ -385,6 +441,14 @@ def test_delete_shopping_cart(
 
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
+
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
 
     data = fake_seller()
     seller1 = seller_service.add(SellerCreate(**data))
@@ -434,7 +498,7 @@ def test_delete_shopping_cart(
         buyer.id, shopping_cart_product=shopping_cart_item3
     )
 
-    response = client.delete(f"/buyers/{buyer.id}/shopping_cart")
+    response = client.delete(f"/shopping_cart/me", headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content is None or content == {}

@@ -35,6 +35,7 @@ load_dotenv()
 def get_db_url() -> str:
     return os.getenv(
         "DB_URL",
+        #"postgresql+psycopg://postgres:password@database-1.caonuyb119ll.us-east-1.rds.amazonaws.com:5432/remote_db", 
         "postgresql+psycopg://postgres:password@localhost:5432/database",
     )
 

@@ -93,16 +93,26 @@ def test_create_wish_list(
     response = client.post(f"/wish_list/me", json=wish_list_item, headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
-    assert seller_product in content
+    assert "seller_product" in content
     assert content["id_buyer"] == buyer.id
     assert content["seller_product"]["id"] == seller_product.id
-    assert content["name"] == product.name
-    assert content["spec_sheet"] == product.spec_sheet
-    assert content["stock"] == product.stock
-    assert content["description"] == product.description
-    assert content["author"] == product.author
-    assert content["category"] == product.category
-
+    assert content["seller_product"]["id_product"] == product.id
+    assert content["seller_product"]["id_seller"] == seller.id
+    assert content["seller_product"]["state"] == "Pending"
+    assert "description" not in content["seller_product"]
+    assert "justification" not in content["seller_product"]
+    assert content["seller_product"]["age_restricted"] == seller_product.age_restricted
+    assert content["seller_product"]["name"] == product.name
+    assert content["seller_product"]["spec_sheet"] == product.spec_sheet
+    assert content["seller_product"]["eco_points"] == seller_product.eco_points
+    assert content["seller_product"]["stock"] == product.stock
+    assert content["seller_product"]["author"] == product.author
+    assert content["seller_product"]["pages"] == product.pages
+    assert content["seller_product"]["category"] == product.category
+    assert content["seller_product"]["images"] == product.images
+    assert content["seller_product"]["price"] == seller_product.price
+    assert content["seller_product"]["shipping_costs"] == seller_product.shipping_costs
+    assert content["seller_product"]["quantity"] == seller_product.quantity
 
     wish_list_item = wish_list_service.get_by_id(
         content["seller_product"]["id"], content["id_buyer"]
@@ -286,7 +296,7 @@ def test_delete_wish_list_item(
     wish_list_item = InWishListCreate(id_seller_product=seller_product.id)
     wish_list_item = wish_list_service.add(buyer.id, wish_list_item=wish_list_item)
 
-    response = client.delete(f"/wish_list/me", headers=headers)
+    response = client.delete(f"/wish_list/me/{seller_product.id}", headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content is None or content == {}
