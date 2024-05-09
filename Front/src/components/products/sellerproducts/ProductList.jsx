@@ -4,8 +4,8 @@ import ProductListItem from './ProductListItem';
 
 const ProductList = ({ products, onDelete, onEdit, onSave }) => {
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="simple product table">
+    <TableContainer component={Paper} sx={{ borderRadius: '16px', boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.2)'}}>
+      <Table sx={{ minWidth: 650, }} aria-label="simple product table">
         <TableHead style={{ backgroundColor: '#cbe8ba' }}>
           <TableRow>
             <TableCell>Image</TableCell>

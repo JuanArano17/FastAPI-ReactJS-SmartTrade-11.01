@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from '@mui/material';
+import styles from '../../../styles/styles'
 
 const ImageUpload = ({ images, setImages, imagePreviews, setImagePreviews }) => {
   const handleImageChange = (event) => {
@@ -27,6 +28,7 @@ const ImageUpload = ({ images, setImages, imagePreviews, setImagePreviews }) => 
         variant="contained"
         component="label"
         fullWidth
+        sx={styles.greenRoundedButton}
       >
         Upload Images
         <input
@@ -52,7 +54,7 @@ const ImageUpload = ({ images, setImages, imagePreviews, setImagePreviews }) => 
                 color: '#fff',
                 backgroundColor: 'rgba(255,0,0,0.7)',
                 border: 'none',
-                cursor: 'pointer'
+                cursor: 'pointer',
               }}>
               X
             </Button>

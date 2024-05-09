@@ -94,7 +94,6 @@ const TopBar = () => {
                   ...indicatorStyle('/seller-products')
                 }}
               >
-                Products
               </Button>
             </Tooltip>
             <Tooltip title="Profile">

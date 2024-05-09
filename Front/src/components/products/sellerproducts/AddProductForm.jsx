@@ -4,6 +4,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import ImageUpload from './ImageUpload';
 import { createNewProduct, getAllProductsForAutocomplete, createExistingSellerProduct } from '../../../api/services/products/ProductsService';
 import { getLoggedInfo } from '../../../api/services/user/profile/ProfileService';
+import styles from '../../../styles/styles';
 
 function AddProductForm() {
   const [isNewProduct, setIsNewProduct] = useState(true);
@@ -127,9 +128,9 @@ function AddProductForm() {
   };
   return (
     <Container component="main" maxWidth="sm">
-      <Paper elevation={6} style={{ padding: '20px', marginTop: '20px' }}>
+     <Paper elevation={3} sx={styles.paperContainer}>
         <Typography component="h1" variant="h5">
-          {isNewProduct ? 'Add New Product' : 'Add Existing Product'}
+          Add a new product to your list
         </Typography>
         <FormControl fullWidth margin="normal">
           <InputLabel>Type</InputLabel>
@@ -198,19 +199,7 @@ function AddProductForm() {
                 ))}
               </Select>
             </FormControl>
-            {product.category && categoryAttributes[product.category].map(attr => (
-              <TextField
-                key={attr.name}
-                margin="normal"
-                required
-                fullWidth
-                label={attr.label}
-                name={attr.name}
-                value={product.attributes[attr.name]}
-                onChange={handleChange}
-                type={attr.type}
-              />
-            ))}
+           
             <TextField
               margin="normal"
               required
@@ -235,21 +224,21 @@ function AddProductForm() {
               margin="normal"
               required
               fullWidth
-              label="Price"
-              name="price"
-              value={product.price}
-              onChange={handleChange}
-              type="number"
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
               label="Spec Sheet"
               name="specSheet"
               value={product.specSheet}
               onChange={handleChange}
               type="text"
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              label="Price"
+              name="price"
+              value={product.price}
+              onChange={handleChange}
+              type="number"
             />
             <TextField
               margin="normal"
@@ -271,6 +260,19 @@ function AddProductForm() {
               onChange={handleChange}
               type="number"
             />
+             {product.category && categoryAttributes[product.category].map(attr => (
+              <TextField
+                key={attr.name}
+                margin="normal"
+                required
+                fullWidth
+                label={attr.label}
+                name={attr.name}
+                value={product.attributes[attr.name]}
+                onChange={handleChange}
+                type={attr.type}
+              />
+            ))}
             <ImageUpload
               images={images}
               setImages={setImages}
@@ -284,6 +286,7 @@ function AddProductForm() {
           fullWidth
           variant="contained"
           color="primary"
+          sx={styles.greenRoundedButton}
           onClick={handleSubmit}
           style={{ margin: '24px 0px 8px' }}
         >
@@ -302,7 +305,7 @@ function AddProductForm() {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseDialog} color="primary" autoFocus>
+            <Button onClick={handleCloseDialog}  autoFocus>
               Cerrar
             </Button>
           </DialogActions>
