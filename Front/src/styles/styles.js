@@ -12,6 +12,13 @@ const styles = {
         mt: '25px',
         mb: '15px'
     },
+    profilePagePaperContainer: {
+        p: 4,
+        boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.6)',
+        borderRadius: '40px',
+        mt: '25px',
+        mb: '15px',
+    },
     registerButton: {
         mt: 3,
         mb: 2,

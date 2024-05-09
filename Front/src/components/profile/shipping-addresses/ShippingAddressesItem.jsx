@@ -50,8 +50,8 @@ const ShippingAddressItem = ({ id, street, floor, door, postal_code, city, count
 
   if (isEditing) {
     return (
-      <Card sx={{ mb: 2, p: 2 }}>
-        <Grid container spacing={2}>
+      <Card sx={{ mb: 2, p: 2, borderRadius:'40px' }}>
+        <Grid container spacing={2} mt={2} >
           {Object.entries(editedAddress).map(([key, value]) => {
             if (key === 'isDefault') {
               return (
@@ -110,7 +110,7 @@ const ShippingAddressItem = ({ id, street, floor, door, postal_code, city, count
   }
 
   return (
-    <Card sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+    <Card sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, borderRadius:'40px' }}>
       <CardContent>
         <Grid container>
           {Object.entries({ street, floor, door, city, postal_code, country, adit_info, isDefault }).map(([key, value]) => (

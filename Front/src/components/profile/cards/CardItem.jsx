@@ -3,6 +3,7 @@ import { Card, CardContent, Typography, IconButton, Grid, TextField, Button, Sna
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { validateCardNumber, validateCardExpiration, validateCVV } from '../../../utils/CardFormValidations';
+import styles from '../../../styles/styles';
 
 const CardItem = ({ id, card_number, card_name, card_exp_date, card_security_num, onDelete, onUpdate }) => {
     const [isEditing, setIsEditing] = useState(false);
@@ -65,8 +66,8 @@ const CardItem = ({ id, card_number, card_name, card_exp_date, card_security_num
 
     if (isEditing) {
         return (
-            <Card sx={{ mb: 2 }}>
-                <Grid container spacing={2} padding={2}>
+            <Card sx={{ mb: 2, borderRadius:'40px' }}>
+                <Grid container spacing={2} padding={2} mt={2}>
                     <Grid item xs={6}>
                         <TextField
                             label="Card Number"
@@ -126,7 +127,7 @@ const CardItem = ({ id, card_number, card_name, card_exp_date, card_security_num
     }
 
     return (
-        <Card sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Card sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, borderRadius:'40px' }}>
             <CardContent>
                 <Grid container>
                     <Grid item xs={6}>

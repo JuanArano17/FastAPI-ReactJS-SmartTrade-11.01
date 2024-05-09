@@ -25,26 +25,30 @@ const ProfilePage = () => {
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
-  
-const renderTabs = () => {
+
+  const renderTabs = () => {
     const tabs = [<Tab key="personal-info" label="Personal Info" />];
     if (userInfo && userInfo.type === 'Buyer') {
-        tabs.push(<Tab key="shipping-addresses" label="Shipping Addresses" />);
-        tabs.push(<Tab key="cards" label="Cards" />);
+      tabs.push(<Tab key="shipping-addresses" label="Shipping Addresses" />);
+      tabs.push(<Tab key="cards" label="Cards" />);
     }
     return tabs;
-};
+  };
 
   return (
     <Box sx={styles.mainBox}>
       <TopBar showLogoutButton={true} />
       <Container component="main" maxWidth="md" sx={styles.mainContainer}>
-        <Paper elevation={3} sx={styles.paperContainer}>
+        <Paper elevation={3} sx={styles.profilePagePaperContainer}>
           <Typography color="#629c44" variant="h4" gutterBottom>
             Profile Page
           </Typography>
-          <AppBar position="static" color="default">
-            <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" aria-label="profile tabs">
+          <AppBar position="static" color="default" sx={{ borderRadius:'40px', backgroundColor: 'white', color: 'black' }}>
+            <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" aria-label="profile tabs" 
+                  sx={{ 
+                    '.MuiTabs-indicator': { backgroundColor: '#4d9e20' },  
+                    '.Mui-selected': { color: '#000' } 
+                  }}>
               {renderTabs()}
             </Tabs>
           </AppBar>
