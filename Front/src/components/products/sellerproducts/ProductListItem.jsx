@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { TableCell, TableRow, IconButton, TextField, Button } from '@mui/material';
+import { TableCell, TableRow, IconButton, TextField, Button, Checkbox } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-function ProductListItem({ product, onDelete, onEdit, onSave }) {
+function ProductListItem({ product, onDelete, onEdit, onSave, index }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedProduct, setEditedProduct] = useState({ ...product });
 
@@ -18,7 +18,7 @@ function ProductListItem({ product, onDelete, onEdit, onSave }) {
   };
 
   return (
-    <TableRow>
+    <TableRow sx={{ backgroundColor: index % 2 === 0 ? 'white' : '#f7f7f7' }}>
       <TableCell>
         <img src={product.image || "/placeholder-image.png"} alt={product.name} style={{ width: 50, height: 50 }} />
       </TableCell>
@@ -34,8 +34,19 @@ function ProductListItem({ product, onDelete, onEdit, onSave }) {
           product.name
         )}
       </TableCell>
-      <TableCell>{product.stock}</TableCell>
+      <TableCell>{isEditing ? <TextField value={editedProduct.quantity} name="quantity" onChange={handleEditChange} size="small" /> : product.quantity}</TableCell>
       <TableCell>{isEditing ? <TextField value={editedProduct.price} name="price" onChange={handleEditChange} size="small" /> : product.price}</TableCell>
+      <TableCell>{isEditing ? <TextField value={editedProduct.shipping_costs} name="shipping_costs" onChange={handleEditChange} size="small" /> : product.shipping_costs}</TableCell>
+      <TableCell>
+        {isEditing ? (
+          <Checkbox
+            checked={editedProduct.publish}
+            onChange={(e) => setEditedProduct({ ...editedProduct, publish: e.target.checked })}
+          />
+        ) : (
+          <Checkbox checked={product.publish} />
+        )}
+      </TableCell>
       <TableCell>
         <IconButton onClick={() => onDelete(product.id)}>
           <DeleteIcon />

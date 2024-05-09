@@ -129,5 +129,19 @@ const styles = {
         width: 100,
         marginRight: 16
     },
+    addButton: {
+        position: 'relative',
+        right: -540,
+        top: -15,
+        backgroundColor: '#629c44', 
+        color: '#ffffff', 
+        '&:hover': {
+          backgroundColor: '#507a34', 
+        },
+        borderRadius: '50%', 
+        minWidth: '56px', 
+        height: '56px',
+        boxShadow: '0 4px 8px rgba(0,0,0,0.2)' 
+      },
 }
 export default styles;

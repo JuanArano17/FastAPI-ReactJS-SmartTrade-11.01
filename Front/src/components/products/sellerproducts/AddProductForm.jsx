@@ -89,13 +89,13 @@ function AddProductForm() {
             acc[key] = product.attributes[key];
             return acc;
           }, {}),
-          images: images 
+          images: images
         };
         const response = await createNewProduct(newProductData, product.category, sellerData.id);
 
         if (response && response.data && response.data.id) {
           console.log('Nuevo producto creado:', response.data);
-          
+
           const sellerProductData = {
             ...newProductData,
             productId: response.data.id
@@ -271,14 +271,14 @@ function AddProductForm() {
               onChange={handleChange}
               type="number"
             />
+            <ImageUpload
+              images={images}
+              setImages={setImages}
+              imagePreviews={imagePreviews}
+              setImagePreviews={setImagePreviews}
+            />
           </>
         )}
-        <ImageUpload
-          images={images}
-          setImages={setImages}
-          imagePreviews={imagePreviews}
-          setImagePreviews={setImagePreviews}
-        />
         <Button
           type="submit"
           fullWidth
