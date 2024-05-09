@@ -17,8 +17,19 @@ function ProductListItem({ product, onDelete, onEdit, onSave, index }) {
     setIsEditing(false);
   };
 
+  // Determine row color based on the product state
+  const getRowColor = () => {
+    if (product.state === 'approved') {
+      return '#c8e6c9'; // green
+    } else if (product.state === 'rejected') {
+      return '#ffcdd2'; // red
+    } else {
+      return index % 2 === 0 ? 'white' : '#f7f7f7'; // default colors
+    }
+  };
+
   return (
-    <TableRow sx={{ backgroundColor: index % 2 === 0 ? 'white' : '#f7f7f7' }}>
+    <TableRow sx={{ backgroundColor: getRowColor() }}>
       <TableCell>
         <img src={product.image || "/placeholder-image.png"} alt={product.name} style={{ width: 50, height: 50 }} />
       </TableCell>
@@ -37,6 +48,18 @@ function ProductListItem({ product, onDelete, onEdit, onSave, index }) {
       <TableCell>{isEditing ? <TextField value={editedProduct.quantity} name="quantity" onChange={handleEditChange} size="small" /> : product.quantity}</TableCell>
       <TableCell>{isEditing ? <TextField value={editedProduct.price} name="price" onChange={handleEditChange} size="small" /> : product.price}</TableCell>
       <TableCell>{isEditing ? <TextField value={editedProduct.shipping_costs} name="shipping_costs" onChange={handleEditChange} size="small" /> : product.shipping_costs}</TableCell>
+      <TableCell>
+        {isEditing ? (
+          <TextField
+            value={editedProduct.state}
+            name="state"
+            onChange={handleEditChange}
+            size="small"
+          />
+        ) : (
+          product.state
+        )}
+      </TableCell>
       <TableCell>
         {isEditing ? (
           <Checkbox
