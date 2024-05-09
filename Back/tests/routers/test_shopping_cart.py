@@ -121,7 +121,6 @@ def test_create_shopping_cart(
     )
     assert shopping_cart_item is not None
     assert content["id_buyer"] == shopping_cart_item.id_buyer
-    #assert content["seller_product"] in seller_product.__dict__.values() TODO: CHECK THIS
     assert content["quantity"] == shopping_cart_item.quantity
 
     data = fake_seller_product()
