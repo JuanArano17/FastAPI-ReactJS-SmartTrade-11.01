@@ -1,6 +1,7 @@
-import React, { useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Grid, TextField, Typography, Button } from '@mui/material';
 import styles from "../../../styles/styles";
+import { validateCardNumber, validateCardExpirationV2, validateCVV } from '../../../utils/CardFormValidations'; // Adjust the path as necessary
 
 const CardInformationForm = ({ cardData, handleChange }) => {
     const [formValidity, setFormValidity] = useState({
@@ -9,34 +10,29 @@ const CardInformationForm = ({ cardData, handleChange }) => {
         Cvv: false
     });
 
+    const [touched, setTouched] = useState({
+        CardNumber: false,
+        ExpiryDate: false,
+        Cvv: false
+    });
+
     const handleFieldValidation = (fieldId, value) => {
         switch (fieldId) {
             case "CardNumber":
-                return /^\d{16}$/.test(value.replace(/\s+/g, '')); 
+                return validateCardNumber(value); 
             case "ExpiryDate":
-                const matches = value.match(/^(0[1-9]|1[0-2])\/(\d{4})$/);
-                if (matches) {
-                    const year = parseInt(matches[2], 10);
-                    const month = parseInt(matches[1], 10);
-                    const currentYear = new Date().getFullYear();
-                    if (year >= currentYear && year <= currentYear + 50) {
-                        return true;
-                    }
-                }
-                return false;
+                return validateCardExpirationV2(value);
             case "Cvv":
-                return /^\d{3}$/.test(value);
+                return validateCVV(value);
             default:
                 return false;
         }
     };
+
     useEffect(() => {
-        setFormValidity({
-            CardNumber: handleFieldValidation("CardNumber", cardData.CardNumber),
-            ExpiryDate: handleFieldValidation("ExpiryDate", cardData.ExpiryDate),
-            Cvv: handleFieldValidation("Cvv", cardData.Cvv)
-        });
-    }, []); 
+        // We won't automatically validate on mount to avoid initial error display
+    }, []);
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         handleChange(e);
@@ -44,16 +40,21 @@ const CardInformationForm = ({ cardData, handleChange }) => {
             ...prevValidity,
             [name]: handleFieldValidation(name, value)
         }));
+        setTouched((prevTouched) => ({
+            ...prevTouched,
+            [name]: true
+        }));
     };
 
     const isFormValid = Object.values(formValidity).every(valid => valid);
     
     const getHelperText = (field) => {
+        if (!touched[field]) return '';
         switch (field) {
             case "CardNumber":
                 return formValidity.CardNumber ? '' : 'Card number must be 16 digits';
             case "ExpiryDate":
-                return formValidity.ExpiryDate ? '' : 'Insert a valid Date';
+                return formValidity.ExpiryDate ? '' : 'Insert a valid date';
             case "Cvv":
                 return formValidity.Cvv ? '' : 'CVV must be 3 digits';
             default:
@@ -93,7 +94,7 @@ const CardInformationForm = ({ cardData, handleChange }) => {
                         onChange={handleInputChange}
                         inputProps={{ maxLength: 16 }}
                         sx={{ ...styles.textfields, backgroundColor: "white" }}
-                        error={!formValidity.CardNumber}
+                        error={touched.CardNumber && !formValidity.CardNumber}
                         helperText={getHelperText("CardNumber")}
                     />
                 </Grid>
@@ -111,7 +112,7 @@ const CardInformationForm = ({ cardData, handleChange }) => {
                         onChange={handleInputChange}
                         inputProps={{ maxLength: 7 }}
                         sx={{ ...styles.textfields, backgroundColor: "white" }}
-                        error={!formValidity.ExpiryDate}
+                        error={touched.ExpiryDate && !formValidity.ExpiryDate}
                         helperText={getHelperText("ExpiryDate")}
                     />
                 </Grid>
@@ -129,8 +130,8 @@ const CardInformationForm = ({ cardData, handleChange }) => {
                         onChange={handleInputChange}
                         inputProps={{ maxLength: 3 }}
                         sx={{ ...styles.textfields, backgroundColor: "white" }}
+                        error={touched.Cvv && !formValidity.Cvv}
                         helperText={getHelperText("Cvv")}
-                        error={!formValidity.Cvv}
                     />
                 </Grid>
             </Grid>
