@@ -1,10 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardMedia, CardContent, Typography, CardActions } from '@mui/material';
 import FavoriteButton from '../../favorite-button/FavoriteButton';
+import { getLoggedInfo } from '../../../api/services/user/profile/ProfileService';
 
 const SummarizedProduct = ({ product }) => {
     const { idProduct, name, images, price, description, ecoPoints } = product;
     const image = images.length > 0 ? images[0] : 'default-product-image.jpg';
+
+    const [isSeller, setIsSeller] = useState(false);
+
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            const userInfo = await getLoggedInfo();
+            if (userInfo.type === 'seller') {
+                setIsSeller(true);
+            }
+        };
+
+        fetchUserInfo();
+    }, []);
 
     const calculateColor = (points) => {
         const red = 255 * (1 - points / 100);
@@ -38,7 +52,7 @@ const SummarizedProduct = ({ product }) => {
                 sx={{ height: 140, backgroundSize: 'contain' }}
             />
             <CardContent>
-                <FavoriteButton productId={product.id}></FavoriteButton>
+                {isSeller && <FavoriteButton productId={product.id}></FavoriteButton>}
                 <Typography gutterBottom variant="h6" component="div" sx={{ textAlign: 'left' }}>
                     {name}
                 </Typography>
@@ -57,4 +71,5 @@ const SummarizedProduct = ({ product }) => {
         </Card>
     );
 };
+
 export default SummarizedProduct;
