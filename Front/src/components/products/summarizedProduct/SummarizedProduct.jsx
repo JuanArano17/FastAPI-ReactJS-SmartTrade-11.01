@@ -52,7 +52,7 @@ const SummarizedProduct = ({ product }) => {
                 sx={{ height: 140, backgroundSize: 'contain' }}
             />
             <CardContent>
-                {isSeller && <FavoriteButton productId={product.id}></FavoriteButton>}
+                {!isSeller && <FavoriteButton productId={product.id}></FavoriteButton>}
                 <Typography gutterBottom variant="h6" component="div" sx={{ textAlign: 'left' }}>
                     {name}
                 </Typography>
