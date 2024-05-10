@@ -125,7 +125,10 @@ const createExistingSellerProduct = async (productData, id_product, seller_id) =
         price : productData.price,
         shipping_costs : productData.shippingCosts,
         id_product: id_product,
-        sizes: [],
+        sizes: [{
+            size:'',
+            quantity:0,
+        }],
     }
     
     try {

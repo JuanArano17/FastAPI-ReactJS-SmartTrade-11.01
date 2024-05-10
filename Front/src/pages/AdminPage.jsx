@@ -55,6 +55,7 @@ const AdminPage = () => {
                                     <TableCell>ID</TableCell>
                                     <TableCell>Name</TableCell>
                                     <TableCell>Description</TableCell>
+                                    <TableCell>Category</TableCell>
                                     <TableCell>State</TableCell>
                                     <TableCell>Actions</TableCell>
                                 </TableRow>
@@ -65,6 +66,7 @@ const AdminPage = () => {
                                         <TableCell>{product.id}</TableCell>
                                         <TableCell>{product.name}</TableCell>
                                         <TableCell>{product.description}</TableCell>
+                                        <TableCell>{product.category}</TableCell>
                                         <TableCell>{product.state}</TableCell>
                                         <TableCell>
                                             <Button color="primary" onClick={() => handleValidate(product.id)}>validate</Button>
@@ -84,7 +86,6 @@ const AdminPage = () => {
                         />
                     </TableContainer>
                     </Paper>
-                    
                 </Grid>
             </Container>
             <Footer />

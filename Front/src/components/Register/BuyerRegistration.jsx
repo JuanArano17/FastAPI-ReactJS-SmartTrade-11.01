@@ -17,7 +17,7 @@ const formFields = [
     { id: "email", name: "Email", placeholder: "letelier@upv.edu.es*", autoComplete: "email" },
     { id: "dni", name: "DNI", placeholder: "12345678A*" },
     { id: "password", name: "Password", placeholder: "PSW_curso_2023_2024*", autoComplete: "new-password", type: "password" },
-    { id: "billing_address", name: "BillingAddress", placeholder: "Calle nueva 123", autoComplete:""},
+    { id: "billing_address", name: "Billing Address", placeholder: "Calle nueva 123", autoComplete:""},
     { id: "birth_date", name: "Birth date", type: "date" }
 ];
 const BuyerRegistration = () => {

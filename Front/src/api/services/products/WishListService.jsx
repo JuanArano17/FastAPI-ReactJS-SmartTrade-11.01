@@ -2,7 +2,6 @@ import axiosInstance from '../AxiosInstance';
 const getWishItems = async () => {
     try {
         const response = await axiosInstance.get('/wish_list/me');
-        console.log('Los productos del wishlist son:', response);
         return response.data;
     } catch (error) {
         console.error('Error al recuperar productos del wishlist:', error);
@@ -40,7 +39,6 @@ const getWishStatus = async (id_product) => {
         console.log("Empezando getWishStatus:");
         const wishItems = await getWishItems();
         const isInWish = wishItems.some(item => item.seller_product.id === id_product);
-        console.log('Producto está en wishlist:', isInWish);
         return isInWish;
     } catch (error) {
         console.error('Error al recuperar productos del wishlist:', error);

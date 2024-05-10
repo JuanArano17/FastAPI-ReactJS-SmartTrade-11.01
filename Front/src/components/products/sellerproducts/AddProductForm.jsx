@@ -80,10 +80,9 @@ function AddProductForm() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+    const sellerData = await getLoggedInfo();
     if (isNewProduct) {
       try {
-        const sellerData = await getLoggedInfo();
         const newProductData = {
           ...product,
           attributes: Object.keys(product.attributes).reduce((acc, key) => {
@@ -93,7 +92,6 @@ function AddProductForm() {
           images: images
         };
         const response = await createNewProduct(newProductData, product.category, sellerData.id);
-
         if (response && response.data && response.data.id) {
           console.log('Nuevo producto creado:', response.data);
 
@@ -101,6 +99,8 @@ function AddProductForm() {
             ...newProductData,
             productId: response.data.id
           };
+          console.log('seller data', sellerProductData)
+          console.log('seller data', sellerData.id)
           const sellerProductResponse = await createExistingSellerProduct(sellerProductData, sellerData.id);
           console.log('Producto asociado al vendedor con éxito:', sellerProductResponse);
         }
@@ -112,8 +112,7 @@ function AddProductForm() {
       }
     } else {
       try {
-        const sellerData = await getLoggedInfo();
-        const response = await createExistingSellerProduct(product, sellerData.id, sellerData.id);
+        const response = await createExistingSellerProduct(product, sellerData.id);
         console.log('Producto existente añadido:', response);
       } catch (error) {
         console.error('Error al añadir producto existente:', error);
@@ -128,7 +127,7 @@ function AddProductForm() {
   };
   return (
     <Container component="main" maxWidth="sm">
-     <Paper elevation={3} sx={styles.paperContainer}>
+      <Paper elevation={3} sx={styles.paperContainer}>
         <Typography component="h1" variant="h5">
           Add a new product to your list
         </Typography>
@@ -199,7 +198,7 @@ function AddProductForm() {
                 ))}
               </Select>
             </FormControl>
-           
+
             <TextField
               margin="normal"
               required
@@ -260,7 +259,7 @@ function AddProductForm() {
               onChange={handleChange}
               type="number"
             />
-             {product.category && categoryAttributes[product.category].map(attr => (
+            {product.category && categoryAttributes[product.category].map(attr => (
               <TextField
                 key={attr.name}
                 margin="normal"
@@ -305,7 +304,7 @@ function AddProductForm() {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseDialog}  autoFocus>
+            <Button onClick={handleCloseDialog} autoFocus>
               Cerrar
             </Button>
           </DialogActions>

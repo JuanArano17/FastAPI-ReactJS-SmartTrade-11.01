@@ -5,7 +5,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import StarIcon from '@mui/icons-material/Star';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle'; 
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import { Link, useHistory, useLocation } from "react-router-dom";
 import SearchBar from "./searchbar/SearchBar";
@@ -17,7 +17,7 @@ const TopBar = () => {
   const logout = useLogout();
   const isLoggedIn = Boolean(localStorage.getItem('accessToken'));
   const userType = localStorage.getItem('type');
-  console.log("isLoggedIn:", isLoggedIn); 
+  console.log("isLoggedIn:", isLoggedIn);
   console.log("userType:", userType);
   const handleLogoClick = () => {
     history.push("/");
@@ -82,33 +82,19 @@ const TopBar = () => {
         {isLoggedIn && (
           <>
             <SearchBar />
-            <Tooltip title="Your Products">
-              <Button
-                size="large"
-                startIcon={<StorefrontIcon />}
-                variant="text"
-                onClick={handleProductsClick}
-                sx={{
-                  color: buttonColors.products,
-                  fontSize: '1.2em',
-                  ...indicatorStyle('/seller-products')
-                }}
-              >
-              </Button>
-            </Tooltip>
             <Tooltip title="Profile">
-              <Button
-                size="large"
-                startIcon={<AccountCircleIcon />}
-                variant="text"
-                onClick={handleProfileClick}
-                sx={{
-                  color: buttonColors.profile,
-                  fontSize: '1.2em',
-                  ...indicatorStyle('/profile')
-                }}
-              />
-            </Tooltip>
+                  <Button
+                    size="large"
+                    startIcon={<AccountCircleIcon />}
+                    variant="text"
+                    onClick={handleProfileClick}
+                    sx={{
+                      color: buttonColors.profile,
+                      fontSize: '1.2em',
+                      ...indicatorStyle('/profile')
+                    }}
+                  />
+                </Tooltip>
             {userType === 'Buyer' && (
               <>
                 <Tooltip title="View Wish List">
@@ -136,6 +122,24 @@ const TopBar = () => {
                       ...indicatorStyle('/shopping-cart')
                     }}
                   />
+                </Tooltip>
+              </>
+            )}
+            {userType === 'Seller' && (
+              <>
+                <Tooltip title="Your Products">
+                  <Button
+                    size="large"
+                    startIcon={<StorefrontIcon />}
+                    variant="text"
+                    onClick={handleProductsClick}
+                    sx={{
+                      color: buttonColors.products,
+                      fontSize: '1.2em',
+                      ...indicatorStyle('/seller-products')
+                    }}
+                  >
+                  </Button>
                 </Tooltip>
               </>
             )}
