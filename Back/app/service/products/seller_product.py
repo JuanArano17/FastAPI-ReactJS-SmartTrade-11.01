@@ -133,7 +133,8 @@ class SellerProductService:
                     )
                 used_sizes.append(size_data.size)
 
-            product.stock += seller_product.quantity
+            for size in seller_product.sizes:
+                product.stock += size.quantity
 
             seller_product_obj = SellerProduct(
                 **seller_product.model_dump(exclude="sizes"),
@@ -142,6 +143,7 @@ class SellerProductService:
                 eco_points=0,
                 age_restricted=False,
             )
+
             seller_product_obj = self.seller_product_repo.add(seller_product_obj)
 
             for size_data in seller_product.sizes:
