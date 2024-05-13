@@ -32,8 +32,8 @@ from app.schemas.users.types.admin import AdminCreate
 from app.service.users.types.admin import AdminService
 from app.schemas.products.categories.variations.size import SizeCreate
 from app.models.users.in_shopping_cart import InShoppingCart
-from schemas.users.country import CountryCreate
-from service.users.country import CountryService
+from app.schemas.users.country import CountryCreate
+from app.service.users.country import CountryService
 import pycountry
 
 session = get_db()
@@ -81,6 +81,11 @@ country_service = CountryService(session=session)
 admin_service = AdminService(session=session, user_service=user_service)
 
 
+# Clean up the database before populating it
+user_service.delete_all()
+product_service.delete_all()
+country_service.delete_all()
+order_service.delete_all()
 
 # Initialize Faker with a specific seed (for consistency)
 faker = Faker()
@@ -116,7 +121,7 @@ num_approved = 100
 
 all_countries = list(pycountry.countries)
 for country in all_countries:
-    country=CountryCreate(name=country.name)
+    country = CountryCreate(name=country.name)
     country_service.add(country)
 
 admin_service.add(
@@ -127,7 +132,6 @@ admin_service.add(
 
 used_emails = []
 used_dnis = []
-
 
 
 # Create 100 buyers with consistent random data
@@ -246,7 +250,7 @@ for i in range(num_addresses):
     adit_info = faker.text(max_nb_chars=69)
     city = faker.city()
     postal_code = faker.postcode()
-    country =  random.choice(all_countries).name
+    country = random.choice(all_countries).name
     default = random.choice([True, False])
 
     # Create a AddressCreate object
@@ -385,7 +389,7 @@ for _ in range(num_clothes):
         "stock": stock,
         "materials": materials,
         "type": type,
-        #"size": size,
+        # "size": size,
     }
 
     # Add the product to the session
@@ -610,37 +614,36 @@ for _ in range(num_seller_products):
         id_product = random.choice(product_ids)
     used_product_ids.add(id_product)
 
-
     quantity = random.randint(11, 100)
     price = round(random.uniform(1.0, 100.0), 2)
-    remaining_quantity=quantity
+    remaining_quantity = quantity
     shipping_costs = round(random.uniform(1.0, 20.0), 2)
-    product=product_service.get_by_id(id_product)
-    sizes=[]
-    if(product.__class__.__name__=="Clothes"):
-        i=0
-        used_choices=[]
-        options=["XS", "S", "M", "L", "XL", "XXL", "XXXL","XXXXL"]
+    product = product_service.get_by_id(id_product)
+    sizes = []
+    if product.__class__.__name__ == "Clothes":
+        i = 0
+        used_choices = []
+        options = ["XS", "S", "M", "L", "XL", "XXL", "XXXL", "XXXXL"]
         while remaining_quantity > 0:
             size = random.choice(options)
-            while(size in used_choices):
+            while size in used_choices:
                 size = random.choice(options)
             used_choices.append(size)
             quantity_per_size = random.randint(1, remaining_quantity)
-            if(len(used_choices)==len(options)):
+            if len(used_choices) == len(options):
                 quantity_per_size = remaining_quantity
             sizes.append(SizeCreate(size=size, quantity=quantity_per_size).model_dump())
             remaining_quantity -= quantity_per_size
-    
+
     seller_product = SellerProductCreate(
-            quantity=quantity,
-            price=price,
-            shipping_costs=shipping_costs,
-            id_product=id_product,
-            sizes=sizes
-        )
+        quantity=quantity,
+        price=price,
+        shipping_costs=shipping_costs,
+        id_product=id_product,
+        sizes=sizes,
+    )
     # Add the seller product to the session
-    seller_product=seller_product_serv.add(
+    seller_product = seller_product_serv.add(
         id_seller=random.choice(seller_ids), seller_product=seller_product
     )
 
@@ -680,40 +683,40 @@ for _ in range(num_cart_items):
 
     # Choose a buyer ID
     id_buyer = random.choice(buyer_ids)
-    counter=0
+    counter = 0
     while in_shopping_cart_service.cart_repo.get_where(
-        InShoppingCart.id_buyer==id_buyer, InShoppingCart.id_seller_product==id_seller_product
+        InShoppingCart.id_buyer == id_buyer,
+        InShoppingCart.id_seller_product == id_seller_product,
     ):
         id_buyer = random.choice(buyer_ids)
-    
+
     # Create an InShoppingCart object
     in_shopping_cart = InShoppingCartCreate(
         id_seller_product=id_seller_product, quantity=quantity
     )
     # Add the in shopping cart item to the session
 
-    seller_product=seller_product_serv.get_by_id(id_seller_product)
+    seller_product = seller_product_serv.get_by_id(id_seller_product)
 
-    id_size=None
-    if(seller_product.sizes!=[]):
-        size_ids=[]
+    id_size = None
+    if seller_product.sizes != []:
+        size_ids = []
         for size in seller_product.sizes:
             size_ids.append(size.id)
 
-        id_size=random.choice(size_ids)
-        random_size=seller_product_serv.size_repo.get_by_id(id_size)
-        while random_size.quantity<quantity:
-            id_size=random.choice(size_ids)
-            random_size=seller_product_serv.size_repo.get_by_id(id_size)
+        id_size = random.choice(size_ids)
+        random_size = seller_product_serv.size_repo.get_by_id(id_size)
+        while random_size.quantity < quantity:
+            id_size = random.choice(size_ids)
+            random_size = seller_product_serv.size_repo.get_by_id(id_size)
         in_shopping_cart_service.add(
-        id_buyer=id_buyer, shopping_cart_product=in_shopping_cart, id_size=id_size
+            id_buyer=id_buyer, shopping_cart_product=in_shopping_cart, id_size=id_size
         )
     else:
         in_shopping_cart_service.add(
-        id_buyer=id_buyer, shopping_cart_product=in_shopping_cart
+            id_buyer=id_buyer, shopping_cart_product=in_shopping_cart
         )
 
-    
 
 for _ in range(num_list_items):
     # Choose a buyer ID
