@@ -449,6 +449,125 @@ def test_get_approved_seller_products(
         seller_product["id"] for seller_product in content
     ]
 
+def test_get_admin_seller_products(
+    client: TestClient,
+    db: Session,
+    product_service: ProductService,
+    seller_service: SellerService,
+    seller_product_service: SellerProductService
+):
+    data = fake_book()
+    product = product_service.add("book", data)
+
+    data = fake_book()
+    data["name"] = "Book2"
+    product2 = product_service.add("book", data)
+
+    data = fake_seller()
+    seller1 = seller_service.add(SellerCreate(**data))
+
+    data["cif"] = "H31002655"
+    data["email"] = "lucas@gmail.com"
+
+    seller2 = seller_service.add(SellerCreate(**data))
+
+    data["cif"] = "F31002655"
+    data["email"] = "victor@gmail.com"
+
+    data = fake_seller_product()
+    data["id_product"] = product.id
+    seller_product = seller_product_service.add(seller1.id, SellerProductCreate(**data))
+    data={"state": "Approved", "eco_points": 99, "age_restricted": False}
+    seller_product = seller_product_service.update(seller_product.id, SellerProductUpdate(**data))
+
+    data = fake_seller_product()
+    data["id_product"] = product2.id
+    seller_product2 = seller_product_service.add(
+        seller2.id, SellerProductCreate(**data)
+    )
+    data={"state": "Rejected", "justification": "ej"}
+    seller_product2 = seller_product_service.update(seller_product2.id, SellerProductUpdate(**data))
+
+    data = fake_seller_product()
+    data["id_product"] = product.id
+    seller_product3 = seller_product_service.add(
+        seller2.id, SellerProductCreate(**data)
+    )
+
+    response = client.get(f"/admin/seller-products/")
+    assert response.status_code == status.HTTP_200_OK
+    content = response.json()
+    
+    assert len(content) == 1
+    assert seller_product3.id in [
+        seller_product["id"] for seller_product in content
+    ]
+
+def test_get_my_seller_products(
+    client: TestClient,
+    db: Session,
+    product_service: ProductService,
+    seller_service: SellerService,
+    seller_product_service: SellerProductService
+):
+    data = fake_book()
+    product = product_service.add("book", data)
+
+    data = fake_book()
+    data["name"] = "Book2"
+    product2 = product_service.add("book", data)
+
+    data = fake_seller()
+    seller1 = seller_service.add(SellerCreate(**data))
+
+    data["cif"] = "H31002655"
+    data["email"] = "lucas@gmail.com"
+
+    seller2 = seller_service.add(SellerCreate(**data))
+
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    data = fake_seller_product()
+    data["id_product"] = product.id
+    seller_product = seller_product_service.add(seller1.id, SellerProductCreate(**data))
+    data={"state": "Approved", "eco_points": 99, "age_restricted": False}
+    seller_product = seller_product_service.update(seller_product.id, SellerProductUpdate(**data))
+
+    data = fake_seller_product()
+    data["id_product"] = product2.id
+    seller_product2 = seller_product_service.add(
+        seller2.id, SellerProductCreate(**data)
+    )
+    data={"state": "Approved", "eco_points": 69, "age_restricted": True}
+    seller_product2 = seller_product_service.update(seller_product2.id, SellerProductUpdate(**data))
+
+    data = fake_seller_product()
+    data["id_product"] = product.id
+    seller_product3 = seller_product_service.add(
+        seller2.id, SellerProductCreate(**data)
+    )
+    data={"state": "Rejected", "justification":"ej"}
+    seller_product3 = seller_product_service.update(seller_product3.id, SellerProductUpdate(**data))
+    response = client.get(f"/seller_products/me/", headers=headers)
+    content = response.json()
+    print(content)
+    assert response.status_code == status.HTTP_200_OK
+    
+    
+    assert len(content) == 2
+    assert seller_product2.id in [
+        seller_product["id"] for seller_product in content
+    ]
+    assert seller_product3.id in [
+        seller_product["id"] for seller_product in content
+    ]
+
 def test_get_seller_products_from_product(
     client: TestClient,
     db: Session,
@@ -504,6 +623,71 @@ def test_get_seller_products_from_product(
     assert seller_product3.id in [
         seller_product["id"] for seller_product in content
     ]
+
+
+def test_delete_seller_products_from_product(
+    client: TestClient,
+    db: Session,
+    product_service: ProductService,
+    seller_service: SellerService,
+    seller_product_service: SellerProductService
+):
+    data = fake_book()
+    product = product_service.add("book", data)
+
+    data = fake_book()
+    data["name"] = "Book2"
+    product2 = product_service.add("book", data)
+
+    data = fake_seller()
+    seller1 = seller_service.add(SellerCreate(**data))
+
+    data["cif"] = "H31002655"
+    data["email"] = "lucas@gmail.com"
+
+    seller2 = seller_service.add(SellerCreate(**data))
+
+    data["cif"] = "F31002655"
+    data["email"] = "victor@gmail.com"
+
+    data = fake_seller_product()
+    data["id_product"] = product.id
+    seller_product = seller_product_service.add(seller1.id, SellerProductCreate(**data))
+    seller_product_id = seller_product.id
+    data={"state": "Approved", "eco_points": 99, "age_restricted": False}
+    seller_product = seller_product_service.update(seller_product.id, SellerProductUpdate(**data))
+
+    data = fake_seller_product()
+    data["id_product"] = product2.id
+    seller_product2 = seller_product_service.add(
+        seller2.id, SellerProductCreate(**data)
+    )
+    data={"state": "Approved", "eco_points": 69, "age_restricted": True}
+    seller_product2 = seller_product_service.update(seller_product2.id, SellerProductUpdate(**data))
+    seller_product2_id = seller_product2.id
+
+    data = fake_seller_product()
+    data["id_product"] = product.id
+    seller_product3 = seller_product_service.add(
+        seller2.id, SellerProductCreate(**data)
+    )
+    seller_product3_id = seller_product3.id
+
+    response = client.delete(f"/product/{product.id}/seller_products")
+    assert response.status_code == status.HTTP_200_OK
+    content = response.json()
+    assert content is None or content == {}
+
+    seller_product1 = client.get(f"/seller_products/{seller_product_id}")
+    assert seller_product1.status_code == status.HTTP_404_NOT_FOUND
+    seller_product3 = client.get(f"/seller_products/{seller_product3_id}")
+    assert seller_product3.status_code == status.HTTP_404_NOT_FOUND
+    #seller_product2 = client.get(f"/seller_products/{seller_product2_id}")
+    #assert seller_product_service.get_by_id(seller_product_id)==f"Seller product with id {seller_product_id} not found."
+    #assert seller_product_service.get_by_id(seller_product3_id)==f"Seller product with id {seller_product3_id} not found."
+    assert seller_product_service.get_by_id(seller_product2_id).id==seller_product2_id
+    
+
 
 def test_approve_seller_product(
     client: TestClient,
