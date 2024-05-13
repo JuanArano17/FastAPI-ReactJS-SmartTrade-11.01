@@ -892,3 +892,408 @@ def test_delete_seller_product_not_found(
     content = response.json()
     assert content["detail"] == "Seller product with id 999 not found."
 
+
+def test_update_seller_product (
+    client: TestClient,
+    product_service: ProductService,
+    seller_service: SellerService,
+    seller_product_service: SellerProductService,
+    db: Session,
+):
+
+    data = fake_seller()
+    seller = seller_service.add(SellerCreate(**data))
+
+    data = fake_book()
+    product = product_service.add("book", data)
+    init_data = fake_seller_product()
+    init_data["id_product"] = product.id
+    seller_product = seller_product_service.add(seller.id, SellerProductCreate(**init_data))
+    old_stock=product.stock
+    update_data={
+        "quantity": 4,
+        "price": 7,
+        "shipping_costs": 1,
+        "state": "Approved",
+        "eco_points": 13,
+        "age_restricted": True
+    }
+    
+    response = client.put(f"/seller_products/{seller_product.id}", json=update_data)
+    content = response.json()
+    assert response.status_code == status.HTTP_200_OK
+
+    assert "id" in content
+    assert content["id"] == seller_product.id
+    assert content["id_product"] == product.id
+    assert content["id_seller"] == seller.id
+    assert content["price"] == update_data["price"]
+    assert content["shipping_costs"] == update_data["shipping_costs"]
+    assert content["quantity"] == update_data["quantity"]
+    assert content["sizes"] == []
+
+    id=content["id"]
+    seller_product = seller_product_service.get_by_id_full(
+       id
+    )
+
+    seller_product = client.get(f"/seller_products/{id}")
+    seller_product=seller_product.json()
+    assert seller_product is not None
+    assert seller_product["id"] == content["id"] 
+    assert seller_product["quantity"] == content["quantity"]
+    assert seller_product["id_product"] == content["id_product"]
+    assert seller_product["id_seller"] == content["id_seller"] 
+    assert seller_product["state"] == update_data["state"]
+    assert "description" not in seller_product
+    assert seller_product["justification"] == ""
+    assert seller_product["age_restricted"] == update_data["age_restricted"]
+    assert seller_product["name"] == product.name 
+    assert seller_product["spec_sheet"] == product.spec_sheet 
+    assert seller_product["eco_points"] == update_data["eco_points"]
+    assert seller_product["stock"] != product.stock 
+    assert seller_product["author"] == product.author
+    assert seller_product["pages"] == product.pages
+    assert seller_product["category"] == product.category
+    assert seller_product["images"] == product.images
+    assert seller_product["price"] == update_data["price"]
+    assert seller_product["shipping_costs"] == update_data["shipping_costs"]
+    assert seller_product["quantity"] == update_data["quantity"] 
+    assert "sizes" not in seller_product
+
+
+    updated_product = client.get(f"/products/{product.id}")
+    updated_product=updated_product.json()
+
+    assert updated_product["stock"]== old_stock - init_data["quantity"] + update_data["quantity"]
+    
+def test_update_seller_product_not_clothes_with_sizes(
+    client: TestClient,
+    product_service: ProductService,
+    seller_service: SellerService,
+    seller_product_service: SellerProductService,
+    db: Session,
+):
+
+    data = fake_seller()
+    seller = seller_service.add(SellerCreate(**data))
+
+    data = fake_book()
+    product = product_service.add("book", data)
+    init_data = fake_seller_product()
+    init_data["id_product"] = product.id
+    seller_product = seller_product_service.add(seller.id, SellerProductCreate(**init_data))
+    update_data={
+        "quantity": 4,
+        "price": 7,
+        "shipping_costs": 1,
+        "state": "Approved",
+        "eco_points": 13,
+        "age_restricted": True
+    }
+
+    update_data["sizes"] = [{"size":"XL", "quantity": 3}, {"size":"L", "quantity":2}]
+    response = client.put(f"/seller_products/{seller_product.id}", json=update_data)
+    content = response.json()
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert content["detail"] == "Seller products of this category cannot have sizes"
+    
+def test_update_seller_product_clothes (
+    client: TestClient,
+    product_service: ProductService,
+    seller_service: SellerService,
+    seller_product_service: SellerProductService,
+    db: Session,
+):
+
+    data = fake_seller()
+    seller = seller_service.add(SellerCreate(**data))
+
+    data = fake_clothes()
+    product = product_service.add("clothes", data)
+    init_data = fake_seller_product()
+    init_data["id_product"] = product.id
+    init_data["sizes"] = [{"size":"XL", "quantity": 3}, {"size":"L", "quantity":2}]
+    init_data["quantity"] = None
+    seller_product = seller_product_service.add(seller.id, SellerProductCreate(**init_data))
+    old_stock=product.stock
+    update_data={
+        "price": 7,
+        "shipping_costs": 1,
+        "state": "Approved",
+        "eco_points": 13,
+        "age_restricted": True
+    }
+    
+    response = client.put(f"/seller_products/{seller_product.id}", json=update_data)
+    content = response.json()
+    assert response.status_code == status.HTTP_200_OK
+
+    assert "id" in content
+    assert content["id"] == seller_product.id
+    assert content["id_product"] == product.id
+    assert content["id_seller"] == seller.id
+    assert content["price"] == update_data["price"]
+    assert content["shipping_costs"] == update_data["shipping_costs"]
+    assert content["quantity"] == init_data["sizes"][0]["quantity"]+init_data["sizes"][1]["quantity"]
+    assert content["sizes"] != []
+    assert content["sizes"][0]["quantity"]==init_data["sizes"][0]["quantity"]
+    assert content["sizes"][0]["size"]==init_data["sizes"][0]["size"]
+    assert content["sizes"][1]["quantity"]==init_data["sizes"][1]["quantity"]
+    assert content["sizes"][1]["size"]==init_data["sizes"][1]["size"]
+
+    id=content["id"]
+    seller_product = seller_product_service.get_by_id_full(
+       id
+    )
+
+    seller_product = client.get(f"/seller_products/{id}")
+    seller_product=seller_product.json()
+    assert seller_product is not None
+    assert seller_product["id"] == content["id"] 
+    assert seller_product["quantity"] == content["quantity"]
+    assert seller_product["id_product"] == content["id_product"]
+    assert seller_product["id_seller"] == content["id_seller"] 
+    assert seller_product["state"] == update_data["state"]
+    assert "description" not in seller_product
+    assert seller_product["justification"] == ""
+    assert seller_product["age_restricted"] == update_data["age_restricted"]
+    assert seller_product["name"] == product.name 
+    assert seller_product["spec_sheet"] == product.spec_sheet 
+    assert seller_product["eco_points"] == update_data["eco_points"]
+    assert seller_product["stock"] == product.stock 
+    assert seller_product["materials"] == product.materials
+    assert seller_product["type"] == product.type
+    assert seller_product["category"] == product.category
+    assert seller_product["images"] == product.images
+    assert seller_product["price"] == update_data["price"]
+    assert seller_product["shipping_costs"] == update_data["shipping_costs"]
+    assert seller_product["quantity"] == content["quantity"] 
+    assert "sizes" in seller_product
+    assert seller_product["sizes"][0]["quantity"]==content["sizes"][0]["quantity"]
+    assert seller_product["sizes"][0]["size"]==content["sizes"][0]["size"]
+    assert seller_product["sizes"][1]["quantity"]==content["sizes"][1]["quantity"]
+    assert seller_product["sizes"][1]["size"]==content["sizes"][1]["size"]
+
+def test_update_seller_product_clothes_with_sizes(
+    client: TestClient,
+    product_service: ProductService,
+    seller_service: SellerService,
+    seller_product_service: SellerProductService,
+    db: Session,
+):
+
+    data = fake_seller()
+    seller = seller_service.add(SellerCreate(**data))
+
+    data = fake_clothes()
+    product = product_service.add("clothes", data)
+    init_data = fake_seller_product()
+    init_data["id_product"] = product.id
+    init_data["sizes"] = [{"size":"XL", "quantity": 3}, {"size":"L", "quantity":2}]
+    init_data["quantity"] = None
+    seller_product = seller_product_service.add(seller.id, SellerProductCreate(**init_data))
+    old_stock=product.stock
+    update_data={
+        "price": 7,
+        "shipping_costs": 1,
+        "state": "Approved",
+        "eco_points": 13,
+        "age_restricted": True
+    }
+    update_data["sizes"]= [{"size":"XL", "quantity": 4}, {"size":"L", "quantity":1},{"size":"M", "quantity":3}]
+    
+    response = client.put(f"/seller_products/{seller_product.id}", json=update_data)
+    content = response.json()
+    assert response.status_code == status.HTTP_200_OK
+
+    assert "id" in content
+    assert content["id"] == seller_product.id
+    assert content["id_product"] == product.id
+    assert content["id_seller"] == seller.id
+    assert content["price"] == update_data["price"]
+    assert content["shipping_costs"] == update_data["shipping_costs"]
+    assert content["quantity"] == update_data["sizes"][0]["quantity"]+update_data["sizes"][1]["quantity"]+update_data["sizes"][2]["quantity"]
+    assert content["sizes"] != []
+    assert content["sizes"][0]["quantity"]==update_data["sizes"][0]["quantity"]
+    assert content["sizes"][0]["size"]==update_data["sizes"][0]["size"]
+    assert content["sizes"][1]["quantity"]==update_data["sizes"][1]["quantity"]
+    assert content["sizes"][1]["size"]==update_data["sizes"][1]["size"]
+    assert content["sizes"][2]["quantity"]==update_data["sizes"][2]["quantity"]
+    assert content["sizes"][2]["size"]==update_data["sizes"][2]["size"]
+
+    id=content["id"]
+    seller_product = seller_product_service.get_by_id_full(
+       id
+    )
+
+    seller_product = client.get(f"/seller_products/{id}")
+    seller_product=seller_product.json()
+    assert seller_product is not None
+    assert seller_product["id"] == content["id"] 
+    assert seller_product["quantity"] == content["quantity"]
+    assert seller_product["id_product"] == content["id_product"]
+    assert seller_product["id_seller"] == content["id_seller"] 
+    assert seller_product["state"] == update_data["state"]
+    assert "description" not in seller_product
+    assert seller_product["justification"] == ""
+    assert seller_product["age_restricted"] == update_data["age_restricted"]
+    assert seller_product["name"] == product.name 
+    assert seller_product["spec_sheet"] == product.spec_sheet 
+    assert seller_product["eco_points"] == update_data["eco_points"]
+    assert seller_product["stock"] != product.stock 
+    assert seller_product["materials"] == product.materials
+    assert seller_product["type"] == product.type
+    assert seller_product["category"] == product.category
+    assert seller_product["images"] == product.images
+    assert seller_product["price"] == update_data["price"]
+    assert seller_product["shipping_costs"] == update_data["shipping_costs"]
+    assert seller_product["quantity"] == content["quantity"] 
+    assert "sizes" in seller_product
+    assert seller_product["sizes"][0]["quantity"]==content["sizes"][0]["quantity"]
+    assert seller_product["sizes"][0]["size"]==content["sizes"][0]["size"]
+    assert seller_product["sizes"][1]["quantity"]==content["sizes"][1]["quantity"]
+    assert seller_product["sizes"][1]["size"]==content["sizes"][1]["size"]
+    assert seller_product["sizes"][2]["quantity"]==content["sizes"][2]["quantity"]
+    assert seller_product["sizes"][2]["size"]==content["sizes"][2]["size"]
+    
+    updated_product = client.get(f"/products/{product.id}")
+    updated_product=updated_product.json()
+
+    assert updated_product["stock"] == old_stock - init_data["sizes"][0]["quantity"] - init_data["sizes"][1]["quantity"] + update_data["sizes"][0]["quantity"] + update_data["sizes"][1]["quantity"] + update_data["sizes"][2]["quantity"]
+
+
+def test_update_seller_product_clothes_only_sizes(
+    client: TestClient,
+    product_service: ProductService,
+    seller_service: SellerService,
+    seller_product_service: SellerProductService,
+    db: Session,
+):
+
+    data = fake_seller()
+    seller = seller_service.add(SellerCreate(**data))
+
+    data = fake_clothes()
+    product = product_service.add("clothes", data)
+    init_data = fake_seller_product()
+    init_data["id_product"] = product.id
+    init_data["sizes"] = [{"size":"XL", "quantity": 3}, {"size":"L", "quantity":2}]
+    init_data["quantity"] = None
+    seller_product = seller_product_service.add(seller.id, SellerProductCreate(**init_data))
+    old_stock=product.stock
+    update_data={}
+    update_data["sizes"]= [{"size":"XL", "quantity": 4}, {"size":"L", "quantity":1},{"size":"M", "quantity":3}]
+    
+    response = client.put(f"/seller_products/{seller_product.id}", json=update_data)
+    content = response.json()
+    assert response.status_code == status.HTTP_200_OK
+
+    assert "id" in content
+    assert content["id"] == seller_product.id
+    assert content["id_product"] == product.id
+    assert content["id_seller"] == seller.id
+    assert content["price"] == init_data["price"]
+    assert content["shipping_costs"] == init_data["shipping_costs"]
+    assert content["quantity"] == update_data["sizes"][0]["quantity"]+update_data["sizes"][1]["quantity"]+update_data["sizes"][2]["quantity"]
+    assert content["sizes"] != []
+    assert content["sizes"][0]["quantity"]==update_data["sizes"][0]["quantity"]
+    assert content["sizes"][0]["size"]==update_data["sizes"][0]["size"]
+    assert content["sizes"][1]["quantity"]==update_data["sizes"][1]["quantity"]
+    assert content["sizes"][1]["size"]==update_data["sizes"][1]["size"]
+    assert content["sizes"][2]["quantity"]==update_data["sizes"][2]["quantity"]
+    assert content["sizes"][2]["size"]==update_data["sizes"][2]["size"]
+
+    id=content["id"]
+    seller_product = seller_product_service.get_by_id_full(
+       id
+    )
+
+    seller_product = client.get(f"/seller_products/{id}")
+    seller_product=seller_product.json()
+    assert seller_product is not None
+    assert seller_product["id"] == content["id"] 
+    assert seller_product["quantity"] == content["quantity"]
+    assert seller_product["id_product"] == content["id_product"]
+    assert seller_product["id_seller"] == content["id_seller"] 
+    assert seller_product["state"] == "Pending"
+    assert "description" not in seller_product
+    assert "justification" not in seller_product
+    assert seller_product["age_restricted"] == False
+    assert seller_product["name"] == product.name 
+    assert seller_product["spec_sheet"] == product.spec_sheet 
+    assert seller_product["eco_points"] == 0
+    assert seller_product["stock"] != product.stock 
+    assert seller_product["materials"] == product.materials
+    assert seller_product["type"] == product.type
+    assert seller_product["category"] == product.category
+    assert seller_product["images"] == product.images
+    assert seller_product["price"] == init_data["price"]
+    assert seller_product["shipping_costs"] == init_data["shipping_costs"]
+    assert seller_product["quantity"] == content["quantity"] 
+    assert "sizes" in seller_product
+    assert seller_product["sizes"][0]["quantity"]==content["sizes"][0]["quantity"]
+    assert seller_product["sizes"][0]["size"]==content["sizes"][0]["size"]
+    assert seller_product["sizes"][1]["quantity"]==content["sizes"][1]["quantity"]
+    assert seller_product["sizes"][1]["size"]==content["sizes"][1]["size"]
+    assert seller_product["sizes"][2]["quantity"]==content["sizes"][2]["quantity"]
+    assert seller_product["sizes"][2]["size"]==content["sizes"][2]["size"]
+
+    updated_product = client.get(f"/products/{product.id}")
+    updated_product=updated_product.json()
+
+    assert updated_product["stock"] == old_stock - init_data["sizes"][0]["quantity"] - init_data["sizes"][1]["quantity"] + update_data["sizes"][0]["quantity"] + update_data["sizes"][1]["quantity"] + update_data["sizes"][2]["quantity"]
+
+def test_update_seller_product_clothes_repeat_sizes(
+    client: TestClient,
+    product_service: ProductService,
+    seller_service: SellerService,
+    seller_product_service: SellerProductService,
+    db: Session,
+):
+
+    data = fake_seller()
+    seller = seller_service.add(SellerCreate(**data))
+
+    data = fake_clothes()
+    product = product_service.add("clothes", data)
+    init_data = fake_seller_product()
+    init_data["id_product"] = product.id
+    init_data["sizes"] = [{"size":"XL", "quantity": 3}, {"size":"L", "quantity":2}]
+    init_data["quantity"] = None
+    seller_product = seller_product_service.add(seller.id, SellerProductCreate(**init_data))
+    old_stock=product.stock
+    update_data={}
+    update_data["sizes"]= [{"size":"XL", "quantity": 4}, {"size":"L", "quantity":1},{"size":"M", "quantity":3}, {"size":"L", "quantity":9}]
+    
+    response = client.put(f"/seller_products/{seller_product.id}", json=update_data)
+    content = response.json()
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert content["detail"] == "There can't be repeat sizes for the same clothing item"
+
+def test_update_seller_product_clothes_with_quantity(
+    client: TestClient,
+    product_service: ProductService,
+    seller_service: SellerService,
+    seller_product_service: SellerProductService,
+    db: Session,
+):
+
+    data = fake_seller()
+    seller = seller_service.add(SellerCreate(**data))
+
+    data = fake_clothes()
+    product = product_service.add("clothes", data)
+    init_data = fake_seller_product()
+    init_data["id_product"] = product.id
+    init_data["sizes"] = [{"size":"XL", "quantity": 3}, {"size":"L", "quantity":2}]
+    init_data["quantity"] = None
+    seller_product = seller_product_service.add(seller.id, SellerProductCreate(**init_data))
+    old_stock=product.stock
+    update_data={"quantity": 200}
+    update_data["sizes"]= [{"size":"XL", "quantity": 4}, {"size":"L", "quantity":1},{"size":"M", "quantity":3}]
+    
+    response = client.put(f"/seller_products/{seller_product.id}", json=update_data)
+    content = response.json()
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert content["detail"] == "Only update size quantities for clothing objects"

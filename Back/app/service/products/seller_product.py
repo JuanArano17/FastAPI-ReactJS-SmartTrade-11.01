@@ -273,13 +273,13 @@ class SellerProductService:
         current_state.handle(new_data)
         if new_data.sizes and product.__class__.__name__ != "Clothes":
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="Seller products of this category cannot have sizes",
             )
 
         if new_data.quantity and product.__class__.__name__ == "Clothes":
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="Only update size quantities for clothing objects",
             )
 
@@ -305,6 +305,7 @@ class SellerProductService:
                             new_data.quantity - size[0].quantity + size_data.quantity
                         )
                         self.size_repo.update(size[0], size_data)
+                        seller_product.notify_observers(new_quantity=size_data.quantity, id_size=size[0].id)
                     else:
                         new_data.quantity = new_data.quantity + size_data.quantity
                         size_data = SizeCreate(**size_data.model_dump())

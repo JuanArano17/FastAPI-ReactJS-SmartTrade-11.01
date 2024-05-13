@@ -505,3 +505,5 @@ def test_delete_shopping_cart(
 
     # wish_list = db.execute(select(InWishList).where(InWishList.id_seller_product == seller_product.id and InWishList.id_buyer == buyer.id)).all()
     # assert len(wish_list) == 0
+
+    #test observer pattern
