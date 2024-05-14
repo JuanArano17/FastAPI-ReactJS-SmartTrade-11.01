@@ -87,7 +87,7 @@ class InShoppingCartService:
 
             if(not size):
                 raise HTTPException(
-                            status_code=status.HTTP_400_BAD_REQUEST,
+                            status_code=status.HTTP_404_NOT_FOUND,
                             detail="Could not find size",
                             )
 
