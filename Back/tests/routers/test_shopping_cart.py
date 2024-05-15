@@ -1052,4 +1052,200 @@ def test_delete_shopping_cart(
     # wish_list = db.execute(select(InWishList).where(InWishList.id_seller_product == seller_product.id and InWishList.id_buyer == buyer.id)).all()
     # assert len(wish_list) == 0
 
-    #test observer pattern
+def test_observer_pattern(
+    client: TestClient,
+    buyer_service: BuyerService,
+    product_service: ProductService,
+    seller_service: SellerService,
+    seller_product_service: SellerProductService,
+    shopping_cart_service: InShoppingCartService,
+    db: Session,
+):
+    data = fake_buyer()
+    buyer = buyer_service.add(BuyerCreate(**data))
+
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    data = fake_seller()
+    seller = seller_service.add(SellerCreate(**data))
+
+    data = fake_book()
+    product = product_service.add("book", data)
+
+    data = fake_seller_product()
+    data["id_product"] = product.id
+    seller_product = seller_product_service.add(seller.id, SellerProductCreate(**data))
+
+    shopping_cart_item = {"id_seller_product": seller_product.id, "quantity": 2}
+
+    response = client.post(f"/shopping_cart/me", json=shopping_cart_item, headers=headers)
+    assert response.status_code == status.HTTP_200_OK
+    content1 = response.json()
+
+    data = fake_buyer()
+    data["email"]="me@gmail.com"
+    data["dni"]="47763177N"
+    buyer = buyer_service.add(BuyerCreate(**data))
+
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    response = client.post(f"/shopping_cart/me", json=shopping_cart_item, headers=headers)
+    assert response.status_code == status.HTTP_200_OK
+    content2 = response.json()
+
+    data = fake_book()
+    product = product_service.add("book", data)
+
+    data = fake_seller_product()
+    data["id_product"] = product.id
+    seller_product2 = seller_product_service.add(seller.id, SellerProductCreate(**data))
+
+    shopping_cart_item = {"id_seller_product": seller_product2.id, "quantity": 2}
+    response = client.post(f"/shopping_cart/me", json=shopping_cart_item, headers=headers)
+    assert response.status_code == status.HTTP_200_OK
+    content3 = response.json()
+
+    data = fake_seller_product()
+    data["id_product"] = product.id
+    data["quantity"] = 1
+    seller_product = seller_product_service.update(
+        seller_product.id, SellerProductUpdate(**data)
+    )
+
+    shopping_cart_item = shopping_cart_service.get_by_id(
+        content1["id"]
+    )
+    assert shopping_cart_item is not None
+    assert shopping_cart_item.id_buyer == shopping_cart_item.id_buyer
+    assert shopping_cart_item.id_seller_product == seller_product.id
+    assert shopping_cart_item.quantity == seller_product.quantity
+
+    shopping_cart_item = shopping_cart_service.get_by_id(
+        content2["id"]
+    )
+    assert shopping_cart_item is not None
+    assert shopping_cart_item.id_buyer == shopping_cart_item.id_buyer
+    assert shopping_cart_item.id_seller_product == seller_product.id
+    assert shopping_cart_item.quantity == seller_product.quantity
+
+    shopping_cart_item = shopping_cart_service.get_by_id(
+        content3["id"]
+    )
+    assert shopping_cart_item is not None
+    assert shopping_cart_item.id_buyer == shopping_cart_item.id_buyer
+    assert shopping_cart_item.id_seller_product == seller_product2.id
+    assert shopping_cart_item.quantity != seller_product.quantity
+    assert shopping_cart_item.quantity == content3["quantity"]
+
+
+def test_observer_pattern_clothes(
+    client: TestClient,
+    buyer_service: BuyerService,
+    product_service: ProductService,
+    seller_service: SellerService,
+    seller_product_service: SellerProductService,
+    shopping_cart_service: InShoppingCartService,
+    db: Session,
+):
+    data = fake_buyer()
+    buyer = buyer_service.add(BuyerCreate(**data))
+
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    data = fake_seller()
+    seller = seller_service.add(SellerCreate(**data))
+
+    data = fake_clothes()
+    product = product_service.add("clothes", data)
+
+    data = fake_seller_product()
+    data["id_product"] = product.id
+    data["sizes"] = [{"size":"XL", "quantity": 3}, {"size":"L", "quantity":2}]
+    seller_product = seller_product_service.add(seller.id, SellerProductCreate(**data))
+
+    shopping_cart_item = {"id_seller_product": seller_product.id, "quantity": 2}
+    id_s=seller_product.sizes[0].id
+    response = client.post(f"/shopping_cart/me/?id_size={id_s}", json=shopping_cart_item, headers=headers)
+    assert response.status_code == status.HTTP_200_OK
+    content1 = response.json()
+
+    data = fake_buyer()
+    data["email"]="me@gmail.com"
+    data["dni"]="47763177N"
+    buyer = buyer_service.add(BuyerCreate(**data))
+
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    response = client.post(f"/shopping_cart/me/?id_size={id_s}", json=shopping_cart_item, headers=headers)
+    assert response.status_code == status.HTTP_200_OK
+    content2 = response.json()
+
+    data = fake_clothes()
+    product = product_service.add("clothes", data)
+
+    data = fake_seller_product()
+    data["id_product"] = product.id
+    data["sizes"] = [{"size":"XL", "quantity": 3}, {"size":"L", "quantity":2}]
+    seller_product2 = seller_product_service.add(seller.id, SellerProductCreate(**data))
+
+    shopping_cart_item = {"id_seller_product": seller_product2.id, "quantity": 2}
+    id_s=seller_product2.sizes[0].id
+    response = client.post(f"/shopping_cart/me/?id_size={id_s}", json=shopping_cart_item, headers=headers)
+    assert response.status_code == status.HTTP_200_OK
+    content3 = response.json()
+
+    data = {}
+    data["sizes"] = [{"size":"XL", "quantity":1}]
+    seller_product = seller_product_service.update(
+        seller_product.id, SellerProductUpdate(**data)
+    )
+
+    shopping_cart_item = shopping_cart_service.get_by_id(
+        content1["id"]
+    )
+    assert shopping_cart_item is not None
+    assert shopping_cart_item.id_buyer == shopping_cart_item.id_buyer
+    assert shopping_cart_item.id_seller_product == seller_product.id
+    assert shopping_cart_item.quantity == seller_product.sizes[1].quantity 
+    #we use index one because updated sizes become the last of the list
+
+    shopping_cart_item = shopping_cart_service.get_by_id(
+        content2["id"]
+    )
+    assert shopping_cart_item is not None
+    assert shopping_cart_item.id_buyer == shopping_cart_item.id_buyer
+    assert shopping_cart_item.id_seller_product == seller_product.id
+    assert shopping_cart_item.quantity == seller_product.sizes[1].quantity
+
+    shopping_cart_item = shopping_cart_service.get_by_id(
+        content3["id"]
+    )
+    assert shopping_cart_item is not None
+    assert shopping_cart_item.id_buyer == shopping_cart_item.id_buyer
+    assert shopping_cart_item.id_seller_product == seller_product2.id
+    assert shopping_cart_item.quantity != seller_product.quantity
+    assert shopping_cart_item.quantity == content3["quantity"]
