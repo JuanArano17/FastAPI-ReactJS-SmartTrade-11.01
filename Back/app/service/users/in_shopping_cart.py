@@ -40,6 +40,96 @@ class InShoppingCartService:
         self.buyer_service = buyer_service
         self.seller_product_service = seller_product_service
 
+    def validate_seller_product_quantity(self, seller_product, quantity):
+        if seller_product.quantity < quantity:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Not enough seller products",
+            )
+
+    def validate_cart_item_uniqueness(self, id_buyer, id_seller_product, id_size=None):
+        same_items = self.cart_repo.get_where(
+            InShoppingCart.id_buyer == id_buyer,
+            InShoppingCart.id_seller_product == id_seller_product,
+        )
+
+        if id_size:
+            for item in same_items:
+                size2 = self.seller_product_service.size_repo.get_by_id(item.id_size)
+                if size2.size == id_size:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Product already in shopping cart",
+                    )
+        elif same_items:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Product already in shopping cart",
+            )
+
+    def add_product_without_sizes(
+        self, id_buyer, shopping_cart_product: InShoppingCartCreate
+    ) -> InShoppingCart:
+        if self.cart_repo.get_where(
+            InShoppingCart.id_buyer == id_buyer,
+            InShoppingCart.id_seller_product == shopping_cart_product.id_seller_product,
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Product already in shopping cart",
+            )
+
+        cart_product = InShoppingCart(
+            **shopping_cart_product.model_dump(), id_buyer=id_buyer
+        )
+        return cart_product
+
+    def add_product_with_sizes(
+        self, id_buyer, shopping_cart_product: InShoppingCartCreate, id_size
+    ) -> InShoppingCart:
+        if not id_size:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="This shopping cart item should have a size assigned",
+            )
+
+        size = self.seller_product_service.size_repo.get_by_id(id_size)
+        if not size:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Could not find size",
+            )
+
+        if shopping_cart_product.id_seller_product != size.seller_product_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="This size doesn't belong to this product",
+            )
+
+        if shopping_cart_product.quantity > size.quantity:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Not enough seller products",
+            )
+
+        same_items = self.cart_repo.get_where(
+            InShoppingCart.id_buyer == id_buyer,
+            InShoppingCart.id_seller_product == shopping_cart_product.id_seller_product,
+        )
+
+        for item in same_items:
+            size2 = self.seller_product_service.size_repo.get_by_id(item.id_size)
+            if size2.size == size.size:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Product already in shopping cart",
+                )
+
+        cart_product = InShoppingCart(
+            **shopping_cart_product.model_dump(), id_buyer=id_buyer, id_size=id_size
+        )
+        return cart_product
+
     def add(
         self, id_buyer, shopping_cart_product: InShoppingCartCreate, id_size=None
     ) -> InShoppingCart:
@@ -48,99 +138,30 @@ class InShoppingCartService:
             shopping_cart_product.id_seller_product
         )
 
+        self.validate_seller_product_quantity(seller_product, shopping_cart_product.quantity)
+        self.validate_cart_item_uniqueness(id_buyer, shopping_cart_product.id_seller_product, id_size)
 
-        if seller_product.quantity < shopping_cart_product.quantity:  # type: ignore
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Not enough seller products",
-            )
-        
-        
-        if(seller_product.sizes==[]):
-            if(id_size):
+        if seller_product.sizes:
+            cart_product = self.add_product_with_sizes(id_buyer, shopping_cart_product, id_size)
+        else:
+            if id_size:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="This shopping cart item shouldn't have a size assigned",
                 )
-            
-            if self.cart_repo.get_where(
-            InShoppingCart.id_buyer == id_buyer,
-            InShoppingCart.id_seller_product == shopping_cart_product.id_seller_product,
-            ):
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Product already in shopping cart",
-                )
-            
-            cart_product = InShoppingCart(
-                **shopping_cart_product.model_dump(), id_buyer=id_buyer
-            )
-            
-        if(seller_product.sizes!=[]):
-            if not id_size:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="This shopping cart item should have a size assigned",
-                )
-            
-            size=self.seller_product_service.size_repo.get_by_id(id_size)
+            cart_product = self.add_product_without_sizes(id_buyer, shopping_cart_product)
 
-            if(not size):
-                raise HTTPException(
-                            status_code=status.HTTP_404_NOT_FOUND,
-                            detail="Could not find size",
-                            )
-
-            if(shopping_cart_product.id_seller_product!=size.seller_product_id):
-                raise HTTPException(
-                            status_code=status.HTTP_400_BAD_REQUEST,
-                            detail="This size doesn't belong to this product",
-                            )
-
-            if shopping_cart_product.quantity > size.quantity:
-                    raise HTTPException(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        detail="Not enough seller products",
-                    )
-
-            same_items=self.cart_repo.get_where(InShoppingCart.id_buyer==id_buyer, InShoppingCart.id_seller_product
-                                                               == shopping_cart_product.id_seller_product)
-                
-            if same_items:
-                for item in same_items:
-                    #Compare same sizes
-                    size2=self.seller_product_service.size_repo.get_by_id(item.id_size)
-                    if(size2.size==size.size):
-                        raise HTTPException(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        detail="Product already in shopping cart",
-                    )    
-                                                                
-            cart_product = InShoppingCart(
-                **shopping_cart_product.model_dump(), id_buyer=id_buyer, id_size=id_size
-            )
-        
         cart_item = self.cart_repo.add(cart_product)
         return cart_item
-        
 
     def add_by_user(
         self, user: User, shopping_cart_product: InShoppingCartCreate, id_size=None
     ) -> CompleteShoppingCart:
         buyer = self.buyer_service.get_by_id(user.id)
 
-        seller_product = self.seller_product_service.get_by_id(
-            shopping_cart_product.id_seller_product
+        cart_product = self.add(
+            id_buyer=buyer.id, shopping_cart_product=shopping_cart_product, id_size=id_size
         )
-
-        if(seller_product.sizes!=[]):
-            cart_product = self.add(
-                id_buyer=buyer.id, shopping_cart_product=shopping_cart_product, id_size=id_size
-            )
-        else: 
-            cart_product = self.add(
-                id_buyer=buyer.id, shopping_cart_product=shopping_cart_product
-            )
 
         seller_product = self.seller_product_service.get_by_id(
             cart_product.id_seller_product
@@ -151,9 +172,9 @@ class InShoppingCartService:
             )
         )
 
-        size=None
-        if(seller_product.sizes!=[]) :
-                size=self.seller_product_service.size_repo.get_by_id(id_size)
+        size = None
+        if seller_product.sizes:
+            size = self.seller_product_service.size_repo.get_by_id(id_size)
 
         return CompleteShoppingCart(
             **cart_product.__dict__, seller_product=complete_seller_product, size=size
