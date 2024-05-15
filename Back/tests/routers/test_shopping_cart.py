@@ -928,11 +928,9 @@ def test_delete_shopping_cart_item(
     content = response.json()
     assert content is None or content == {}
 
-    # list_item = db.execute(
-    #    select(InWishList).where(InWishList.id == list_item.id)
-    # ).scalar_one_or_none()
-    # assert list_item is None
-
+    response = client.get(f"/shopping_cart/me/", headers=headers)
+    assert response.json()==[]
+    
 
 def test_delete_shopping_cart_item_not_found(
     client: TestClient,
@@ -1049,8 +1047,8 @@ def test_delete_shopping_cart(
     content = response.json()
     assert content is None or content == {}
 
-    # wish_list = db.execute(select(InWishList).where(InWishList.id_seller_product == seller_product.id and InWishList.id_buyer == buyer.id)).all()
-    # assert len(wish_list) == 0
+    response = client.get(f"/shopping_cart/me/", headers=headers)
+    assert response.json()==[]
 
 def test_observer_pattern(
     client: TestClient,
