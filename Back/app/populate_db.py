@@ -47,6 +47,9 @@ address_service = AddressService(session, buyer_service)
 seller_product_serv = SellerProductService(
     session, seller_service=seller_service, product_service=product_service
 )
+in_shopping_cart_service = InShoppingCartService(
+    session, buyer_service, seller_product_serv
+)
 order_service = OrderService(
     session,
     buyer_service,
@@ -54,9 +57,7 @@ order_service = OrderService(
     address_service,
     product_service,
     seller_product_serv,
-)
-in_shopping_cart_service = InShoppingCartService(
-    session, buyer_service, seller_product_serv
+    in_shopping_cart_service,
 )
 in_wish_list_service = InWishListService(
     session=session,
