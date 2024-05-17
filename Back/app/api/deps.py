@@ -76,12 +76,16 @@ def get_current_active_admin(current_user: CurrentUserDep):
 def get_user_service(session: SessionDep):
     return UserService(session=session)
 
+
 UserServiceDep = Annotated[UserService, Depends(get_user_service)]
+
 
 def get_country_service(session: SessionDep):
     return CountryService(session=session)
 
+
 CountryServiceDep = Annotated[CountryService, Depends(get_country_service)]
+
 
 def get_buyer_service(session: SessionDep, user_service: UserServiceDep):
     return BuyerService(session=session, user_service=user_service)
@@ -140,27 +144,6 @@ SellerProductServiceDep = Annotated[
 ]
 
 
-def get_order_service(
-    session: SessionDep,
-    buyer_service: BuyerServiceDep,
-    card_service: CardServiceDep,
-    address_service: AddressServiceDep,
-    product_service: ProductServiceDep,
-    seller_product_service: SellerProductServiceDep,
-):
-    return OrderService(
-        session=session,
-        buyer_service=buyer_service,
-        card_service=card_service,
-        address_service=address_service,
-        product_service=product_service,
-        seller_product_service=seller_product_service,
-    )
-
-
-OrderServiceDep = Annotated[OrderService, Depends(get_order_service)]
-
-
 def get_shopping_cart_service(
     session: SessionDep,
     buyer_service: BuyerServiceDep,
@@ -176,6 +159,29 @@ def get_shopping_cart_service(
 ShoppingCartServiceDep = Annotated[
     InShoppingCartService, Depends(get_shopping_cart_service)
 ]
+
+
+def get_order_service(
+    session: SessionDep,
+    buyer_service: BuyerServiceDep,
+    card_service: CardServiceDep,
+    address_service: AddressServiceDep,
+    product_service: ProductServiceDep,
+    seller_product_service: SellerProductServiceDep,
+    shopping_cart_service: ShoppingCartServiceDep,
+):
+    return OrderService(
+        session=session,
+        buyer_service=buyer_service,
+        card_service=card_service,
+        address_service=address_service,
+        product_service=product_service,
+        seller_product_service=seller_product_service,
+        shopping_cart_service=shopping_cart_service,
+    )
+
+
+OrderServiceDep = Annotated[OrderService, Depends(get_order_service)]
 
 
 def get_wish_list_service(
