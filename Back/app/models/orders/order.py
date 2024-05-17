@@ -1,4 +1,4 @@
-from sqlalchemy import DateTime, Float, ForeignKey, Integer
+from sqlalchemy import DateTime, ForeignKey, Integer, Numeric
 from sqlalchemy.orm import relationship, mapped_column
 
 from app.base import Base
@@ -15,8 +15,8 @@ class Order(Base):
     id_address = mapped_column(
         Integer, ForeignKey("Address.id", name="fk_order_address_id")
     )
-    order_date = mapped_column(DateTime, nullable=False)
-    total = mapped_column(Float, nullable=False)
+    order_date = mapped_column(DateTime)
+    total = mapped_column(Numeric(10, 2), nullable=False)
 
     card = relationship("Card", back_populates="orders")
     address = relationship("Address", back_populates="orders")

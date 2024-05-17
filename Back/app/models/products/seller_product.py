@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Float, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Float, ForeignKey, Integer, String, Numeric
 from sqlalchemy.orm import relationship, mapped_column
 from app.base import Base
 
@@ -18,7 +18,7 @@ class SellerProduct(Base):
         ForeignKey("Seller.id", ondelete="CASCADE", name="fk_seller_product_seller_id"),
     )
     quantity = mapped_column(Integer, nullable=False)
-    price = mapped_column(Float, nullable=False)
+    price = mapped_column(Numeric(10, 2), nullable=False)
     shipping_costs = mapped_column(Float, nullable=False)
     state = mapped_column(String, nullable=False)
     justification = mapped_column(String)
@@ -37,10 +37,9 @@ class SellerProduct(Base):
 
     def notify_observers(self, new_quantity: int):
         for cart_item in self.in_shopping_carts:
-            #if self.sizes==[]:
-                if cart_item.quantity > new_quantity:
-                    cart_item.quantity = new_quantity
-            #else:
-            #    pass 
-                #logic for clothes observer
-            
+            # if self.sizes==[]:
+            if cart_item.quantity > new_quantity:
+                cart_item.quantity = new_quantity
+        # else:
+        #    pass
+        # logic for clothes observer
