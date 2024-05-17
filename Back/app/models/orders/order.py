@@ -1,7 +1,16 @@
-from sqlalchemy import DateTime, ForeignKey, Integer, Numeric
+from enum import Enum
+from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, Enum as EnumColumn
 from sqlalchemy.orm import relationship, mapped_column
 
 from app.base import Base
+
+
+class OrderState(Enum):
+    PENDING = "pending"
+    CONFIRMED = "completed"
+    CANCELLED = "cancelled"
+    SHIPPED = "shipped"
+    DELIVERED = "delivered"
 
 
 class Order(Base):
@@ -17,6 +26,9 @@ class Order(Base):
     )
     order_date = mapped_column(DateTime)
     total = mapped_column(Numeric(10, 2), nullable=False)
+    state = mapped_column(
+        EnumColumn(OrderState), nullable=False, default=OrderState.PENDING
+    )
 
     card = relationship("Card", back_populates="orders")
     address = relationship("Address", back_populates="orders")
