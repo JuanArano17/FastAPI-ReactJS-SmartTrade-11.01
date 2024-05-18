@@ -5,15 +5,17 @@ import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
 import styles from '../styles/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { getProductSellerById } from '../api/services/products/ProductsService';
+import { getProductSellerById, getAllProductsSeller } from '../api/services/products/ProductsService';
 import { addCartItem } from '../api/services/products/ShoppingCartService';
 import FavoriteButton from '../components/favorite-button/FavoriteButton';
-import ImageSelector from '../components/products/ImageSelector/ImageSelector';  // Importamos el nuevo componente
+import ImageSelector from '../components/products/ImageSelector/ImageSelector';
+import SimilarProduct from '../components/products/similarProduct/SimilarProduct';
 
 const ProductDetailPage = () => {
     const { id } = useParams();
     const [snackbar, setSnackbar] = useState({ open: false, message: '', backgroundColor:'' });
     const [productData, setProductData] = useState(null);
+    const [similarProducts, setSimilarProducts] = useState([]);
     const [selectedSize, setSelectedSize] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -24,12 +26,19 @@ const ProductDetailPage = () => {
             try {
                 setLoading(true);
                 const response = await getProductSellerById(id);
-                console.log("Product by id: ", response);
                 if (response) {
                     setProductData(response);
                     if (response.sizes && response.sizes.length > 0) {
                         setSelectedSize(response.sizes[0].size); 
                     }
+                    const allProducts = await getAllProductsSeller();
+                    const similar = allProducts.filter(product => 
+                        product.id !== response.id &&
+                        product.category === response.category &&
+                        Math.abs(product.price - response.price) <= 25 &&
+                        Math.abs(product.ecoPoints - response.eco_points) <= 25
+                    );
+                    setSimilarProducts(similar);
                     setLoading(false);
                     setError(null);
                 }
@@ -172,6 +181,13 @@ const ProductDetailPage = () => {
                             <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                                 Similar Products
                             </Typography>
+                            <Grid container spacing={2}>
+                                {similarProducts.map((product) => (
+                                    <Grid item key={product.id} xs={12} sm={6} md={4}>
+                                        <SimilarProduct product={product} />
+                                    </Grid>
+                                ))}
+                            </Grid>
                         </Box>
                     </Paper>
                 )}
