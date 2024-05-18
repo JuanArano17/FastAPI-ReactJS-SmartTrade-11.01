@@ -45,11 +45,11 @@ def get_engine() -> Engine:
     url = get_db_url()
     if not database_exists(url):
         create_database(url)
-    engine = create_engine(url, pool_size=50, echo=False)
+    engine = create_engine(url, pool_size=50, echo=True)
     return engine
 
 
-engine = create_engine(get_db_url(), pool_size=50, echo=False)
+engine = create_engine(get_db_url(), pool_size=50, echo=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

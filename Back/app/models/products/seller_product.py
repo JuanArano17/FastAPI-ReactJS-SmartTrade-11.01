@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Float, ForeignKey, Integer, String
+from sqlalchemy import Boolean, Float, ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import relationship, mapped_column
 from app.base import Base
 
@@ -24,7 +24,7 @@ class SellerProduct(Base):
     justification = mapped_column(String)
     eco_points = mapped_column(Float, nullable=False)
     age_restricted = mapped_column(Boolean)
-    stars= mapped_column(Integer)
+    stars= mapped_column(Numeric(2,1))
 
     product = relationship("Product", back_populates="seller_products")
     in_wish_lists = relationship("InWishList", back_populates="seller_product")

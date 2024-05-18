@@ -52,6 +52,23 @@ class ReviewService:
         self.seller_product_service.get_by_id(review.id_seller_product)
 
         review_item = Review(**review.model_dump(), id_buyer=id_buyer)
+
+        reviews=self.review_repo.get_where(
+            Review.id_seller_product == review.id_seller_product,
+        )
+
+        seller_product=self.seller_product_service.get_by_id(review.id_seller_product)
+        if reviews==[]:
+             seller_product.stars=review_item.stars
+        else:
+            reviews.append(review_item)
+            total_stars=0
+            number_of_reviews=0
+            for review in reviews:
+                number_of_reviews+=1
+                total_stars+=review.stars
+            seller_product.stars=round(total_stars/number_of_reviews,1)
+
         review_item=self.review_repo.add(review_item)
         return review_item
 

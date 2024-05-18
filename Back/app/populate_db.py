@@ -667,6 +667,8 @@ for i in range(num_rejected):
         seller_product_id=seller_product_ids[i], new_data=seller_product
     )
 
+list_of_approved_ids=[]
+
 for i in range(num_approved):
     # Create a SellerProduct object
     seller_product = SellerProductUpdate(
@@ -683,10 +685,12 @@ for i in range(num_approved):
         new_data=seller_product,
     )
 
+    list_of_approved_ids.append(seller_product_ids[i + 1 + num_rejected])
+
 for _ in range(num_cart_items):
     # Generate random data for each in shopping cart item
     quantity = random.randint(1, 10)  # Random quantity between 1 and 10
-    id_seller_product = random.choice(seller_product_ids)
+    id_seller_product = random.choice(list_of_approved_ids)
 
     # Choose a buyer ID
     id_buyer = random.choice(buyer_ids)
@@ -728,7 +732,7 @@ for _ in range(num_cart_items):
 for _ in range(num_list_items):
     # Choose a buyer ID
     id_buyer = random.choice(buyer_ids)
-    id_seller_product = random.choice(seller_product_ids)
+    id_seller_product = random.choice(list_of_approved_ids)
 
     while in_wish_list_service.wishlist_repo.get_by_id(
         id_buyer=id_buyer, id_seller_product=id_seller_product
@@ -743,10 +747,9 @@ for _ in range(num_list_items):
 for _ in range(num_reviews):
     # Choose a buyer ID
     id_buyer = random.choice(buyer_ids)
-    id_seller_product = random.choice(seller_product_ids)
+    id_seller_product = random.choice(list_of_approved_ids)
     while review_service.review_repo.get_repeat_review(id_buyer=id_buyer, id_seller_product=id_seller_product)!=[]:
         id_buyer = random.choice(buyer_ids)
-        print(review_service.review_repo.get_repeat_review(id_buyer=id_buyer, id_seller_product=id_seller_product))
 
     # Create an wish list object
     data={"stars":random.randint(1,5), "comment":faker.text(max_nb_chars=40), "id_seller_product":id_seller_product}
