@@ -28,6 +28,7 @@ from app.models.products.seller_product import SellerProduct
 from app.models.users.in_shopping_cart import InShoppingCart
 from app.models.users.in_wish_list import InWishList
 from app.models.orders.refund_product import RefundProduct
+from app.models.products.review import Review
 
 load_dotenv()
 
@@ -44,11 +45,11 @@ def get_engine() -> Engine:
     url = get_db_url()
     if not database_exists(url):
         create_database(url)
-    engine = create_engine(url, pool_size=50, echo=True)
+    engine = create_engine(url, pool_size=50, echo=False)
     return engine
 
 
-engine = create_engine(get_db_url(), pool_size=50, echo=True)
+engine = create_engine(get_db_url(), pool_size=50, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 

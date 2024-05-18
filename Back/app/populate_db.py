@@ -36,6 +36,9 @@ from app.schemas.users.country import CountryCreate
 from app.service.users.country import CountryService
 import pycountry
 
+from app.schemas.products.review import ReviewCreate
+from app.service.products.review import ReviewService
+
 session = get_db()
 user_service = UserService(session=session)
 buyer_service = BuyerService(session, user_service=user_service)
@@ -57,7 +60,7 @@ order_service = OrderService(
     address_service,
     product_service,
     seller_product_serv,
-    in_shopping_cart_service,
+#    in_shopping_cart_service,
 )
 in_wish_list_service = InWishListService(
     session=session,
@@ -78,6 +81,8 @@ refund_product_service = RefundProductService(
     product_line_service=product_line_service,
 )
 country_service = CountryService(session=session)
+
+review_service = ReviewService(session=session, seller_product_service=seller_product_serv, buyer_service=buyer_service)
 
 admin_service = AdminService(session=session, user_service=user_service)
 
@@ -109,10 +114,11 @@ num_addresses = 100
 num_seller_products = 140
 num_cart_items = 100
 num_list_items = 100
-num_orders = 40
+num_orders = 60
 num_product_lines_per_order = 2
 num_rejected = 20
 num_approved = 100
+num_reviews = 100
 
 
 # # Initialize SQLAlchemy session
@@ -733,6 +739,20 @@ for _ in range(num_list_items):
     in_wish_list = InWishListCreate(id_seller_product=id_seller_product)
     # Add the wish list item to the session
     in_wish_list_service.add(id_buyer=id_buyer, wish_list_item=in_wish_list)
+
+for _ in range(num_reviews):
+    # Choose a buyer ID
+    id_buyer = random.choice(buyer_ids)
+    id_seller_product = random.choice(seller_product_ids)
+    while review_service.review_repo.get_repeat_review(id_buyer=id_buyer, id_seller_product=id_seller_product)!=[]:
+        id_buyer = random.choice(buyer_ids)
+        print(review_service.review_repo.get_repeat_review(id_buyer=id_buyer, id_seller_product=id_seller_product))
+
+    # Create an wish list object
+    data={"stars":random.randint(1,5), "comment":faker.text(max_nb_chars=40), "id_seller_product":id_seller_product}
+    review = ReviewCreate(**data)
+    # Add the wish list item to the session
+    review_service.add(id_buyer=id_buyer, review=review)
 
 # Generate and add orders
 for i in range(num_orders):
