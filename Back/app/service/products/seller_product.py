@@ -227,6 +227,7 @@ class SellerProductService:
             publisher=product.publisher if hasattr(product, "publisher") else None,
             platform=product.platform if hasattr(product, "platform") else None,
             sizes=sizes,
+            stars=seller_product.stars
         )
 
     def map_seller_products(self, seller_products):

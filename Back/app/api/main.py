@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.api.routers import reviews
 from app.api.routers import countries
 from app.api.routers import admin
 from app.api.routers import orders
@@ -38,3 +39,4 @@ api_router.include_router(seller_product.seller_prod_router)
 api_router.include_router(seller_product.seller_router)
 api_router.include_router(admin.router)
 api_router.include_router(countries.router)
+api_router.include_router(reviews.router)

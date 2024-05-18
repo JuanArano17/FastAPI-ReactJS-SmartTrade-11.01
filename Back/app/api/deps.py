@@ -28,6 +28,7 @@ from app.service.products.image import ImageService
 from app.service.users.in_shopping_cart import InShoppingCartService
 from app.service.users.in_wish_list import InWishListService
 from app.service.users.country import CountryService
+from app.service.products.review import ReviewService
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login/access-token")
@@ -139,7 +140,6 @@ SellerProductServiceDep = Annotated[
     SellerProductService, Depends(get_seller_product_service)
 ]
 
-
 def get_order_service(
     session: SessionDep,
     buyer_service: BuyerServiceDep,
@@ -209,6 +209,10 @@ def get_product_line_service(
 
 ProductLineServiceDep = Annotated[ProductLineService, Depends(get_product_line_service)]
 
+def get_review_service(session: SessionDep, seller_product_service: SellerProductServiceDep, buyer_service: BuyerServiceDep):
+    return ReviewService(session=session, seller_product_service=seller_product_service, buyer_service=buyer_service)
+
+ReviewServiceDep = Annotated[ReviewService, Depends(get_review_service)]
 
 def get_refund_product_service(
     session: SessionDep,

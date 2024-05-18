@@ -7,6 +7,7 @@ from app.service.users.types.buyer import BuyerService
 from app.crud_repository import CRUDRepository
 from app.models.products.review import Review
 from app.schemas.products.review import CompleteReview, ReviewCreate
+from schemas.users.types.buyer import Buyer
 
 
 class ReviewRepository(CRUDRepository):
@@ -105,6 +106,30 @@ class ReviewService:
 
     def get_all_by_buyer(self, id_buyer) -> list[Review]:
         return self.review_repo.get_where(Review.id_buyer == id_buyer)
+    
+    def get_all_by_seller_product(self, id_seller_product) -> list[CompleteReview]:
+        reviews=self.review_repo.get_where(Review.id_seller_product == id_seller_product)
+        review_items=[]
+        for item in reviews:
+            seller_product = self.seller_product_service.get_by_id(
+                item.id_seller_product
+            )
+            complete_seller_product = (
+                self.seller_product_service.map_seller_product_to_read_schema(
+                    seller_product
+                )
+            )
+            buyer=self.buyer_service.get_by_id(item.id_buyer)
+            buyer=Buyer(email=buyer.email, name=buyer.name, surname=buyer.surname, birth_date=buyer.birth_date, eco_points=buyer.eco_points, dni=buyer.dni, billing_address=buyer.billing_address, payment_method=buyer.payment_method, profile_picture=buyer.profile_picture, id=buyer.id, type=buyer.type, addresses=buyer.addresses, in_shopping_cart=buyer.in_shopping_carts, in_wish_list=buyer.in_wish_lists, cards=buyer.cards, orders=buyer.orders)
+            complete_review=CompleteReview(
+                    id=item.id,id_buyer=item.id_buyer, stars=item.stars, comment=item.comment, buyer=buyer,  seller_product=complete_seller_product
+                )
+            review_items.append(
+                complete_review
+            )
+            
+
+        return review_items 
 
     def get_all_by_user(self, user: User) -> list[Review]:
         buyer = self.buyer_service.get_by_id(user.id)

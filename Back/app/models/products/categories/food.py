@@ -22,4 +22,4 @@ class Food(Product):
     }
 
     def __repr__(self):
-        return f"Food(id={self.id}, name='{self.name}', description='{self.description}', eco_points={self.eco_points}, spec_sheet='{self.spec_sheet}', stock={self.stock}, brand={self.brand}, type={self.type}, ingredients={self.ingredients})"
+        return f"Food(id={self.id}, name='{self.name}', description='{self.description}', spec_sheet='{self.spec_sheet}', stock={self.stock}, brand={self.brand}, type={self.type}, ingredients={self.ingredients})"
