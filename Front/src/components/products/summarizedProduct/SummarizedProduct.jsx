@@ -27,7 +27,7 @@ const SummarizedProduct = ({ product }) => {
         return `rgb(${Math.round(red)}, ${Math.round(green)}, ${blue})`;
     };
 
-    const boxShadowColor = calculateColor(ecoPoints);
+    const ecoPointsColor = calculateColor(ecoPoints);
 
     return (
         <Card
@@ -41,7 +41,7 @@ const SummarizedProduct = ({ product }) => {
                 boxShadow: '0px 4px 20px rgba(128, 128, 128, 0.4)',  
                 height: '100%',
                 '&:hover': {
-                    boxShadow: `0px 4px 20px ${boxShadowColor}`, 
+                    boxShadow: `0px 4px 20px ${ecoPointsColor}`, 
                 }
             }}
         >
@@ -61,7 +61,7 @@ const SummarizedProduct = ({ product }) => {
                 </Typography>
             </CardContent>
             <CardActions sx={{ justifyContent: 'space-between', p: 2 }}>
-                <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'left' }}>
+                <Typography variant="body1" sx={{ textAlign: 'left', color: ecoPointsColor}}>
                     EPoints: {ecoPoints}
                 </Typography>
                 <Typography variant="body1" color="green" sx={{ textAlign: 'right' }}>
