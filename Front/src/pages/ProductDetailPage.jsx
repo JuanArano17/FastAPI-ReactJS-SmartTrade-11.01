@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { Box, Container, Typography, Grid, Button, Paper, Divider, CircularProgress, Rating, ButtonBase, IconButton, Snackbar } from '@mui/material';
+import { Box, Container, Typography, Grid, Button, Paper, Divider, CircularProgress, Rating, IconButton, Snackbar } from '@mui/material';
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
 import styles from '../styles/styles';
@@ -8,6 +8,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { getProductSellerById } from '../api/services/products/ProductsService';
 import { addCartItem } from '../api/services/products/ShoppingCartService';
 import FavoriteButton from '../components/favorite-button/FavoriteButton';
+import ImageSelector from '../components/products/ImageSelector/ImageSelector';  // Importamos el nuevo componente
 
 const ProductDetailPage = () => {
     const { id } = useParams();
@@ -16,7 +17,6 @@ const ProductDetailPage = () => {
     const [selectedSize, setSelectedSize] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [imageIndex, setImageIndex] = useState(0);
     const history = useHistory();
 
     useEffect(() => {
@@ -63,7 +63,6 @@ const ProductDetailPage = () => {
     const handleCloseSnackbar = () => {
         setSnackbar({ open: false, message: '', backgroundColor: '' });
     };
-    
 
     const handleSizeChange = (sizeId) => {
         setSelectedSize(sizeId);
@@ -122,10 +121,6 @@ const ProductDetailPage = () => {
         return <Typography color="error">{error}</Typography>;
     }
 
-    const handleImageChange = (newIndex) => {
-        setImageIndex(newIndex);
-    };
-
     return (
         <Box sx={styles.mainBox}>
             <TopBar showSearchBar={true} showLogoutButton={true} />
@@ -137,31 +132,8 @@ const ProductDetailPage = () => {
                         </IconButton>
                         <FavoriteButton productId={productData.id} />
                         <Grid container spacing={2}>
-                            <Grid item xs={12} md={5} sx={{ display: 'flex', justifyContent: 'center' }}>
-                                <Box sx={{
-                                    width: 600,
-                                    height: 600,
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    overflow: 'hidden',
-                                    borderRadius: '40px',
-                                }}>
-                                    <ButtonBase onClick={() => handleImageChange((imageIndex + 1) % productData.images.length)} disabled={productData.images.length <= 1}>
-                                        <img
-                                            src={productData.images[imageIndex]}
-                                            alt={`Image ${imageIndex + 1} of ${productData.name}`}
-                                            style={{
-                                                height: '100%',
-                                                width: '100%',
-                                                objectFit: 'cover',  
-                                                objectPosition: 'center center',  
-                                                borderRadius: '40px',  
-                                                boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.7)' 
-                                            }}
-                                        />
-                                    </ButtonBase>
-                                </Box>
+                            <Grid item xs={12} md={5} mt={2}>
+                                <ImageSelector images={productData.images} />  {/* Utilizamos el nuevo componente */}
                             </Grid>
                             <Grid item xs={12} md={7}>
                                 <Typography variant="h6" color="text.secondary">
