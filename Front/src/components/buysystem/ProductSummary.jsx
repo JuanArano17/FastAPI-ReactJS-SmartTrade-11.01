@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Typography, Button } from '@mui/material';
+import { Grid, Typography, Button, Paper, Box } from '@mui/material';
 import styles from '../../styles/styles';
 
 const ProductSummary = ({ cartItems, selectedCard, selectedAddress, onConfirm, onBack }) => {
@@ -10,16 +10,26 @@ const ProductSummary = ({ cartItems, selectedCard, selectedAddress, onConfirm, o
     };
 
     return (
-        <div>
-            <Typography variant="h4" sx={{ color: '#629C44', my: 2, fontWeight: 'bold' }}>
+        <Paper sx={styles.paperContainer}>
+            <Typography variant="h4" sx={{ color: '#629C44', mb: 4, fontWeight: 'bold', textAlign: 'center' }}>
                 Product Summary
             </Typography>
             <Grid container spacing={2}>
                 {cartItems.map((item) => (
                     <Grid item xs={12} key={item.seller_product.id}>
-                        <Typography variant="h6">{item.seller_product.name}</Typography>
-                        <Typography>Quantity: {item.quantity}</Typography>
-                        <Typography>Price: ${item.seller_product.price}</Typography>
+                        <Paper elevation={1} sx={{ p: 2, mb: 2, borderRadius: '10px' }}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={4}>
+                                    <Box sx={{ width: 50, height: 50, backgroundColor: 'grey.300' }} />
+                                </Grid>
+                                <Grid item xs={8}>
+                                    <Typography variant="h6">{item.seller_product.name}</Typography>
+                                    <Typography variant="body2">Seller name and info</Typography>
+                                    <Typography variant="body2">Quantity: {item.quantity}</Typography>
+                                    <Typography variant="body2">Subtotal: ${item.seller_product.price * item.quantity}</Typography>
+                                </Grid>
+                            </Grid>
+                        </Paper>
                     </Grid>
                 ))}
                 <Grid item xs={12}>
@@ -55,7 +65,7 @@ const ProductSummary = ({ cartItems, selectedCard, selectedAddress, onConfirm, o
                     </Button>
                 </Grid>
             </Grid>
-        </div>
+        </Paper>
     );
 };
 
