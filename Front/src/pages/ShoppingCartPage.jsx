@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Container, Typography, Grid } from '@mui/material';
+import { Box, Container, Typography, Grid, Button } from '@mui/material';
+import { useHistory } from 'react-router-dom';
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
 import CartItem from '../components/products/shoppingcart/CartItem';
@@ -9,6 +10,7 @@ import { getCartItems } from '../api/services/products/ShoppingCartService';
 
 const ShoppingCartPage = () => {
     const [cartItems, setCartItems] = useState([]);
+    const history = useHistory();
     const fetchCartData = async () => {
         try {
             const cartItems = await getCartItems();
@@ -22,6 +24,10 @@ const ShoppingCartPage = () => {
     useEffect(() => {
         fetchCartData();
     }, []);
+
+    const handleContinue = () => {
+        history.push('/buying-process');
+    };
 
     const calculateTotal = () => {
         return cartItems.reduce((acc, item) => {
@@ -42,6 +48,17 @@ const ShoppingCartPage = () => {
                     ))}
                     <Grid item xs={12}>
                         <CartTotal total={calculateTotal()} />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            color="primary"
+                            sx={{ ...styles.greenRoundedButton, mt: 2 }}
+                            onClick={handleContinue}
+                        >
+                            Continue
+                        </Button>
                     </Grid>
                 </Grid>
             </Container>
