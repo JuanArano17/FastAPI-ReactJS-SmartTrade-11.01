@@ -26,7 +26,7 @@ class ProductLineService:
 
     def add(self, id_order, id_buyer, product_line: ProductLineCreate) -> ProductLine:
         self.buyer_service.get_by_id(id_buyer)
-        order = self.order_service.get_by_id(id_order)
+        order = self.order_service.order_repo.get_by_id(id_order)
         if order.id_buyer != id_buyer:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -59,7 +59,6 @@ class ProductLineService:
 
         product_line = ProductLine(**product_line.model_dump(), id_order=id_order)
         order.total += product_line.subtotal
-
         # seller_product.quantity -= product_line.quantity
 
         if seller_product.sizes == []:

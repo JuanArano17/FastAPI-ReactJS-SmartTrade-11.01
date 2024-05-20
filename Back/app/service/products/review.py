@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from app.models.users.types.user import User
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
@@ -7,7 +8,7 @@ from app.service.users.types.buyer import BuyerService
 from app.crud_repository import CRUDRepository
 from app.models.products.review import Review
 from app.schemas.products.review import CompleteReview, ReviewCreate
-from schemas.users.types.buyer import Buyer
+from app.schemas.users.types.buyer import Buyer
 
 
 class ReviewRepository(CRUDRepository):
@@ -27,7 +28,19 @@ class ReviewRepository(CRUDRepository):
     def get_repeat_review(self, id_buyer, id_seller_product):
         return self.get_where(self._model.id_buyer==id_buyer, self._model.id_seller_product==id_seller_product)
 
-
+    def get_seller_product_by_buyer(self,session: Session, buyer_id: int):
+        from app.models.orders.order import Order
+        from app.models.orders.product_line import ProductLine
+        from app.models.products.seller_product import SellerProduct
+        from app.schemas.users.types.buyer import Buyer
+        stmt = (
+            select(SellerProduct)
+            .join(ProductLine, ProductLine.id_seller_product == SellerProduct.id)
+            .join(Order, Order.id == ProductLine.id_order)
+            .filter(Order.id_buyer == buyer_id)
+        )
+        return session.execute(stmt).scalars().all()
+    
 class ReviewService:
     def __init__(
         self,
@@ -49,6 +62,13 @@ class ReviewService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="A review was already made by this user for this seller product",
             )
+        
+        if self.seller_product_service.get_by_id(review.id_seller_product) not in self.get_seller_product_by_buyer(id_buyer):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="The buyer must purchase the product to review it",
+            )
+        
         self.buyer_service.get_by_id(id_buyer)
         self.seller_product_service.get_by_id(review.id_seller_product)
 
@@ -171,5 +191,7 @@ class ReviewService:
         buyer = self.buyer_service.get_by_id(user.id)
         self.delete_by_id_buyer(buyer.id)
 
+    def get_seller_product_by_buyer(self, buyer_id):
+        return self.review_repo.get_seller_product_by_buyer(self.session, buyer_id)
     #def delete_one_by_user(self, id_review):
     #    self.delete_by_id(id_review)
