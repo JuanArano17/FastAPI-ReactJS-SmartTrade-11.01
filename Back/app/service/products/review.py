@@ -172,10 +172,18 @@ class ReviewService:
 
         return reviews
 
-    def delete_by_id(self, id_review):
-        self.get_by_id(id_review)
-        self.review_repo.delete_by_id(
-            id_review
+    def delete_by_id(self,id_buyer,id_review):
+        reviews=self.get_all_by_buyer(id_buyer)
+        review=self.get_by_id(id_review)
+        if review in reviews:
+            self.get_by_id(id_review)
+            self.review_repo.delete_by_id(
+                id_review
+            )
+        else:
+            raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The review that you are trying to delete does not belong to the buyer",
         )
 
     def delete_all(self):

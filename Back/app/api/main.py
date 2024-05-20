@@ -40,3 +40,5 @@ api_router.include_router(seller_product.seller_router)
 api_router.include_router(admin.router)
 api_router.include_router(countries.router)
 api_router.include_router(reviews.router)
+api_router.include_router(reviews.router2)
+
