@@ -10,6 +10,7 @@ import { addCartItem } from '../api/services/products/ShoppingCartService';
 import FavoriteButton from '../components/favorite-button/FavoriteButton';
 import ImageSelector from '../components/products/ImageSelector/ImageSelector';
 import SimilarProduct from '../components/products/similarProduct/SimilarProduct';
+import Slider from 'react-slick';
 
 const ProductDetailPage = () => {
     const { id } = useParams();
@@ -130,6 +131,32 @@ const ProductDetailPage = () => {
         return <Typography color="error">{error}</Typography>;
     }
 
+    const sliderSettings = {
+        dots: true,
+        infinite: false,
+        speed: 500,
+        slidesToShow: 3,
+        slidesToScroll: 3,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 2,
+                    infinite: true,
+                    dots: true
+                }
+            },
+            {
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1
+                }
+            }
+        ]
+    };
+
     return (
         <Box sx={styles.mainBox}>
             <TopBar showSearchBar={true} showLogoutButton={true} />
@@ -181,13 +208,19 @@ const ProductDetailPage = () => {
                             <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                                 Similar Products
                             </Typography>
-                            <Grid container spacing={2}>
+                            <Slider {...sliderSettings}>
                                 {similarProducts.map((product) => (
-                                    <Grid item key={product.id} xs={12} sm={6} md={4}>
+                                    <div key={product.id}>
                                         <SimilarProduct product={product} />
-                                    </Grid>
+                                    </div>
                                 ))}
-                            </Grid>
+                            </Slider>
+                        </Box>
+                        <Divider sx={styles.ThickDivider}></Divider>
+                        <Box sx={{ textAlign: 'left' }}>
+                            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                                Reviews
+                            </Typography>
                         </Box>
                     </Paper>
                 )}
