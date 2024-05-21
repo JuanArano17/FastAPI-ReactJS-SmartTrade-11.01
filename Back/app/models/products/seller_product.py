@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Float, ForeignKey, Integer, String, Numeric
+from sqlalchemy import Boolean, Float, ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import relationship, mapped_column
 from app.base import Base
 
@@ -24,6 +24,7 @@ class SellerProduct(Base):
     justification = mapped_column(String)
     eco_points = mapped_column(Float, nullable=False)
     age_restricted = mapped_column(Boolean)
+    stars= mapped_column(Numeric(2,1))
 
     product = relationship("Product", back_populates="seller_products")
     in_wish_lists = relationship("InWishList", back_populates="seller_product")
@@ -31,6 +32,7 @@ class SellerProduct(Base):
     seller = relationship("Seller", back_populates="seller_products")
     product_lines = relationship("ProductLine", back_populates="seller_product")
     sizes = relationship("Size", back_populates="seller_product")
+    reviews = relationship("Review", back_populates="seller_product", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"SellerProduct(id={self.id}, id_product={self.id_product}, id_seller={self.id_seller}, quantity={self.quantity}, price={self.price}, shipping_costs={self.shipping_costs}, state={self.state}, justification={self.justification}, eco_points={self.eco_points}, age_restricted={self.age_restricted})"

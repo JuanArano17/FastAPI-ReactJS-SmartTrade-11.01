@@ -36,6 +36,9 @@ from app.schemas.users.country import CountryCreate
 from app.service.users.country import CountryService
 import pycountry
 
+from app.schemas.products.review import ReviewCreate
+from app.service.products.review import ReviewService
+
 session = get_db()
 user_service = UserService(session=session)
 buyer_service = BuyerService(session, user_service=user_service)
@@ -57,7 +60,7 @@ order_service = OrderService(
     address_service,
     product_service,
     seller_product_serv,
-    in_shopping_cart_service,
+#    in_shopping_cart_service,
 )
 in_wish_list_service = InWishListService(
     session=session,
@@ -79,6 +82,8 @@ refund_product_service = RefundProductService(
 )
 country_service = CountryService(session=session)
 
+review_service = ReviewService(session=session, seller_product_service=seller_product_serv, buyer_service=buyer_service)
+
 admin_service = AdminService(session=session, user_service=user_service)
 
 
@@ -98,21 +103,22 @@ Faker.seed(42)  # Set the seed to any value you prefer
 num_buyers = 100
 num_sellers = 100
 num_cards = 100
-num_books = 20
-num_games = 20
-num_electronics = 20
-num_electrodomestics = 20
-num_foods = 20
-num_clothes = 20
-num_house_utilities = 20
+num_books = 40
+num_games = 40
+num_electronics = 40
+num_electrodomestics = 40
+num_foods = 40
+num_clothes = 40
+num_house_utilities = 40
 num_addresses = 100
-num_seller_products = 140
+num_seller_products = 280
 num_cart_items = 100
 num_list_items = 100
-num_orders = 40
-num_product_lines_per_order = 2
-num_rejected = 20
-num_approved = 100
+num_orders = 100
+num_product_lines_per_order = 3
+num_rejected = 40
+num_approved = 200
+num_reviews = 100
 
 
 # # Initialize SQLAlchemy session
@@ -661,6 +667,8 @@ for i in range(num_rejected):
         seller_product_id=seller_product_ids[i], new_data=seller_product
     )
 
+list_of_approved_ids=[]
+
 for i in range(num_approved):
     # Create a SellerProduct object
     seller_product = SellerProductUpdate(
@@ -677,10 +685,12 @@ for i in range(num_approved):
         new_data=seller_product,
     )
 
+    list_of_approved_ids.append(seller_product_ids[i + 1 + num_rejected])
+
 for _ in range(num_cart_items):
     # Generate random data for each in shopping cart item
     quantity = random.randint(1, 10)  # Random quantity between 1 and 10
-    id_seller_product = random.choice(seller_product_ids)
+    id_seller_product = random.choice(list_of_approved_ids)
 
     # Choose a buyer ID
     id_buyer = random.choice(buyer_ids)
@@ -722,7 +732,7 @@ for _ in range(num_cart_items):
 for _ in range(num_list_items):
     # Choose a buyer ID
     id_buyer = random.choice(buyer_ids)
-    id_seller_product = random.choice(seller_product_ids)
+    id_seller_product = random.choice(list_of_approved_ids)
 
     while in_wish_list_service.wishlist_repo.get_by_id(
         id_buyer=id_buyer, id_seller_product=id_seller_product
@@ -735,17 +745,17 @@ for _ in range(num_list_items):
     in_wish_list_service.add(id_buyer=id_buyer, wish_list_item=in_wish_list)
 
 # Generate and add orders
+# Generate and add orders
+created_orders = []
 for i in range(num_orders):
     # Generate random data for each order
-    order_date = datetime.now() - timedelta(
-        days=random.randint(1, 30)
-    )  # Random date within the past 30 days
-    buyer = buyer_service.get_by_id(buyer_ids[i])
+    order_date = datetime.now() - timedelta(days=random.randint(1, 30))  # Random date within the past 30 days
+    buyer = buyer_service.get_by_id(random.choice(buyer_ids))
     cards = buyer.cards
     addresses = buyer.addresses
+
     while len(cards) < 1 or len(addresses) < 1:
-        i += 1
-        buyer = buyer_service.get_by_id(buyer_ids[i])
+        buyer = buyer_service.get_by_id(random.choice(buyer_ids))
         cards = buyer.cards
         addresses = buyer.addresses
 
@@ -758,34 +768,85 @@ for i in range(num_orders):
     )
 
     # Add the order to the session
-    created_order = order_service.add(id_buyer=buyer_ids[i], order=order)
+    created_order = order_service.add(id_buyer=buyer.id, order=order)
+    created_orders.append((created_order.id, buyer.id))
+
+for order_id, buyer_id in created_orders:
     used_seller_product_ids = set()
     for j in range(num_product_lines_per_order):
-        # Generate random values for product line attributes
+        print(f"Creating ProductLine {j + 1} for Order ID {order_id}")
         quantity = random.randint(1, 6)
-        # Choose a seller product randomly (ensure it's not a duplicate)
-        while True:
-            seller_product_id = random.choice(seller_product_ids)
-            if seller_product_id not in used_seller_product_ids:
-                used_seller_product_ids.add(seller_product_id)
-                break
-        seller_product = seller_product_serv.get_by_id(seller_product_id)
-        price = seller_product.price
-        subtotal = quantity * price
+        
+        attempts = 0
+        max_attempts = 10
 
-        if quantity < seller_product.quantity:
-            product_line = ProductLineCreate(
-                quantity=quantity,
-                subtotal=subtotal,
-                id_seller_product=seller_product.id,
-            )
-            product_line_service.add(
-                id_order=created_order.id,
-                id_buyer=buyer_ids[i],
-                product_line=product_line,
-            )
+        while attempts < max_attempts:
+            seller_product_id = random.choice(seller_product_ids)
+            
+            if seller_product_id not in used_seller_product_ids:
+                seller_product = seller_product_serv.get_by_id(seller_product_id)
+                
+                if seller_product.quantity >= quantity:
+                    used_seller_product_ids.add(seller_product_id)
+                    price = seller_product.price
+                    subtotal = quantity * price
+
+                    product_line = ProductLineCreate(
+                        quantity=quantity,
+                        subtotal=subtotal,
+                        id_seller_product=seller_product.id,
+                    )
+                    
+                    try:
+                        added_product_line = product_line_service.add(
+                            id_order=order_id,
+                            id_buyer=buyer_id,
+                            product_line=product_line,
+                        )
+                        print(f"Added ProductLine {j + 1}: Order ID {order_id}, SellerProduct ID {seller_product.id}, Quantity {added_product_line.quantity}, Subtotal {subtotal}")
+                        break
+                    except Exception as e:
+                        print(f"Error adding ProductLine {j + 1} for Order ID {order_id}: {e}")
+                        session.rollback()
+                        
+            attempts += 1
+
+        if attempts == max_attempts:
+            print(f"Max attempts reached for Order ID {order_id} while trying to add ProductLine {j + 1}")
+
 
 product_line_ids = product_line_service.product_line_repo.get_id_list()
+
+for i in range(num_buyers):
+    print(buyer_ids[i])
+    print(review_service.get_seller_product_by_buyer(buyer_ids[i]))
+
+buyer_purchased_products = {buyer_id: set() for buyer_id in buyer_ids}
+
+# Llenar el diccionario con los productos comprados por cada comprador
+for order_id, buyer_id in created_orders:
+    product_lines = product_line_service.get_all_by_order_id(order_id)
+    for product_line in product_lines:
+        buyer_purchased_products[buyer_id].add(product_line.id_seller_product)
+
+for _ in range(num_reviews):
+    # Choose a buyer ID
+    id_buyer = random.choice(buyer_ids)
+    purchased_products = list(buyer_purchased_products[id_buyer])
+    if not purchased_products:
+        continue  # Saltar si el comprador no ha comprado ningún producto
+
+    id_seller_product = random.choice(purchased_products)
+    
+    while review_service.review_repo.get_repeat_review(id_buyer=id_buyer, id_seller_product=id_seller_product) != []:
+        id_seller_product = random.choice(purchased_products)
+
+    # Create a review object
+    data = {"stars": random.randint(1, 5), "comment": faker.text(max_nb_chars=40), "id_seller_product": id_seller_product}
+    review = ReviewCreate(**data)
+    
+    # Add the review to the session
+    review_service.add(id_buyer=id_buyer, review=review)
 
 for _ in range(20):
     # Generate random data for each refund product
