@@ -1,8 +1,8 @@
 """review table
 
-Revision ID: 14648af86b79
-Revises: 2816457297cc
-Create Date: 2024-05-18 14:33:42.175400
+Revision ID: dcdcf7e91f9f
+Revises: 2f4220a451e1
+Create Date: 2024-05-21 12:27:47.153860
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '14648af86b79'
-down_revision: Union[str, None] = '2816457297cc'
+revision: str = 'dcdcf7e91f9f'
+down_revision: Union[str, None] = '2f4220a451e1'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -32,7 +32,7 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_Review_id_buyer'), 'Review', ['id_buyer'], unique=False)
     op.create_index(op.f('ix_Review_id_seller_product'), 'Review', ['id_seller_product'], unique=False)
-    op.add_column('SellerProduct', sa.Column('stars', sa.Integer(), nullable=True))
+    op.add_column('SellerProduct', sa.Column('stars', sa.Numeric(precision=2, scale=1), nullable=True))
     # ### end Alembic commands ###
 
 
