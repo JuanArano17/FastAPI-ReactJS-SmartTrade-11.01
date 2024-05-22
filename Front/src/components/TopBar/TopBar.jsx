@@ -8,6 +8,7 @@ import StarIcon from '@mui/icons-material/Star';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import { Link, useHistory, useLocation } from "react-router-dom";
 import SearchBar from "./searchbar/SearchBar";
 import { useLogout } from "../../utils/hooks/useLogout";
@@ -44,6 +45,10 @@ const TopBar = () => {
     history.push("/tutorial");
   };
 
+  const handleOrdersClick = () => {
+    history.push("/orders");
+  };
+
   const buttonColors = {
     home: '#357a38',
     shoppingCart: '#357a38',
@@ -54,6 +59,7 @@ const TopBar = () => {
     profile: '#357a38',
     products: '#357a38',
     tutorial: '#ffffff' // Color blanco para el ícono de tutorial
+    orders: '#357a38' // Define color for orders button
   };
 
   const indicatorStyle = (path) => ({
@@ -70,7 +76,8 @@ const TopBar = () => {
     "/logout": "logout",
     "/profile": "profile",
     "/seller-products": "products",
-    "/tutorial": "tutorial"
+    "/tutorial": "tutorial",
+    "/orders": "orders"
   })[path] || 'home';
 
   return (
@@ -145,11 +152,23 @@ const TopBar = () => {
                       fontSize: '1.2em',
                       ...indicatorStyle('/seller-products')
                     }}
-                  >
-                  </Button>
+                  />
                 </Tooltip>
               </>
             )}
+            <Tooltip title="Track Orders">
+              <Button
+                size="large"
+                startIcon={<LocalShippingIcon />}
+                variant="text"
+                onClick={handleOrdersClick}
+                sx={{
+                  color: buttonColors.orders,
+                  fontSize: '1.2em',
+                  ...indicatorStyle('/orders')
+                }}
+              />
+            </Tooltip>
             <Tooltip title="Logout">
               <Button
                 size="large"
