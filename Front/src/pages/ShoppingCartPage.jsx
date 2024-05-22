@@ -11,6 +11,7 @@ import { getCartItems } from '../api/services/products/ShoppingCartService';
 const ShoppingCartPage = () => {
     const [cartItems, setCartItems] = useState([]);
     const history = useHistory();
+
     const fetchCartData = async () => {
         try {
             const cartItems = await getCartItems();
@@ -21,6 +22,7 @@ const ShoppingCartPage = () => {
             console.error('Error al cargar los datos del carrito:', error);
         }
     };
+
     useEffect(() => {
         fetchCartData();
     }, []);
@@ -56,6 +58,7 @@ const ShoppingCartPage = () => {
                             color="primary"
                             sx={{ ...styles.greenRoundedButton, mt: 2 }}
                             onClick={handleContinue}
+                            disabled={cartItems.length === 0}
                         >
                             Continue
                         </Button>
@@ -66,4 +69,5 @@ const ShoppingCartPage = () => {
         </Box>
     );
 };
+
 export default ShoppingCartPage;
