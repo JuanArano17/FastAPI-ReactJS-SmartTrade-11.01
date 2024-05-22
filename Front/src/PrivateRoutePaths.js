@@ -42,3 +42,4 @@ export const sellerproductsPaths = {
     Unknown: '/',
     Seller: '/sellerproducts',
 };
+export const helpPagePaths = {};

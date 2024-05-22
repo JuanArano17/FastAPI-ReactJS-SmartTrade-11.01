@@ -7,6 +7,7 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import StarIcon from '@mui/icons-material/Star';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import StorefrontIcon from '@mui/icons-material/Storefront';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { Link, useHistory, useLocation } from "react-router-dom";
 import SearchBar from "./searchbar/SearchBar";
 import { useLogout } from "../../utils/hooks/useLogout";
@@ -39,6 +40,10 @@ const TopBar = () => {
     history.push("/seller-products");
   };
 
+  const handleTutorialClick = () => {
+    history.push("/tutorial");
+  };
+
   const buttonColors = {
     home: '#357a38',
     shoppingCart: '#357a38',
@@ -47,7 +52,8 @@ const TopBar = () => {
     register: '#357a38',
     logout: '#357a38',
     profile: '#357a38',
-    products: '#357a38'  // Definir el color del botón de productos
+    products: '#357a38',
+    tutorial: '#ffffff' // Color blanco para el ícono de tutorial
   };
 
   const indicatorStyle = (path) => ({
@@ -63,7 +69,8 @@ const TopBar = () => {
     "/register": "register",
     "/logout": "logout",
     "/profile": "profile",
-    "/seller-products": "products"
+    "/seller-products": "products",
+    "/tutorial": "tutorial"
   })[path] || 'home';
 
   return (
@@ -83,18 +90,18 @@ const TopBar = () => {
           <>
             <SearchBar />
             <Tooltip title="Profile">
-                  <Button
-                    size="large"
-                    startIcon={<AccountCircleIcon />}
-                    variant="text"
-                    onClick={handleProfileClick}
-                    sx={{
-                      color: buttonColors.profile,
-                      fontSize: '1.2em',
-                      ...indicatorStyle('/profile')
-                    }}
-                  />
-                </Tooltip>
+              <Button
+                size="large"
+                startIcon={<AccountCircleIcon />}
+                variant="text"
+                onClick={handleProfileClick}
+                sx={{
+                  color: buttonColors.profile,
+                  fontSize: '1.2em',
+                  ...indicatorStyle('/profile')
+                }}
+              />
+            </Tooltip>
             {userType === 'Buyer' && (
               <>
                 <Tooltip title="View Wish List">
@@ -193,6 +200,21 @@ const TopBar = () => {
             </Link>
           </>
         )}
+        <Tooltip title="Tutorial">
+          <IconButton 
+            size="large" 
+            color="inherit" 
+            onClick={handleTutorialClick} 
+            sx={{ 
+              backgroundColor: '#357a38', 
+              color: '#ffffff', 
+              '&:hover': { backgroundColor: '#ffffff', color: '#357a38' }, 
+              marginRight: '40px', 
+              ...indicatorStyle('/tutorial') 
+            }}>
+            <HelpOutlineIcon />
+          </IconButton>
+        </Tooltip>
       </Toolbar>
     </AppBar>
   );
