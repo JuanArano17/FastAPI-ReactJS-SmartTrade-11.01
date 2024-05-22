@@ -51,14 +51,14 @@ class ProductLineService:
                 detail="Product quantity exceeds seller's stock",
             )
 
-        if seller_product.price * product_line.quantity != product_line.subtotal:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Product subtotal does not match seller's price and quantity",
-            )
+        #if seller_product.price * product_line.quantity != product_line.subtotal:
+        #    raise HTTPException(
+        #        status_code=status.HTTP_400_BAD_REQUEST,
+        #        detail="Product subtotal does not match seller's price and quantity",
+        #    )
 
         product_line = ProductLine(**product_line.model_dump(), id_order=id_order)
-        order.total += product_line.subtotal
+        #order.total += product_line.subtotal
         # seller_product.quantity -= product_line.quantity
 
         if seller_product.sizes == []:
