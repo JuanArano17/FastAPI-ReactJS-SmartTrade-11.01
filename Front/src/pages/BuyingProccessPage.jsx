@@ -70,7 +70,7 @@ const BuyingProcessPage = () => {
                                                     <FormControlLabel key={card.id} value={card.card_name} control={<Radio />} label={`${card.card_name}`} />
                                                 ))}
                                             </RadioGroup>
-                                            <Button  sx={styles.greenRoundedButton} onClick={() => setShowAddCardForm(true)}>
+                                            <Button sx={styles.greenRoundedButton} onClick={() => setShowAddCardForm(true)}>
                                                 Add New Card
                                             </Button>
                                         </FormControl>
@@ -80,7 +80,7 @@ const BuyingProcessPage = () => {
                                             <FormLabel component="legend">Select a Shipping Address</FormLabel>
                                             <RadioGroup value={selectedAddress} onChange={(e) => setSelectedAddress(e.target.value)}>
                                                 {addresses.map((address) => (
-                                                    <FormControlLabel key={address.id} value={JSON.stringify(address)} control={<Radio />} label={`${address.street}, ${address.city}`} />
+                                                    <FormControlLabel key={address.id} value={address.street} control={<Radio />} label={`${address.street}, ${address.city}`} />
                                                 ))}
                                             </RadioGroup>
                                             <Button  sx={styles.greenRoundedButton} onClick={() => setShowAddAddressForm(true)}>
