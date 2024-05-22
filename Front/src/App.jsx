@@ -38,6 +38,7 @@ function App() {
           <PrivateRouter path="/wish-list" component={WishListPage} allowedTypes={['Buyer']} redirectPaths={buyerPaths} />
           <PrivateRouter path="/admin/validate-product/:id" component={ValidateProductPage} allowedTypes={['Admin']} redirectPaths={adminPaths} />
           <PrivateRouter path="/admin" component={AdminPage} allowedTypes={['Admin']} redirectPaths={adminPaths} />
+          <PrivateRouter path="/tutorial" component={TutorialPage} allowedTypes={['Admin', 'Seller', 'Buyer', 'Unknown']} redirectPaths={helpPagePaths} />
           <PrivateRouter path="/buying-process" component={BuyingProcessPage} allowedTypes={['Buyer']} redirectPaths={buyerPaths} />
           <PrivateRouter path="/buy-summary" component={BuySummaryPage} allowedTypes={['Buyer']} redirectPaths={buyerPaths} />
           <PrivateRouter path="/review-product" component={ReviewProductPage} allowedTypes={['Buyer']} redirectPaths={buyerPaths} />
