@@ -35,12 +35,13 @@ class SellerProduct(Base):
     def __repr__(self):
         return f"SellerProduct(id={self.id}, id_product={self.id_product}, id_seller={self.id_seller}, quantity={self.quantity}, price={self.price}, shipping_costs={self.shipping_costs}, state={self.state}, justification={self.justification}, eco_points={self.eco_points}, age_restricted={self.age_restricted})"
 
-    def notify_observers(self, new_quantity: int):
+    def notify_observers(self, new_quantity: int, id_size:int = None):
         for cart_item in self.in_shopping_carts:
-            #if self.sizes==[]:
+            if self.sizes==[]:
                 if cart_item.quantity > new_quantity:
                     cart_item.quantity = new_quantity
-            #else:
-            #    pass 
-                #logic for clothes observer
+            else:
+                if cart_item.id_size==id_size:
+                    if cart_item.quantity > new_quantity:
+                        cart_item.quantity = new_quantity
             
