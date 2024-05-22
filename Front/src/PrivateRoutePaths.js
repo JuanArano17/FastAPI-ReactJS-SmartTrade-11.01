@@ -47,3 +47,4 @@ export const orderPaths = {
     Buyer: '/orders',
     Seller: '/orders',
 };
+export const helpPagePaths = {};

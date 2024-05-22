@@ -8,6 +8,7 @@ import StarIcon from '@mui/icons-material/Star';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { Link, useHistory, useLocation } from "react-router-dom";
 import SearchBar from "./searchbar/SearchBar";
 import { useLogout } from "../../utils/hooks/useLogout";
@@ -42,6 +43,10 @@ const TopBar = () => {
     history.push("/orders");
   };
 
+  const handleTutorialClick = () => {
+    history.push("/tutorial");
+  };
+
   const buttonColors = {
     home: '#357a38',
     shoppingCart: '#357a38',
@@ -52,6 +57,8 @@ const TopBar = () => {
     profile: '#357a38',
     products: '#357a38',
     orders: '#357a38' // Define color for orders button
+    products: '#357a38',
+    tutorial: '#ffffff' // Color blanco para el ícono de tutorial
   };
 
   const indicatorStyle = (path) => ({
@@ -69,6 +76,8 @@ const TopBar = () => {
     "/profile": "profile",
     "/seller-products": "products",
     "/orders": "orders"
+    "/seller-products": "products",
+    "/tutorial": "tutorial"
   })[path] || 'home';
 
   return (
@@ -88,6 +97,18 @@ const TopBar = () => {
           <>
             <SearchBar />
             <Tooltip title="Profile">
+              <Button
+                size="large"
+                startIcon={<AccountCircleIcon />}
+                variant="text"
+                onClick={handleProfileClick}
+                sx={{
+                  color: buttonColors.profile,
+                  fontSize: '1.2em',
+                  ...indicatorStyle('/profile')
+                }}
+              />
+            </Tooltip>
               <Button
                 size="large"
                 startIcon={<AccountCircleIcon />}
@@ -210,6 +231,21 @@ const TopBar = () => {
             </Link>
           </>
         )}
+        <Tooltip title="Tutorial">
+          <IconButton 
+            size="large" 
+            color="inherit" 
+            onClick={handleTutorialClick} 
+            sx={{ 
+              backgroundColor: '#357a38', 
+              color: '#ffffff', 
+              '&:hover': { backgroundColor: '#ffffff', color: '#357a38' }, 
+              marginRight: '40px', 
+              ...indicatorStyle('/tutorial') 
+            }}>
+            <HelpOutlineIcon />
+          </IconButton>
+        </Tooltip>
       </Toolbar>
     </AppBar>
   );
