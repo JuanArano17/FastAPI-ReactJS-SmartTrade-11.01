@@ -7,7 +7,6 @@ import SelectCardAndShipping from '../components/buysystem/SelectCardAndShipping
 import ProductSummary from '../components/buysystem/ProductSummary';
 import ReviewProduct from '../components/buysystem/ReviewProduct';
 import { getCartItems } from '../api/services/products/ShoppingCartService';
-import CartSummary from '../components/buysystem/CartSummary';
 
 const BuyingProcessPage = () => {
     const [step, setStep] = useState(1);
