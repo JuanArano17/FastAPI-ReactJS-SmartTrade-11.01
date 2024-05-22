@@ -42,3 +42,8 @@ export const sellerproductsPaths = {
     Unknown: '/',
     Seller: '/sellerproducts',
 };
+export const orderPaths = {
+    Admin: '/admin',
+    Buyer: '/orders',
+    Seller: '/orders',
+};
