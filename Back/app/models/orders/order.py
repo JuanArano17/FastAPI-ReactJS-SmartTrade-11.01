@@ -1,16 +1,8 @@
-from enum import Enum
 from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, Enum as EnumColumn
 from sqlalchemy.orm import relationship, mapped_column
 
 from app.base import Base
-
-
-class OrderState(Enum):
-    PENDING = "pending"
-    CONFIRMED = "completed"
-    CANCELLED = "cancelled"
-    SHIPPED = "shipped"
-    DELIVERED = "delivered"
+from app.core.enums import OrderState
 
 
 class Order(Base):
