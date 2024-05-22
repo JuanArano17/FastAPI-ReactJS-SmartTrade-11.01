@@ -23,9 +23,10 @@ const BuySummaryPage = () => {
     }, []);
 
     const calculateTotal = () => {
-        return cartItems.reduce((acc, item) => {
+        const total = cartItems.reduce((acc, item) => {
             return acc + (item.seller_product.price + item.seller_product.shipping_costs) * item.quantity;
         }, 0);
+        return total.toFixed(2);
     };
 
     const handleConfirmPurchase = () => {
@@ -51,7 +52,7 @@ const BuySummaryPage = () => {
                             <Typography variant="h6">Selected card:{selectedCard}</Typography>
                             <Typography variant="h6" sx={{ mt: 2 }}>Shipping address: {selectedAddress}</Typography>
                             <Divider sx={{ my: 2 }} />
-                            <Typography variant="h5">Total bill: ${calculateTotal()}</Typography>
+                            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Total bill: ${calculateTotal()}</Typography>
                         </Grid>
                         <Grid item xs={12}>
                             <Button
