@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
@@ -12,7 +12,9 @@ import AdminPage from './pages/AdminPage';
 import ValidateProductPage from './pages/ValidateProductPage';
 import WishListPage from './pages/WishListPage';
 import BuyingProcessPage from './pages/BuyingProccessPage';
-import { adminPaths, buyerPaths, catalogPaths, forgotPasswordPaths, homePaths, loginPaths, profilePaths, registerPaths, sellerproductsPaths, helpPagePaths } from './PrivateRoutePaths';
+import BuySummaryPage from './pages/BuySummaryPage';
+import ReviewProductPage from './pages/ReviewProductPage';
+import { adminPaths, buyerPaths, catalogPaths, forgotPasswordPaths, homePaths, loginPaths, profilePaths, registerPaths, sellerproductsPaths } from './PrivateRoutePaths';
 import PrivateRouter from './components/router/PrivateRouter';
 import SellerProductsPage from './pages/SellerProductsPage';
 import TutorialPage from './pages/TutorialPage';
@@ -32,10 +34,12 @@ function App() {
           <PrivateRouter path="/forgotPassword" component={ForgotPasswordPage} allowedTypes={['Unknown']} redirectPaths={forgotPasswordPaths} />
           <PrivateRouter path="/seller-products" component={SellerProductsPage} allowedTypes={['Seller']} redirectPaths={sellerproductsPaths} />
           <PrivateRouter path="/shopping-cart" component={ShoppingCartPage} allowedTypes={['Buyer']} redirectPaths={buyerPaths} />
-          <PrivateRouter path="/buying-process" component={BuyingProcessPage} allowedTypes={['Buyer']} redirectPaths={buyerPaths} />
           <PrivateRouter path="/wish-list" component={WishListPage} allowedTypes={['Buyer']} redirectPaths={buyerPaths} />
           <PrivateRouter path="/admin/validate-product/:id" component={ValidateProductPage} allowedTypes={['Admin']} redirectPaths={adminPaths} />
           <PrivateRouter path="/admin" component={AdminPage} allowedTypes={['Admin']} redirectPaths={adminPaths} />
+          <PrivateRouter path="/buying-process" component={BuyingProcessPage} allowedTypes={['Buyer']} redirectPaths={buyerPaths} />
+          <PrivateRouter path="/buy-summary" component={BuySummaryPage} allowedTypes={['Buyer']} redirectPaths={buyerPaths} />
+          <PrivateRouter path="/review-product" component={ReviewProductPage} allowedTypes={['Buyer']} redirectPaths={buyerPaths} />
           <PrivateRouter path="/tutorial" component={TutorialPage} allowedTypes={['Admin', 'Seller', 'Buyer', 'Unknown']} redirectPaths={helpPagePaths} />
           <PrivateRouter exact path="/" component={HomePage} allowedTypes={['Unknown']} redirectPaths={homePaths} />
         </Switch>

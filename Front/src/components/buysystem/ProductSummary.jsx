@@ -4,6 +4,8 @@ import styles from '../../styles/styles';
 
 const ProductSummary = ({ cartItems, selectedCard, selectedAddress, onConfirm, onBack }) => {
     const calculateTotal = () => {
+        console.log("card",selectedCard);
+        console.log("address",selectedAddress);
         return cartItems.reduce((acc, item) => {
             return acc + (item.seller_product.price + item.seller_product.shipping_costs) * item.quantity;
         }, 0);
