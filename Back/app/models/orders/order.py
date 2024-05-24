@@ -1,7 +1,8 @@
-from sqlalchemy import Date, Float, ForeignKey, Integer
+from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, Enum as EnumColumn
 from sqlalchemy.orm import relationship, mapped_column
 
 from app.base import Base
+from app.core.enums import OrderState
 
 
 class Order(Base):
@@ -15,8 +16,11 @@ class Order(Base):
     id_address = mapped_column(
         Integer, ForeignKey("Address.id", name="fk_order_address_id")
     )
-    order_date = mapped_column(Date, nullable=False)
-    total = mapped_column(Float, nullable=False)
+    order_date = mapped_column(DateTime)
+    total = mapped_column(Numeric(10, 2), nullable=False)
+    state = mapped_column(
+        EnumColumn(OrderState), nullable=False, default=OrderState.PENDING
+    )
 
     card = relationship("Card", back_populates="orders")
     address = relationship("Address", back_populates="orders")

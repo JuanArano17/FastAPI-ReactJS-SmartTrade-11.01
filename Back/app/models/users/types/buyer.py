@@ -18,6 +18,8 @@ class Buyer(User):
     dni = mapped_column(String(255), nullable=False, unique=True)
     billing_address = mapped_column(String(255))
     payment_method = mapped_column(String(255))
+    
+    reviews = relationship("Review", back_populates="buyer", cascade="all, delete-orphan")
 
     addresses = relationship(
         "Address", back_populates="buyer", cascade="all, delete-orphan"

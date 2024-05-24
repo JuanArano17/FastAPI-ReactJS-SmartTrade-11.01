@@ -70,6 +70,7 @@ class SellerProductRead(BaseModel):
     publisher: Optional[str] = None
     platform: Optional[str] = None
     sizes: Optional[list[Size]] = []
+    stars: Optional[float] = None
     # shopping_cart_products: list[InShoppingCart] = []
     # wish_list_products: list[InWishList] = []
     # product_lines: list[ProductLine] = []
