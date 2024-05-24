@@ -9,7 +9,7 @@ const OrdersTable = ({ data, isSeller }) => {
           <TableRow>
             <TableCell>Image</TableCell>
             <TableCell>Name</TableCell>
-            <TableCell>More info</TableCell>
+            <TableCell>Info</TableCell>
             <TableCell>Quantity</TableCell>
             <TableCell>Price</TableCell>
             <TableCell>State</TableCell>
@@ -18,16 +18,16 @@ const OrdersTable = ({ data, isSeller }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((row, index) => (
-            <TableRow key={index} sx={{ backgroundColor: index % 2 === 0 ? 'white' : '#f7f7f7' }}>
-              <TableCell>{row.image}</TableCell>
-              <TableCell>{row.name}</TableCell>
-              <TableCell>{row.info}</TableCell>
-              <TableCell>{row.quantity}</TableCell>
-              <TableCell>{row.price}</TableCell>
-              <TableCell>{row.state}</TableCell>
-              <TableCell>{row.expectedArrival}</TableCell>
-              {isSeller && <TableCell>{row.actions}</TableCell>}
+          {data.map((order, index) => (
+            <TableRow key={index}>
+              <TableCell>{order.image}</TableCell>
+              <TableCell>{order.name}</TableCell>
+              <TableCell>{order.info}</TableCell>
+              <TableCell>{order.quantity}</TableCell>
+              <TableCell>{order.price}</TableCell>
+              <TableCell>{order.state}</TableCell>
+              <TableCell>{order.expectedArrival}</TableCell>
+              {isSeller && <TableCell>{order.actions}</TableCell>}
             </TableRow>
           ))}
         </TableBody>

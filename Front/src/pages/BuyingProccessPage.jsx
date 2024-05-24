@@ -23,8 +23,6 @@ const BuyingProcessPage = () => {
             const addressData = await getAddresssesInfo();
             setCards(cardData);
             setAddresses(addressData);
-            console.log("cards", cardData);
-            console.log("addresses", addressData);
         };
         fetchData();
     }, []);
@@ -33,9 +31,6 @@ const BuyingProcessPage = () => {
         if (selectedCard && selectedAddress) {
             history.push('/buy-summary', { selectedCard, selectedAddress });
         }
-
-        console.log("selectedCard: ", selectedCard);
-        console.log("selectedAddress:", selectedAddress);
     };
 
     const handleAddCard = async (newCard) => {
@@ -65,9 +60,9 @@ const BuyingProcessPage = () => {
                                     <Grid item xs={12} md={6}>
                                         <FormControl component="fieldset">
                                             <FormLabel component="legend">Select a Card</FormLabel>
-                                            <RadioGroup value={selectedCard} onChange={(e) => setSelectedCard(e.target.value)}>
+                                            <RadioGroup value={selectedCard?.id} onChange={(e) => setSelectedCard(cards.find(card => card.id === parseInt(e.target.value)))}>
                                                 {cards.map((card) => (
-                                                    <FormControlLabel key={card.id} value={card.card_name} control={<Radio />} label={`${card.card_name}`} />
+                                                    <FormControlLabel key={card.id} value={card.id} control={<Radio />} label={`${card.card_name}`} />
                                                 ))}
                                             </RadioGroup>
                                             <Button sx={styles.greenRoundedButton} onClick={() => setShowAddCardForm(true)}>
@@ -78,9 +73,9 @@ const BuyingProcessPage = () => {
                                     <Grid item xs={12} md={6}>
                                         <FormControl component="fieldset">
                                             <FormLabel component="legend">Select a Shipping Address</FormLabel>
-                                            <RadioGroup value={selectedAddress} onChange={(e) => setSelectedAddress(e.target.value)}>
+                                            <RadioGroup value={selectedAddress?.id} onChange={(e) => setSelectedAddress(addresses.find(address => address.id === parseInt(e.target.value)))}>
                                                 {addresses.map((address) => (
-                                                    <FormControlLabel key={address.id} value={address.street} control={<Radio />} label={`${address.street}, ${address.city}`} />
+                                                    <FormControlLabel key={address.id} value={address.id} control={<Radio />} label={`${address.street}, ${address.city}`} />
                                                 ))}
                                             </RadioGroup>
                                             <Button  sx={styles.greenRoundedButton} onClick={() => setShowAddAddressForm(true)}>

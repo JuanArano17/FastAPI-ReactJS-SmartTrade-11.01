@@ -6,6 +6,7 @@ import Footer from '../components/footer/Footer';
 import CartSummaryItem from '../components/products/shoppingcart/CartSummaryItem';
 import styles from '../styles/styles';
 import { getCartItems } from '../api/services/products/ShoppingCartService';
+import { createOrder } from '../api/services/orders/OrderService';  // Importa la función de creación de pedidos
 
 const BuySummaryPage = () => {
     const { state } = useLocation();
@@ -29,8 +30,25 @@ const BuySummaryPage = () => {
         return total.toFixed(2);
     };
 
-    const handleConfirmPurchase = () => {
-        history.push('/review-product');
+    const handleConfirmPurchase = async () => {
+        console.log(selectedAddress);
+        console.log(selectedCard);
+
+        try {
+            // Crear el pedido
+            const orderData = {
+                order_date: new Date().toISOString(),
+                id_card: selectedCard.id,
+                id_address: selectedAddress.id,
+                total: calculateTotal(),
+            };
+
+            const response = await createOrder(orderData);
+
+            history.push('/review-product');
+        } catch (error) {
+            console.error('Error al crear el pedido:', error.response ? error.response.data : error.message);
+        }
     };
 
     return (
@@ -49,8 +67,8 @@ const BuySummaryPage = () => {
                         ))}
                         <Grid item xs={12}>
                             <Divider sx={{ my: 2 }} />
-                            <Typography variant="h6">Selected card:{selectedCard}</Typography>
-                            <Typography variant="h6" sx={{ mt: 2 }}>Shipping address: {selectedAddress}</Typography>
+                            <Typography variant="h6">Selected card: {selectedCard.card_name}</Typography>
+                            <Typography variant="h6" sx={{ mt: 2 }}>Shipping address: {selectedAddress.street}, {selectedAddress.city}</Typography>
                             <Divider sx={{ my: 2 }} />
                             <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Total bill: ${calculateTotal()}</Typography>
                         </Grid>
