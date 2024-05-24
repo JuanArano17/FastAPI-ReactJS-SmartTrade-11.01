@@ -8,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Import your services and models here
 from app.database import SessionLocal
+from app.core.enums import OrderState
 from app.service.users.types.seller import SellerService
 from app.service.users.types.buyer import BuyerService
 from app.service.users.card import CardService
@@ -46,6 +47,10 @@ from app.core.enums import OrderState
 # Initialize Faker with a specific seed (for consistency)
 faker = Faker()
 Faker.seed(42)  # Set the seed to any value you prefer
+
+def get_random_image_url():
+    response = requests.get("https://picsum.photos/200")
+    return response.url
 
 # Define the number of items to create
 num_buyers = 100
