@@ -1,4 +1,5 @@
 import random
+import requests
 import pycountry
 import string
 from faker import Faker
@@ -45,6 +46,10 @@ from app.service.products.review import ReviewService
 # Initialize Faker with a specific seed (for consistency)
 faker = Faker()
 Faker.seed(42)  # Set the seed to any value you prefer
+
+def get_random_image_url():
+    response = requests.get("https://picsum.photos/200")
+    return response.url
 
 # Define the number of items to create
 num_buyers = 100
@@ -293,8 +298,24 @@ def create_product(category, extra_fields):
     }
     product.update(extra_fields)
     created_product = product_service.add(category=category, product_data=product)
+    used_urls = []
     for _ in range(random.randint(1, 5)):
-        url = faker.image_url()
+        # Generar un número aleatorio para evitar caché y obtener una imagen diferente cada vez
+        random_param = random.randint(1, 100000)
+        if category=="Game":
+                url = f"https://source.unsplash.com/featured/?videogame&{random_param}"
+        elif category.lower() =="houseutilities":
+                url = f"https://source.unsplash.com/featured/?kitchen&{random_param}"
+        else:
+                url = f"https://source.unsplash.com/featured/?{category}&{random_param}"
+        while url in used_urls:
+            if category=="Game":
+                url = f"https://source.unsplash.com/featured/?videogame&{random_param}"
+            elif category.lower() =="houseutilities":
+                url = f"https://source.unsplash.com/featured/?kitchen&{random_param}"
+            else:
+                url = f"https://source.unsplash.com/featured/?{category}&{random_param}"
+        used_urls.append(url)
         image_create = ImageCreate(url=url)
         image_service.add(id_product=created_product.id, image=image_create)
     session.commit()
