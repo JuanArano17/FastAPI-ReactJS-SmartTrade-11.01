@@ -1,3 +1,4 @@
+from decimal import Decimal
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
@@ -51,17 +52,25 @@ class ProductLineService:
                 detail="Product quantity exceeds seller's stock",
             )
 
-        #if seller_product.price * product_line.quantity != product_line.subtotal:
-        #    raise HTTPException(
-        #        status_code=status.HTTP_400_BAD_REQUEST,
-        #        detail="Product subtotal does not match seller's price and quantity",
-        #    )
+        product_line_subtotal = Decimal(product_line.subtotal).quantize(Decimal("0.01"))
+        seller_product_price = Decimal(seller_product.price).quantize(Decimal("0.01"))
+        calculated_subtotal = (
+            seller_product_price * Decimal(product_line.quantity)
+        ).quantize(Decimal("0.01"))
+
+        if product_line_subtotal != calculated_subtotal:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Product subtotal does not match seller's price and quantity",
+            )
 
         product_line = ProductLine(**product_line.model_dump(), id_order=id_order)
-        #order.total += product_line.subtotal
-        # seller_product.quantity -= product_line.quantity
+        order.total += Decimal(product_line.subtotal)
 
         if seller_product.sizes == []:
+            print(
+                f"seller product - product line quantity: {seller_product.quantity} - {product_line.quantity}\n\n\n\n"
+            )
             seller_product_update = SellerProductUpdate(
                 quantity=seller_product.quantity - product_line.quantity
             )
