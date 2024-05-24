@@ -1,4 +1,4 @@
-from sqlalchemy import Float, ForeignKey, Integer
+from sqlalchemy import ForeignKey, Integer, Numeric
 from sqlalchemy.orm import relationship, mapped_column
 
 from app.base import Base
@@ -21,7 +21,7 @@ class ProductLine(Base):
         ),
     )
     quantity = mapped_column(Integer, nullable=False)
-    subtotal = mapped_column(Float, nullable=False)
+    subtotal = mapped_column(Numeric(10, 2), nullable=False)
 
     order = relationship("Order", back_populates="product_lines")
     seller_product = relationship("SellerProduct", back_populates="product_lines")

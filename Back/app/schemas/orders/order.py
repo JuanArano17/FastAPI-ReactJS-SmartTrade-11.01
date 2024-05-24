@@ -1,31 +1,28 @@
 from datetime import datetime, timezone
 from pydantic import BaseModel, ConfigDict, Field, NonNegativeFloat, validator
-from typing import List, Optional
 
 from app.schemas.orders.product_line import ProductLine, CompleteProductLine
+from app.core.enums import OrderState
+
+
+class ConfirmOrder(BaseModel):
+    id_card: int
+    id_address: int
 
 
 class OrderBase(BaseModel):
-    order_date: datetime = Field(default_factory=datetime.now)
-    id_card: int
-    id_address: int
+    order_date: datetime | None = Field(default_factory=datetime.now)
+    id_card: int | None
+    id_address: int | None
+    state: OrderState
     total: NonNegativeFloat = Field(default=0)
 
     @validator("order_date")
     @classmethod
     def validate_date(cls, v: datetime):
-        if v.astimezone(timezone.utc) > datetime.now(tz=timezone.utc):
+        if v is not None and v.astimezone(timezone.utc) > datetime.now(tz=timezone.utc):
             raise ValueError("The order date must be in the past")
         return v
-
-
-class OrderCreate(OrderBase):
-    pass
-
-
-class OrderUpdate(OrderBase):
-    id_card: Optional[int] = None
-    id_address: Optional[int] = None
 
 
 class Order(OrderBase):
@@ -33,7 +30,7 @@ class Order(OrderBase):
 
     id: int
     id_buyer: int
-    product_lines: List[ProductLine]
+    product_lines: list[ProductLine]
 
 
 class CompleteOrder(OrderBase):
