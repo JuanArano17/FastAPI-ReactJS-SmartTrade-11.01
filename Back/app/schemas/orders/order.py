@@ -25,6 +25,11 @@ class OrderBase(BaseModel):
         return v
 
 
+# Only used in populate_db.py
+class OrderCreate(OrderBase):
+    pass
+
+
 class Order(OrderBase):
     model_config = ConfigDict(from_attributes=True)
 

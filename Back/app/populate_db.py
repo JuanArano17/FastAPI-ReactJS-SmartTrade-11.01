@@ -1,11 +1,13 @@
 import random
+import pycountry
 import string
 from faker import Faker
 from datetime import datetime, timedelta
-from concurrent.futures import ThreadPoolExecutor, as_completed, wait
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Import your services and models here
 from app.database import SessionLocal
+from app.core.enums import OrderState
 from app.service.users.types.seller import SellerService
 from app.service.users.types.buyer import BuyerService
 from app.service.users.card import CardService
@@ -16,6 +18,7 @@ from app.schemas.users.card import CardCreate
 from app.schemas.products.image import ImageCreate
 from app.schemas.users.in_shopping_cart import InShoppingCartCreate
 from app.schemas.users.in_wish_list import InWishListCreate
+from app.schemas.orders.order import OrderCreate
 from app.schemas.orders.product_line import ProductLineCreate
 from app.schemas.users.types.seller import SellerCreate
 from app.schemas.products.seller_product import SellerProductCreate, SellerProductUpdate
@@ -28,7 +31,6 @@ from app.service.orders.order import OrderService
 from app.service.orders.product_line import ProductLineService
 from app.service.orders.refund_product import RefundProductService
 from app.schemas.orders.refund_product import RefundProductCreate
-from app.schemas.orders.order import OrderCreate
 from app.service.users.types.user import UserService
 from app.schemas.users.types.admin import AdminCreate
 from app.service.users.types.admin import AdminService
@@ -36,7 +38,6 @@ from app.schemas.products.categories.variations.size import SizeCreate
 from app.models.users.in_shopping_cart import InShoppingCart
 from app.schemas.users.country import CountryCreate
 from app.service.users.country import CountryService
-import pycountry
 
 from app.schemas.products.review import ReviewCreate
 from app.service.products.review import ReviewService
@@ -66,6 +67,7 @@ num_rejected = 40
 num_approved = 200
 num_reviews = 100
 
+
 def create_services():
     session = SessionLocal()
     user_service = UserService(session=session)
@@ -88,6 +90,7 @@ def create_services():
         address_service,
         product_service,
         seller_product_serv,
+        in_shopping_cart_service,
     )
     in_wish_list_service = InWishListService(
         session=session,
@@ -108,7 +111,11 @@ def create_services():
         product_line_service=product_line_service,
     )
     country_service = CountryService(session=session)
-    review_service = ReviewService(session=session, seller_product_service=seller_product_serv, buyer_service=buyer_service)
+    review_service = ReviewService(
+        session=session,
+        seller_product_service=seller_product_serv,
+        buyer_service=buyer_service,
+    )
     admin_service = AdminService(session=session, user_service=user_service)
 
     return {
@@ -131,11 +138,13 @@ def create_services():
         "admin_service": admin_service,
     }
 
+
 def run_in_parallel(tasks, *args):
     with ThreadPoolExecutor() as executor:
         futures = [executor.submit(task, *args) for task in tasks]
         results = [future.result() for future in as_completed(futures)]
     return results
+
 
 def initialize_db():
     services = create_services()
@@ -144,7 +153,7 @@ def initialize_db():
     product_service = services["product_service"]
     country_service = services["country_service"]
     order_service = services["order_service"]
-    
+
     # Clean up the database before populating it
     user_service.delete_all()
     product_service.delete_all()
@@ -164,11 +173,12 @@ def initialize_db():
     session.commit()
     session.close()
 
+
 def create_buyer():
     services = create_services()
     session = services["session"]
     buyer_service = services["buyer_service"]
-    
+
     dni_digits = "".join(random.choices(string.digits, k=8))
     dni_letter = random.choice(string.ascii_uppercase)
     dni = dni_digits + dni_letter
@@ -190,12 +200,15 @@ def create_buyer():
     session.close()
     return buyer_id
 
+
 def create_seller():
     services = create_services()
     session = services["session"]
     seller_service = services["seller_service"]
-    
-    cif = "".join(random.choices(string.ascii_uppercase, k=1)) + "".join(random.choices(string.digits, k=8))
+
+    cif = "".join(random.choices(string.ascii_uppercase, k=1)) + "".join(
+        random.choices(string.digits, k=8)
+    )
     bank_data = faker.iban()
     seller_data = {
         "email": faker.email(),
@@ -213,11 +226,12 @@ def create_seller():
     session.close()
     return seller_id
 
+
 def create_card(buyer_ids):
     services = create_services()
     session = services["session"]
     card_service = services["card_service"]
-    
+
     card_number = faker.credit_card_number(card_type=None)
     card_name = faker.name()
     card_exp_date = faker.date_between(start_date=datetime.now(), end_date="+10y")
@@ -232,11 +246,12 @@ def create_card(buyer_ids):
     session.commit()
     session.close()
 
+
 def create_address(buyer_ids):
     services = create_services()
     session = services["session"]
     address_service = services["address_service"]
-    
+
     street = faker.street_address()
     floor = random.randint(1, 200)
     door = str(faker.building_number())
@@ -259,12 +274,13 @@ def create_address(buyer_ids):
     session.commit()
     session.close()
 
+
 def create_product(category, extra_fields):
     services = create_services()
     session = services["session"]
     product_service = services["product_service"]
     image_service = services["image_service"]
-    
+
     name = faker.word()[:39]
     description = faker.sentence()
     spec_sheet = faker.text(max_nb_chars=200)
@@ -286,12 +302,13 @@ def create_product(category, extra_fields):
     session.close()
     return created_product_id
 
+
 def create_order(buyer_ids):
     services = create_services()
     session = services["session"]
     buyer_service = services["buyer_service"]
     order_service = services["order_service"]
-    
+
     order_date = datetime.now() - timedelta(days=random.randint(1, 30))
     buyer_id = random.choice(buyer_ids)
     buyer = buyer_service.get_by_id(buyer_id)
@@ -307,20 +324,22 @@ def create_order(buyer_ids):
         id_address=random.choice(addresses).id,
         order_date=order_date,
         total=0,
+        state=OrderState.CONFIRMED,
     )
-    created_order = order_service.add(id_buyer=buyer.id, order=order)
+    created_order = order_service.populate(id_buyer=buyer.id, order=order)
     order_id = created_order.id  # Obtener el ID antes de cerrar la sesión
     buyer_id = buyer.id  # Obtener el ID antes de cerrar la sesión
     session.commit()
     session.close()
     return order_id, buyer_id
 
+
 def create_product_lines_sequential(orders, seller_product_ids):
     services = create_services()
     session = services["session"]
     seller_product_serv = services["seller_product_serv"]
     product_line_service = services["product_line_service"]
-    
+
     for order_id, buyer_id in orders:
         used_seller_product_ids = set()
         for _ in range(num_product_lines_per_order):
@@ -335,12 +354,20 @@ def create_product_lines_sequential(orders, seller_product_ids):
                         used_seller_product_ids.add(seller_product_id)
                         price = seller_product.price
                         subtotal = quantity * price
+                        print(f"el subtotal es {subtotal}")
+                        print(
+                            f"seller_product_price: {price}\nquantity: {quantity}\nsubtotal: {subtotal}"
+                        )
                         product_line = ProductLineCreate(
                             quantity=quantity,
                             subtotal=subtotal,
                             id_seller_product=seller_product.id,
                         )
-                        product_line_service.add(id_order=order_id, id_buyer=buyer_id, product_line=product_line)
+                        product_line_service.add(
+                            id_order=order_id,
+                            id_buyer=buyer_id,
+                            product_line=product_line,
+                        )
                         break
                 attempts += 1
     session.commit()
@@ -354,7 +381,7 @@ def create_reviews_sequential(buyer_purchased_products):
 
     review_count = 0
     reviewed_pairs = set()
-    
+
     while review_count < num_reviews:
         buyer_id = random.choice(list(buyer_purchased_products.keys()))
         purchased_products = list(buyer_purchased_products[buyer_id])
@@ -362,7 +389,11 @@ def create_reviews_sequential(buyer_purchased_products):
             id_seller_product = random.choice(purchased_products)
             review_pair = (buyer_id, id_seller_product)
             if review_pair not in reviewed_pairs:
-                data = {"stars": random.randint(1, 5), "comment": faker.text(max_nb_chars=40), "id_seller_product": id_seller_product}
+                data = {
+                    "stars": random.randint(1, 5),
+                    "comment": faker.text(max_nb_chars=40),
+                    "id_seller_product": id_seller_product,
+                }
                 review = ReviewCreate(**data)
                 review_service.add(id_buyer=buyer_id, review=review)
                 reviewed_pairs.add(review_pair)
@@ -371,6 +402,7 @@ def create_reviews_sequential(buyer_purchased_products):
     session.commit()
     session.close()
 
+
 def create_refund_products_sequential(product_line_ids):
     services = create_services()
     session = services["session"]
@@ -378,7 +410,7 @@ def create_refund_products_sequential(product_line_ids):
     order_service = services["order_service"]
     refund_product_service = services["refund_product_service"]
     buyer_service = services["buyer_service"]
-    
+
     for _ in range(20):
         id_product_line = random.choice(product_line_ids)
         product_line = product_line_service.product_line_repo.get_by_id(id_product_line)
@@ -388,7 +420,9 @@ def create_refund_products_sequential(product_line_ids):
             id_product_line = random.choice(product_line_ids)
             product_line = product_line_service.get_by_id(id_product_line)
             order = order_service.get_by_id(product_line.id_order)
-        refund_date = product_line.order.order_date + timedelta(days=random.randint(1, 30))
+        refund_date = product_line.order.order_date + timedelta(
+            days=random.randint(1, 30)
+        )
         refund_product = RefundProductCreate(quantity=quantity, refund_date=refund_date)
         buyer = buyer_service.get_by_id(order.id_buyer)
         refund_product_service.add(
@@ -415,17 +449,57 @@ run_in_parallel([create_address] * num_addresses, buyer_ids)
 # Populate products in parallel
 product_categories = [
     ("book", {"pages": random.randint(100, 1500), "author": faker.name()}),
-    ("game", {"publisher": faker.company(), "platform": random.choice(["PlayStation", "Xbox", "Nintendo Switch", "PC"]), "size": str(random.randint(1, 1000)) + "GB"}),
-    ("clothes", {"materials": random.choice(["Cotton", "Polyester", "Wool"]), "type": random.choice(["T-shirt", "Jeans", "Dress"])}),
-    ("electronics", {"brand": faker.company(), "type": random.choice(["Smartphone", "Laptop"]), "capacity": str(random.randint(1, 1000)) + "GB"}),
-    ("electrodomestics", {"brand": faker.company(), "type": random.choice(["Refrigerator", "Washing Machine"]), "power_source": random.choice(["Batteries", "Electrical"])}),
-    ("houseutilities", {"brand": faker.company(), "type": random.choice(["Knife", "Fork"])}),
-    ("food", {"brand": faker.company(), "type": random.choice(["Fruit", "Vegetable"]), "ingredients": random.choice(["Protein", "Carbohydrates"])}),
+    (
+        "game",
+        {
+            "publisher": faker.company(),
+            "platform": random.choice(["PlayStation", "Xbox", "Nintendo Switch", "PC"]),
+            "size": str(random.randint(1, 1000)) + "GB",
+        },
+    ),
+    (
+        "clothes",
+        {
+            "materials": random.choice(["Cotton", "Polyester", "Wool"]),
+            "type": random.choice(["T-shirt", "Jeans", "Dress"]),
+        },
+    ),
+    (
+        "electronics",
+        {
+            "brand": faker.company(),
+            "type": random.choice(["Smartphone", "Laptop"]),
+            "capacity": str(random.randint(1, 1000)) + "GB",
+        },
+    ),
+    (
+        "electrodomestics",
+        {
+            "brand": faker.company(),
+            "type": random.choice(["Refrigerator", "Washing Machine"]),
+            "power_source": random.choice(["Batteries", "Electrical"]),
+        },
+    ),
+    (
+        "houseutilities",
+        {"brand": faker.company(), "type": random.choice(["Knife", "Fork"])},
+    ),
+    (
+        "food",
+        {
+            "brand": faker.company(),
+            "type": random.choice(["Fruit", "Vegetable"]),
+            "ingredients": random.choice(["Protein", "Carbohydrates"]),
+        },
+    ),
 ]
 
 product_ids = []
 for category, extra_fields in product_categories:
-    product_ids.extend(run_in_parallel([lambda: create_product(category, extra_fields)] * num_books))
+    product_ids.extend(
+        run_in_parallel([lambda: create_product(category, extra_fields)] * num_books)
+    )
+
 
 def create_seller_product_sequential():
     services = create_services()
@@ -442,7 +516,7 @@ def create_seller_product_sequential():
             id_product = random.choice(product_ids)
 
         used_product_ids.append(id_product)
-        
+
         quantity = random.randint(11, 100)
         price = round(random.uniform(1.0, 100.0), 2)
         remaining_quantity = quantity
@@ -462,7 +536,9 @@ def create_seller_product_sequential():
                 quantity_per_size = random.randint(1, remaining_quantity)
                 if len(used_choices) == len(options):
                     quantity_per_size = remaining_quantity
-                sizes.append(SizeCreate(size=size, quantity=quantity_per_size).model_dump())
+                sizes.append(
+                    SizeCreate(size=size, quantity=quantity_per_size).model_dump()
+                )
                 remaining_quantity -= quantity_per_size
 
         seller_product = SellerProductCreate(
@@ -476,6 +552,7 @@ def create_seller_product_sequential():
     session.commit()
     session.close()
 
+
 # Ejecutar la creación secuencial de productos de vendedor
 create_seller_product_sequential()
 
@@ -486,9 +563,13 @@ for i in range(num_rejected):
     services = create_services()
     session = services["session"]
     seller_product_serv = services["seller_product_serv"]
-    
-    seller_product = SellerProductUpdate(state="Rejected", justification=faker.text(max_nb_chars=49))
-    seller_product_serv.update(seller_product_id=seller_product_ids[i], new_data=seller_product)
+
+    seller_product = SellerProductUpdate(
+        state="Rejected", justification=faker.text(max_nb_chars=49)
+    )
+    seller_product_serv.update(
+        seller_product_id=seller_product_ids[i], new_data=seller_product
+    )
     session.commit()
     session.close()
 
@@ -498,23 +579,27 @@ for i in range(num_approved):
     services = create_services()
     session = services["session"]
     seller_product_serv = services["seller_product_serv"]
-    
+
     seller_product = SellerProductUpdate(
         state="Approved",
         eco_points=round(random.uniform(0, 100), 2),
         age_restricted=random.choice([True, False]),
     )
-    seller_product_serv.update(seller_product_id=seller_product_ids[i + 1 + num_rejected], new_data=seller_product)
+    seller_product_serv.update(
+        seller_product_id=seller_product_ids[i + 1 + num_rejected],
+        new_data=seller_product,
+    )
     session.commit()
     session.close()
     list_of_approved_ids.append(seller_product_ids[i + 1 + num_rejected])
+
 
 def create_cart_item():
     services = create_services()
     session = services["session"]
     in_shopping_cart_service = services["in_shopping_cart_service"]
     seller_product_serv = services["seller_product_serv"]
-    
+
     quantity = random.randint(1, 10)
     id_seller_product = random.choice(list_of_approved_ids)
     id_buyer = random.choice(buyer_ids)
@@ -523,7 +608,9 @@ def create_cart_item():
         InShoppingCart.id_seller_product == id_seller_product,
     ):
         id_buyer = random.choice(buyer_ids)
-    in_shopping_cart = InShoppingCartCreate(id_seller_product=id_seller_product, quantity=quantity)
+    in_shopping_cart = InShoppingCartCreate(
+        id_seller_product=id_seller_product, quantity=quantity
+    )
     seller_product = seller_product_serv.get_by_id(id_seller_product)
     id_size = None
     if seller_product.sizes:
@@ -533,25 +620,33 @@ def create_cart_item():
         while random_size.quantity < quantity:
             id_size = random.choice(size_ids)
             random_size = seller_product_serv.size_repo.get_by_id(id_size)
-        in_shopping_cart_service.add(id_buyer=id_buyer, shopping_cart_product=in_shopping_cart, id_size=id_size)
+        in_shopping_cart_service.add(
+            id_buyer=id_buyer, shopping_cart_product=in_shopping_cart, id_size=id_size
+        )
     else:
-        in_shopping_cart_service.add(id_buyer=id_buyer, shopping_cart_product=in_shopping_cart)
+        in_shopping_cart_service.add(
+            id_buyer=id_buyer, shopping_cart_product=in_shopping_cart
+        )
     session.commit()
     session.close()
+
 
 def create_wish_list_item():
     services = create_services()
     session = services["session"]
     in_wish_list_service = services["in_wish_list_service"]
-    
+
     id_buyer = random.choice(buyer_ids)
     id_seller_product = random.choice(list_of_approved_ids)
-    while in_wish_list_service.wishlist_repo.get_by_id(id_buyer=id_buyer, id_seller_product=id_seller_product):
+    while in_wish_list_service.wishlist_repo.get_by_id(
+        id_buyer=id_buyer, id_seller_product=id_seller_product
+    ):
         id_buyer = random.choice(buyer_ids)
     in_wish_list = InWishListCreate(id_seller_product=id_seller_product)
     in_wish_list_service.add(id_buyer=id_buyer, wish_list_item=in_wish_list)
     session.commit()
     session.close()
+
 
 # Populate shopping cart and wish list items in parallel
 run_in_parallel([create_cart_item] * num_cart_items)
@@ -572,7 +667,7 @@ for order_id, buyer_id in created_orders:
     services = create_services()
     session = services["session"]
     product_line_service = services["product_line_service"]
-    
+
     product_lines = product_line_service.get_all_by_order_id(order_id)
     for product_line in product_lines:
         buyer_purchased_products[buyer_id].add(product_line.id_seller_product)
