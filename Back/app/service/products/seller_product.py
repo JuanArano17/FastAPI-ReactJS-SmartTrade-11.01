@@ -102,7 +102,16 @@ class SellerProductService:
     def add(self, id_seller, seller_product: SellerProductCreate) -> SellerProduct:
         self.seller_service.get_by_id(id_seller)
         product = self.product_service.get_by_id(seller_product.id_product)
+        self._validate_existing_product(id_seller, seller_product)
+        if product.__class__.__name__ == "Clothes":
+            self._validate_clothing_product(seller_product, product)
+        else:
+            self._validate_non_clothing_product(seller_product, product)
 
+        seller_product_obj = self._create_seller_product(id_seller, seller_product)
+        return seller_product_obj
+
+    def _validate_existing_product(self, id_seller, seller_product: SellerProductCreate):
         if self.seller_product_repo.get_where(
             SellerProduct.id_seller == id_seller,
             SellerProduct.id_product == seller_product.id_product,
@@ -112,80 +121,68 @@ class SellerProductService:
                 detail=f"Seller already has a product with id {seller_product.id_product}",
             )
 
-        if product.__class__.__name__ == "Clothes":
-            if seller_product.sizes == []:
-                raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail="Clothing products must have at least one size specified.",
-                )
-            seller_product.quantity = 0
-            for size in seller_product.sizes:
-                seller_product.quantity += size.quantity
-
-            total_size = 0
-            used_sizes = []
-            for size_data in seller_product.sizes:
-                total_size += size_data.quantity
-                if size_data.size in used_sizes:
-                    raise HTTPException(
-                        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                        detail="There can't be repeat sizes for the same clothing item",
-                    )
-                used_sizes.append(size_data.size)
-
-            product.stock += seller_product.quantity
-
-            seller_product_obj = SellerProduct(
-                **seller_product.model_dump(exclude="sizes"),
-                id_seller=id_seller,
-                state=ProductState.Pending,
-                eco_points=0,
-                age_restricted=False,
+    def _validate_clothing_product(self, seller_product: SellerProductCreate, product):
+        if not seller_product.sizes:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Clothing products must have at least one size specified.",
             )
-            seller_product_obj = self.seller_product_repo.add(seller_product_obj)
+        seller_product.quantity = sum(size.quantity for size in seller_product.sizes)
+        self._check_duplicate_sizes(seller_product.sizes)
+        product.stock += seller_product.quantity
 
-            for size_data in seller_product.sizes:
-                self.size_repo.add(
-                    Size(
-                        **size_data.model_dump(),
-                        seller_product_id=seller_product_obj.id,
-                    )
-                )
-            return seller_product_obj
-        else:
-            if seller_product.sizes != []:
-                raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail="This category of product cannot have sizes",
-                )
-
-            if not seller_product.quantity:
-                raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail="This category of product must have a quantity",
-                )
-
-            product.stock += seller_product.quantity
-
-            seller_product_obj = SellerProduct(
-                **seller_product.model_dump(exclude="sizes"),
-                id_seller=id_seller,
-                state=ProductState.Pending,
-                eco_points=0,
-                age_restricted=False,
+    def _validate_non_clothing_product(self, seller_product: SellerProductCreate, product):
+        if seller_product.sizes:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="This category of product cannot have sizes",
             )
-            seller_product_obj = self.seller_product_repo.add(seller_product_obj)
-            return seller_product_obj
+        if not seller_product.quantity:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="This category of product must have a quantity",
+            )
+        product.stock += seller_product.quantity
+
+    def _check_duplicate_sizes(self, sizes):
+        used_sizes = set()
+        for size_data in sizes:
+            if size_data.size in used_sizes:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="There can't be repeat sizes for the same clothing item",
+                )
+            used_sizes.add(size_data.size)
+
+    def _create_seller_product(self, id_seller, seller_product: SellerProductCreate) -> SellerProduct:
+        seller_product_obj = SellerProduct(
+            **seller_product.model_dump(exclude="sizes"),
+            id_seller=id_seller,
+            state=ProductState.Pending,
+            eco_points=0,
+            age_restricted=False,
+        )
+        seller_product_obj = self.seller_product_repo.add(seller_product_obj)
+
+        for size_data in seller_product.sizes:
+            self.size_repo.add(
+                Size(
+                    **size_data.model_dump(),
+                    seller_product_id=seller_product_obj.id,
+                )
+            )
+        return seller_product_obj
 
     def get_current_state(self, state: str) -> SellerProductState:
-        if state == ProductState.Pending:
-            return PendingState()
-        elif state == ProductState.Approved:
-            return ApprovedState()
-        elif state == ProductState.Rejected:
-            return RejectedState()
-        else:
+        state_mapping = {
+            ProductState.Pending: PendingState,
+            ProductState.Approved: ApprovedState,
+            ProductState.Rejected: RejectedState,
+        }
+        state_class = state_mapping.get(state)
+        if state_class is None:
             raise ValueError("Invalid state value")
+        return state_class()
 
     def map_seller_product_to_read_schema(
         self, seller_product: SellerProduct
@@ -231,11 +228,7 @@ class SellerProductService:
         )
 
     def map_seller_products(self, seller_products):
-        complete_seller_products = []
-        for seller_product in seller_products:
-            seller_product_info = self.map_seller_product_to_read_schema(seller_product)
-            complete_seller_products.append(seller_product_info)
-        return complete_seller_products
+        return [self.map_seller_product_to_read_schema(seller_product) for seller_product in seller_products]
 
     def get_by_id(self, seller_product_id) -> SellerProduct:
         if seller_product := self.seller_product_repo.get_by_id(seller_product_id):
@@ -256,79 +249,64 @@ class SellerProductService:
 
     def get_all_by_state(self, state) -> list[SellerProductRead]:
         seller_products = self.seller_product_repo.get_all()
-        complete_seller_products = []
-        for seller_product in seller_products:
-            if seller_product.state == state:
-                seller_product_info = self.map_seller_product_to_read_schema(
-                    seller_product
-                )
-                complete_seller_products.append(seller_product_info)
-        return complete_seller_products
-
+        return [self.map_seller_product_to_read_schema(sp) for sp in seller_products if sp.state == state]
+    
     def update(self, seller_product_id, new_data: SellerProductUpdate) -> SellerProduct:
         seller_product = self.get_by_id(seller_product_id)
         current_state = self.get_current_state(seller_product.state)
         product = self.product_service.get_by_id(seller_product.id_product)
         current_state.handle(new_data)
+        self._validate_sizes_on_update(new_data, product)
+        self._update_quantities(seller_product, new_data, product)
+        modified_data = SellerProductUpdate(**new_data.model_dump(exclude="sizes"))
+        if self.are_all_fields_none_except_sizes(modified_data):
+            return seller_product
+        return self.seller_product_repo.update(seller_product, modified_data)
+
+    def _validate_sizes_on_update(self, new_data, product):
         if new_data.sizes and product.__class__.__name__ != "Clothes":
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="Seller products of this category cannot have sizes",
             )
-
         if new_data.quantity and product.__class__.__name__ == "Clothes":
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="Only update size quantities for clothing objects",
             )
-
         if product.__class__.__name__ == "Clothes":
-            used_sizes = []
-            for size_data in new_data.sizes:
-                if size_data.size in used_sizes:
-                    raise HTTPException(
-                        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                        detail="There can't be repeat sizes for the same clothing item",
-                    )
-                used_sizes.append(size_data.size)
+            self._check_duplicate_sizes(new_data.sizes)
 
+    def _update_quantities(self, seller_product, new_data, product):
+        if product.__class__.__name__ == "Clothes":
             new_data.quantity = seller_product.quantity
             if new_data.sizes:
                 for size_data in new_data.sizes:
                     size = self.size_repo.get_where(
                         Size.size == size_data.size,
-                        Size.seller_product_id == seller_product_id,
+                        Size.seller_product_id == seller_product.id,
                     )
                     if size:
                         new_data.quantity = (
                             new_data.quantity - size[0].quantity + size_data.quantity
                         )
                         self.size_repo.update(size[0], size_data)
+                        seller_product.notify_observers(new_quantity=size_data.quantity, id_size=size[0].id)
                     else:
-                        new_data.quantity = new_data.quantity + size_data.quantity
+                        new_data.quantity += size_data.quantity
                         size_data = SizeCreate(**size_data.model_dump())
                         self.size_repo.add(
                             Size(
                                 **size_data.model_dump(),
-                                seller_product_id=seller_product_id,
+                                seller_product_id=seller_product.id,
                             )
                         )
-
         if new_data.quantity:
             product.stock = product.stock + new_data.quantity - seller_product.quantity
             seller_product.notify_observers(new_data.quantity)
 
-        # new_data.sizes=[]
-        modified_data = SellerProductUpdate(**new_data.model_dump(exclude="sizes"))
-        if self.are_all_fields_none_except_sizes(modified_data):
-            return seller_product
-        return self.seller_product_repo.update(seller_product, modified_data)
-
     def are_all_fields_none_except_sizes(self, new_data):
-        for field_name, field_value in new_data:
-            if field_name != "sizes" and field_value is not None:
-                return False
-        return True
+        return all(field_name == "sizes" or field_value is None for field_name, field_value in new_data)
 
     def delete_by_id(self, seller_product_id):
         seller_product = self.get_by_id(seller_product_id)

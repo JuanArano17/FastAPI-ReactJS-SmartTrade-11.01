@@ -3,7 +3,7 @@ import { Box, Typography, Avatar, Button, Paper, TextField } from '@mui/material
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { getProfileInfo, updateBuyerInfo, updateSellerInfo } from '../../../api/services/user/profile/ProfileService';
 import styles from '../../../styles/styles';
-import { validateEmail, validateDNI, validateCIF, validateBankData } from '../../../utils/registerFormValidations';
+import { validateEmail, validateDNI, validateCIF, validateBankData, validateAge } from '../../../utils/registerFormValidations';
 
 const PersonalInfo = () => {
   const [userInfo, setUserInfo] = useState(null);
@@ -56,6 +56,13 @@ const PersonalInfo = () => {
           newErrors.cif = 'CIF inválido';
         } else {
           delete newErrors.cif;
+        }
+        break;
+      case 'birth_date':
+        if (!validateAge(value)) {
+          newErrors.birth_date = 'Fecha de nacimiento inválida';
+        } else {
+          delete newErrors.birth_date;
         }
         break;
       case 'bank_data':

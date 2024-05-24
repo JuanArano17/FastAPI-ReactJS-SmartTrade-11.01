@@ -11,9 +11,10 @@ import ShoppingCartPage from './pages/ShoppingCartPage';
 import AdminPage from './pages/AdminPage';
 import ValidateProductPage from './pages/ValidateProductPage';
 import WishListPage from './pages/WishListPage';
-import { adminPaths, buyerPaths, catalogPaths, forgotPasswordPaths, homePaths, loginPaths, profilePaths, registerPaths, sellerproductsPaths } from './PrivateRoutePaths';
+import { adminPaths, buyerPaths, catalogPaths, forgotPasswordPaths, homePaths, loginPaths, profilePaths, registerPaths, sellerproductsPaths, helpPagePaths } from './PrivateRoutePaths';
 import PrivateRouter from './components/router/PrivateRouter';
 import SellerProductsPage from './pages/SellerProductsPage';
+import TutorialPage from './pages/TutorialPage';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
           <PrivateRouter path="/wish-list" component={WishListPage} allowedTypes={['Buyer']} redirectPaths={buyerPaths} />
           <PrivateRouter path="/admin/validate-product/:id" component={ValidateProductPage} allowedTypes={['Admin']} redirectPaths={adminPaths} />
           <PrivateRouter path="/admin" component={AdminPage} allowedTypes={['Admin']} redirectPaths={adminPaths} />
+          <PrivateRouter path="/tutorial" component={TutorialPage} allowedTypes={['Admin', 'Seller', 'Buyer', 'Unknown']} redirectPaths={helpPagePaths} />
           <PrivateRouter exact path="/" component={HomePage} allowedTypes={['Unknown']} redirectPaths={homePaths} />
         </Switch>
       </Router>
