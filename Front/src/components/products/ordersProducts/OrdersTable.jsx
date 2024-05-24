@@ -22,7 +22,7 @@ const OrdersTable = ({ data, isSeller }) => {
             <TableRow key={index}>
               <TableCell>{order.image}</TableCell>
               <TableCell>{order.name}</TableCell>
-              <TableCell>{order.info}</TableCell>
+              <TableCell>{order.id}</TableCell>
               <TableCell>{order.quantity}</TableCell>
               <TableCell>{order.price}</TableCell>
               <TableCell>{order.state}</TableCell>

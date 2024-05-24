@@ -1,87 +1,39 @@
 import React, { useEffect, useState } from "react";
-import { Box, Container, Typography, Paper, Fab } from "@mui/material";
+import { Box, Container, Typography, Paper } from "@mui/material";
 import TopBar from "../components/topbar/TopBar";
 import Footer from "../components/footer/Footer";
 import styles from "../styles/styles";
-import AddIcon from '@mui/icons-material/Add';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import OrdersTable from "../components/products/ordersProducts/OrdersTable";
+import { getOrders } from "../api/services/orders/OrderService";
 
 const OrdersPage = () => {
   const userType = localStorage.getItem('type');
   const [ordersData, setOrdersData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const orders = await getOrders();
+        setOrdersData(orders);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    if (userType === 'Buyer') {
-      setOrdersData([
-        {
-          image: "Image1",
-          name: "Product 1",
-          info: "Lorem ipsum",
-          quantity: 10,
-          price: "$25",
-          state: "Packaging",
-          expectedArrival: "19/06/2024"
-        },
-        {
-          image: "Image2",
-          name: "Product 2",
-          info: "Lorem ipsum",
-          quantity: 20,
-          price: "$60",
-          state: "On the way",
-          expectedArrival: "20/08/2024"
-        },
-        {
-          image: "Image3",
-          name: "Product 3",
-          info: "Lorem ipsum",
-          quantity: 1,
-          price: "$100",
-          state: "Arrived",
-          expectedArrival: "07/05/2024"
-        }
-      ]);
-    } else {
-      setOrdersData([
-        {
-          image: "Image1",
-          name: "Product 1",
-          info: "Lorem ipsum",
-          quantity: 10,
-          price: "$25",
-          state: "Packaging",
-          expectedArrival: "19/06/2024",
-          actions: "Edit/Delete"
-        },
-        {
-          image: "Image2",
-          name: "Product 2",
-          info: "Lorem ipsum",
-          quantity: 20,
-          price: "$60",
-          state: "On the way",
-          expectedArrival: "20/08/2024",
-          actions: "Edit/Delete"
-        },
-        {
-          image: "Image3",
-          name: "Product 3",
-          info: "Lorem ipsum",
-          quantity: 1,
-          price: "$100",
-          state: "Arrived",
-          expectedArrival: "07/05/2024",
-          actions: "Edit/Delete"
-        }
-      ]);
-    }
-  }, [userType]);
+    fetchOrders();
+  }, []);
 
-  const handleBack = () => {
-    // Handle back action here
-  };
+  if (loading) {
+    return <Typography variant="h6">Loading...</Typography>;
+  }
+
+  if (error) {
+    return <Typography variant="h6">Error: {error.message}</Typography>;
+  }
 
   return (
     <Box sx={styles.mainBox}>
