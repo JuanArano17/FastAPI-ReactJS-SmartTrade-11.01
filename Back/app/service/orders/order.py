@@ -14,7 +14,7 @@ from app.service.users.card import CardService
 from app.service.users.address import AddressService
 from app.service.users.types.buyer import BuyerService
 from app.schemas.orders.product_line import CompleteProductLine
-from app.schemas.orders.order import ConfirmOrder, CompleteOrder
+from app.schemas.orders.order import ConfirmOrder, CompleteOrder, OrderCreate
 from app.crud_repository import CRUDRepository
 
 
@@ -146,6 +146,14 @@ class OrderService:
     def get_all_by_buyer_id(self, id_buyer) -> list[Order]:
         self.buyer_service.get_by_id(id_buyer)
         return self.order_repo.get_where(Order.id_buyer == id_buyer)
+
+    def delete_all(self):
+        self.order_repo.delete_all()
+
+    def populate(self, id_buyer: int, order: OrderCreate) -> Order:
+        order = Order(id_buyer=id_buyer, **order.model_dump())
+        self.order_repo.add(order)
+        return order
 
     def _map_order_to_schema(self, order: Order) -> CompleteOrder:
         complete_product_lines = []
