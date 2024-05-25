@@ -19,16 +19,17 @@ const CardItem = ({ id, card_number, card_name, card_exp_date, card_security_num
 
     const handleEditChange = (event) => {
         const { name, value } = event.target;
+        const sanitizedValue = name === 'card_security_num' ? value.replace(/\D/g, '') : value; // Remove non-digit characters for CVV
         setEditedCard(prev => ({
             ...prev,
-            [name]: value
+            [name]: sanitizedValue
         }));
         setFormValidity({
             ...formValidity,
             [name]: {
-                card_number: validateCardNumber(value),
-                card_exp_date: validateCardExpiration(value),
-                card_security_num: validateCVV(value)
+                card_number: validateCardNumber(sanitizedValue),
+                card_exp_date: validateCardExpiration(sanitizedValue),
+                card_security_num: validateCVV(sanitizedValue)
             }[name]
         });
     };
@@ -60,6 +61,10 @@ const CardItem = ({ id, card_number, card_name, card_exp_date, card_security_num
         setUpdateError('');
     };
 
+    const maskCardNumber = (number) => {
+        return number.replace(/\d(?=\d{4})/g, "*");
+    };
+
     if (isEditing) {
         return (
             <Card sx={{ mb: 2, borderRadius: '40px' }}>
@@ -72,7 +77,7 @@ const CardItem = ({ id, card_number, card_name, card_exp_date, card_security_num
                             onChange={handleEditChange}
                             fullWidth
                             error={!formValidity.card_number}
-                            helperText={!formValidity.card_number ? "Invalid card number" : ""}
+                            helperText={!formValidity.card_number ? "Card number must be exactly 16 digits." : ""}
                         />
                         <TextField
                             label="Card Name"
@@ -92,7 +97,7 @@ const CardItem = ({ id, card_number, card_name, card_exp_date, card_security_num
                             fullWidth
                             InputLabelProps={{ shrink: true }}
                             error={!formValidity.card_exp_date}
-                            helperText={!formValidity.card_exp_date ? "Invalid expiration date" : ""}
+                            helperText={!formValidity.card_exp_date ? "Expiration date must be in the future." : ""}
                         />
                         <TextField
                             label="CVV"
@@ -100,8 +105,9 @@ const CardItem = ({ id, card_number, card_name, card_exp_date, card_security_num
                             value={editedCard.card_security_num}
                             onChange={handleEditChange}
                             fullWidth
+                            inputProps={{ maxLength: 3, inputMode: 'numeric', pattern: '[0-9]*' }} // Ensure only numeric input
                             error={!formValidity.card_security_num}
-                            helperText={!formValidity.card_security_num ? "Invalid CVV" : ""}
+                            helperText={!formValidity.card_security_num ? "CVV must be exactly 3 digits." : ""}
                         />
                     </Grid>
                     <Grid item xs={12}>
@@ -128,7 +134,7 @@ const CardItem = ({ id, card_number, card_name, card_exp_date, card_security_num
                 <Grid container>
                     <Grid item xs={6}>
                         <Typography variant="subtitle1"><strong>Card Number</strong></Typography>
-                        <Typography variant="body2">{card_number}</Typography>
+                        <Typography variant="body2">{maskCardNumber(card_number)}</Typography>
                     </Grid>
                     <Grid item xs={6}>
                         <Typography variant="subtitle1"><strong>Card Name</strong></Typography>
@@ -140,7 +146,7 @@ const CardItem = ({ id, card_number, card_name, card_exp_date, card_security_num
                     </Grid>
                 </Grid>
             </CardContent>
-            <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+            <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}> 
                 <IconButton aria-label="edit" onClick={() => setIsEditing(true)} size="large">
                     <EditIcon />
                 </IconButton>

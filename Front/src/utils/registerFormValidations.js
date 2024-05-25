@@ -21,7 +21,7 @@ export const validateDNI = (dni) => {
     return re.test(dni);
 };
 export const validateCIF = (cif) => {
-    const re = /^[ABCDEFGHJKLMNPQRSUVW]\d{7}[0-9A-J]$/;
+    const re = /^[ABCDEFGHJKLMNPQRSUVW]\d{8}$/;
     return re.test(cif);
 }
 export const validateBankData = (bankData) => {

@@ -37,6 +37,9 @@ const SummarizedProduct = ({ product }) => {
                 '&:hover .MuiCard-root': {
                     boxShadow: `0px 4px 20px ${ecoPointsColor}`,
                     transform: 'scale(1.05)',
+                },
+                '&:hover .ecoPointsText': {
+                    color: ecoPointsColor,
                 }
             }}
         >
@@ -71,7 +74,7 @@ const SummarizedProduct = ({ product }) => {
                     </Typography>
                 </CardContent>
                 <CardActions sx={{ justifyContent: 'space-between', p: 2 }}>
-                    <Typography variant="body1" sx={{ textAlign: 'left', color: ecoPointsColor }}>
+                    <Typography className="ecoPointsText" variant="body1" sx={{ textAlign: 'left', color: 'black', transition: 'color 0.3s' }}>
                         EcoPoints: {ecoPoints}
                     </Typography>
                     <Typography variant="body1" color="green" sx={{ textAlign: 'right' }}>
