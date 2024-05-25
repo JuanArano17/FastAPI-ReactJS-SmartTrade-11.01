@@ -70,7 +70,7 @@ const ImageSelector = ({ images }) => {
                         transform: isZoomed ? `scale(2)` : 'scale(1)',
                         transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
                         transition: 'transform 0.3s ease-in-out',
-                        cursor: 'zoom-in'
+                        cursor: isZoomed ? 'zoom-out' : 'zoom-in' // Cambia el cursor dependiendo del estado de zoom
                     }}
                 />
             </Box>

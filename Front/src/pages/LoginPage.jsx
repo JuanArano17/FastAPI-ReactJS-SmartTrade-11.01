@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Box, Typography, TextField, Button, Container, Grid, Paper, Link, IconButton, InputAdornment } from "@mui/material";
 import { useHistory } from "react-router-dom";
 import { loginUserService } from "../api/services/user/AuthService";
@@ -19,6 +19,7 @@ const LoginPage = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const history = useHistory();
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === "checkbox") {
@@ -27,6 +28,7 @@ const LoginPage = () => {
       setFormData((prevData) => ({ ...prevData, [name]: value }));
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -43,15 +45,19 @@ const LoginPage = () => {
       setError(errorMessage);
     }
   };
+
   const handleForgotPasswordClick = () => {
     history.push("/forgotPassword");
   };
+
   const isEmailValid = validateEmail(formData.email);
   const isPasswordValid = validatePassword(formData.password);
   const isFormValid = formData.email !== "" && formData.password !== "" && isEmailValid && isPasswordValid;
+
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
+
   return (
     <Box sx={styles.mainBox}>
       <TopBar />
@@ -93,6 +99,7 @@ const LoginPage = () => {
                   value={formData.email}
                   onChange={handleChange}
                   error={!isEmailValid}
+                  helperText={!isEmailValid ? 'Please enter a valid email address. Example: "jhondoe214@gmail.com".' : ''}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -108,7 +115,8 @@ const LoginPage = () => {
                   autoComplete="current-password"
                   value={formData.password}
                   onChange={handleChange}
-                  error={!isPasswordValid} 
+                  error={!isPasswordValid}
+                  helperText={!isPasswordValid ? 'Password must be at least 8 characters long and include at least one letter, one number, and one special character.' : ''}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">

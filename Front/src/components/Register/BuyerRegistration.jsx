@@ -43,20 +43,20 @@ const BuyerRegistration = () => {
         const { id, value } = e.target;
         let errors = { ...formErrors };
         if (id === 'email') {
-            errors.email = validateEmail(value) ? '' : 'Email is not valid!';
+            errors.email = validateEmail(value) ? '' : 'Please enter a valid email address. Example: "jhondoe214@gmail.com".';
         }
         if (id === 'password') {
-            errors.password = validatePassword(value) ? '' : 'Password does not meet criteria!';
+            errors.password = validatePassword(value) ? '' : 'Password must be at least 8 characters long and include at least one letter, one number, and one special character.';
         }
         if (id === 'birth_date') {
-            errors.birth_date = validateAge(value) ? '' : 'Age is not valid!';
+            errors.birth_date = validateAge(value) ? '' : 'Please enter a valid birth date. Age must be between 0 and 100 years.';
         }
         if (id === 'dni') {
-            errors.dni = validateDNI(value) ? '' : 'DNI is not valid!';
+            errors.dni = validateDNI(value) ? '' : 'DNI must contain exactly 8 numbers followed by a letter. Example: "12345678A".';
         }
         setFormErrors(errors);
         setFormData({ ...formData, [id]: value });
-    }
+    };
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (isFormValid()) {
