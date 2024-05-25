@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useHistory } from 'react-router-dom';
-import { Box, Typography, TextField, Button, Container, Grid, Paper, IconButton, InputAdornment, Snackbar} from "@mui/material";
+import { Box, Typography, TextField, Button, Container, Grid, Paper, IconButton, InputAdornment, Snackbar } from "@mui/material";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { getDefaultRegisterBuyerModel } from "../../models/RegisterBuyerModel";
@@ -20,6 +20,7 @@ const formFields = [
     { id: "billing_address", name: "Billing Address", placeholder: "Calle nueva 123", autoComplete:""},
     { id: "birth_date", name: "Birth date", type: "date" }
 ];
+
 const BuyerRegistration = () => {
     const history = useHistory();
     const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -27,18 +28,26 @@ const BuyerRegistration = () => {
     const [cardData, setCardData] = useState(getDefaultCardInformationModel());
     const [showPassword, setShowPassword] = useState(false);
     const [formErrors, setFormErrors] = useState({});
+    const [isCardFormValid, setCardFormValidity] = useState(false);
+    const [showCardForm, setShowCardForm] = useState(false);
+
     const togglePasswordVisibility = () => {
         setShowPassword((prev) => !prev);
     };
+
     const handleCardChange = (e) => {
         const { name, value } = e.target;
         setCardData(prevCardData => ({ ...prevCardData, [name]: value }));
     };
+
     const isFormValid = () => {
         const isAnyFieldEmpty = formFields.some(field => !formData[field.id]);
         const isAnyFieldError = formFields.some(field => formErrors[field.id]);
-        return !isAnyFieldEmpty && !isAnyFieldError;
+        const isBirthDateValid = validateAge(formData.birth_date);
+        const isRegisterFormValid = !isAnyFieldEmpty && !isAnyFieldError && isBirthDateValid;
+        return isRegisterFormValid && (!showCardForm || isCardFormValid);
     };
+
     const handleChange = (e) => {
         const { id, value } = e.target;
         let errors = { ...formErrors };
@@ -56,18 +65,19 @@ const BuyerRegistration = () => {
         }
         setFormErrors(errors);
         setFormData({ ...formData, [id]: value });
-    }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (isFormValid()) {
             try {
-                console.log('Se esta intentando registrar un usuario Buyer: ', formData)
+                console.log('Se esta intentando registrar un usuario Buyer: ', formData);
                 const userResponse = await registerUserBuyerService(formData);
                 console.log('Se ha registrado un usuario Buyer', userResponse);
                 setOpenSnackbar(true);
                 const userId = userResponse.id;
-                console.log('UserIDBeforeREgisterService: ', userId);
-                if (userId && Object.values(cardData).some(value => value !== "")) {
+                console.log('UserIDBeforeRegisterService: ', userId);
+                if (userId && showCardForm && Object.values(cardData).some(value => value !== "")) {
                     try {
                         await registerCardService({...cardData}, userId);
                     } catch (cardError) {
@@ -82,6 +92,7 @@ const BuyerRegistration = () => {
             console.log('El formulario no es válido.');
         }
     };
+
     return (
         <Container component="main" maxWidth="lg">
             <Paper elevation={3} sx={styles.paperContainer}>
@@ -151,7 +162,16 @@ const BuyerRegistration = () => {
                             <Typography component="h2" variant="h6" color="#629c44" mb={2}>
                                 Enter your card information (OPTIONAL)
                             </Typography>
-                            <CardInformationForm cardData={cardData} handleChange={handleCardChange} />
+                            <Button
+                                variant="outlined"
+                                onClick={() => setShowCardForm(!showCardForm)}
+                                sx={styles.greenRoundedButton}
+                            >
+                                {showCardForm ? "Hide Card Information" : "Add Card Information"}
+                            </Button>
+                            {showCardForm && (
+                                <CardInformationForm cardData={cardData} handleChange={handleCardChange} setCardFormValidity={setCardFormValidity} />
+                            )}
                         </Paper>
                     </Grid>
                 </Grid>
@@ -165,4 +185,5 @@ const BuyerRegistration = () => {
         </Container>
     );
 };
+
 export default BuyerRegistration;
