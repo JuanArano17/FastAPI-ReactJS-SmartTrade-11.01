@@ -12,7 +12,7 @@ const TutorialPage = () => {
             <TopBar showSearchBar={false} showLogoutButton={true} />
             <Container sx={styles.mainContainer}>
                 <Typography variant="h3" align="center" gutterBottom sx={{ color: '#629C44' }}>
-                    Tutorial de la Aplicación
+                    Web-App Tutorial
                 </Typography>
                 <Grid container spacing={4}>
                     {tutorialData.map((section, index) => (

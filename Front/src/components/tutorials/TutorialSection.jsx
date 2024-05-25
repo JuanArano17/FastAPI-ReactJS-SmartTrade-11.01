@@ -34,7 +34,7 @@ const TutorialSection = ({ section }) => {
                 {section.description}
             </Typography>
             <Button variant="outlined" color="primary" onClick={handleOpen}>
-                Ver imagen completa
+                Fullscreen image
             </Button>
             <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
                 <DialogTitle>{section.title}</DialogTitle>
@@ -43,7 +43,7 @@ const TutorialSection = ({ section }) => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary">
-                        Cerrar
+                        Close
                     </Button>
                 </DialogActions>
             </Dialog>
