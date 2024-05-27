@@ -16,7 +16,8 @@ from app.service.users.types.buyer import BuyerService
 from app.schemas.orders.product_line import CompleteProductLine
 from app.schemas.orders.order import CompleteOrder, ConfirmOrder, OrderCreate, OrderUpdate
 from app.crud_repository import CRUDRepository
-from schemas.products.seller_product import SellerProductUpdate
+from app.schemas.products.categories.variations.size import SizeUpdate
+from app.schemas.products.seller_product import SellerProductUpdate
 
 class OrderStateBase:
     def __init__(self, order, order_service):
@@ -54,10 +55,18 @@ class PendingState(OrderStateBase):
                     product_line.id_seller_product
                 ).product
                 seller_product=self.order_service.seller_product_service.get_by_id(product_line.id_seller_product)
-                seller_product_update = SellerProductUpdate(
-                quantity=seller_product.quantity - product_line.quantity
-                )
-                self.order_service.seller_product_service.update(seller_product.id, seller_product_update)
+                if seller_product.sizes==None or seller_product.sizes==[]:
+                    seller_product_update = SellerProductUpdate(
+                    quantity=seller_product.quantity - product_line.quantity
+                    )
+                else:
+                #    cart_item=self.order_service.shopping_cart_service.shopping_cart_repo.get_where()
+                #    size=SizeUpdate()
+                #    seller_product_update = SellerProductUpdate(
+                    
+                #    )
+                #self.order_service.seller_product_service.update(seller_product.id, seller_product_update)
+                    pass
                 
             self.order_service.shopping_cart_service.delete_all_by_user(user)
             return self.order_service.order_repo.update(self.order,order_update)
@@ -189,7 +198,7 @@ class OrderService:
 
         else:
             order=orders[0]
-            
+
         data=OrderUpdate(id_address=data.id_address, id_card=data.id_card)
 
         state_instance = PendingState(order, self)

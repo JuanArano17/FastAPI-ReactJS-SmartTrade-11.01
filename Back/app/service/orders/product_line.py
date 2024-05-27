@@ -1,15 +1,42 @@
+from datetime import datetime
 from decimal import Decimal
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
-from app.schemas.orders.product_line import ProductLineCreate
+from app.schemas.orders.product_line import CompleteProductLine, ProductLineCreate
 from app.service.users.types.buyer import BuyerService
 from app.models.orders.product_line import ProductLine
 from app.service.orders.order import OrderService
 from app.service.products.seller_product import SellerProductService
 from app.crud_repository import CRUDRepository
 from app.schemas.products.seller_product import SellerProductUpdate
+from app.schemas.orders.order import OrderUpdate
+from app.core.enums import OrderState
 
+class ProductLineRepository(CRUDRepository):
+    def __init__(self, session: Session):
+        super().__init__(session=session, model=ProductLine)
+    def add_estimated_date(self, product_line, estimated_date):
+        if product_line == None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"There is no product line with this id",
+            )
+        product_line.estimated_date=estimated_date
+        product_line.commit()
+
+    def get_product_lines_by_seller(self,session: Session, seller_id: int):
+        from app.models.products.seller_product import SellerProduct
+        from app.models.orders.order import Order
+        stmt = (
+            select(ProductLine)
+            .join(SellerProduct, SellerProduct.id == ProductLine.id_seller_product)
+            .join(Order, Order.id==ProductLine.id_order)
+            .filter(SellerProduct.id_seller == seller_id)
+            .filter(Order.state==OrderState.CONFIRMED)
+        )
+        return session.execute(stmt).scalars().all()
 
 class ProductLineService:
     def __init__(
@@ -20,7 +47,7 @@ class ProductLineService:
         seller_product_service: SellerProductService,
     ):
         self.session = session
-        self.product_line_repo = CRUDRepository(session=session, model=ProductLine)
+        self.product_line_repo = ProductLineRepository(session=session)
         self.buyer_service = buyer_service
         self.order_service = order_service
         self.seller_product_service = seller_product_service
@@ -94,9 +121,57 @@ class ProductLineService:
 
     def get_all_by_order_id(self, order_id) -> list[ProductLine]:
         return self.product_line_repo.get_where(ProductLine.id_order == order_id)
+    
+    def get_all_by_seller_id(self, seller_id) -> list[ProductLine]:
+        seller=self.seller_product_service.seller_service.get_by_id(seller_id)
+        self._check_is_seller(seller)
+        product_lines=self.product_line_repo.get_product_lines_by_seller(self.session,seller_id)
+        complete_product_lines=[]
+        for product_line in product_lines:
+            seller_product = self.seller_product_service.get_by_id(
+                    product_line.id_seller_product
+                )
+            product = self.seller_product_service.product_service.get_by_id(seller_product.id_product)
+            complete_product_lines.append(
+                    CompleteProductLine(
+                        **product_line.__dict__,
+                        name=product.name,
+                        description=product.description,
+                        category=product.category,
+                        refund_products=product_line.refund_products,
+                    )
+                )
+        return complete_product_lines
 
-    # no update method required, once a product line is added to an order it's quantity or anything else should not be changed
-
+    def add_estimated_date(self, product_line_id, estimated_date):
+        product_line=self.get_by_id(product_line_id)
+        if product_line.estimated_date!=None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"This product line already has an estimated date",
+            )
+        order=self.order_service.get_by_id(product_line.id_order)
+        buyer=self.buyer_service.get_by_id(order.id_buyer)
+        ship=True
+        max=estimated_date=datetime.now().date()
+        for product_line in order.product_lines:
+            if product_line.estimated_date==None:
+                ship=False
+                break
+            if(product_line.estimated_date>max):
+                max=product_line.estimated_date>max
+        if ship:    
+            data=OrderUpdate(estimated_date=max)
+            self.order_service.ship_confirmed_order(buyer,data,order.id)
+        return self.product_line_repo.add_estimated_date(product_line, estimated_date)
+    
+    def _check_is_seller(self, user):
+        if not str(user.type) == "Seller":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Users of type {user.type} do not have product lines.",
+            )
+    
     # SHOULD ONLY USE THE METHOD BELOW FOR TESTING
     def delete_by_id(self, product_line_id):
         self.get_by_id(product_line_id)
