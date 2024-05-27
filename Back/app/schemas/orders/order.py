@@ -1,14 +1,9 @@
 from datetime import datetime, timezone
-from pydantic import BaseModel, ConfigDict, Field, NonNegativeFloat, validator
+from typing import Optional
+from pydantic import BaseModel, ConfigDict, Field, FutureDate, NonNegativeFloat, validator
 
 from app.schemas.orders.product_line import ProductLine, CompleteProductLine
 from app.core.enums import OrderState
-
-
-class ConfirmOrder(BaseModel):
-    id_card: int
-    id_address: int
-
 
 class OrderBase(BaseModel):
     order_date: datetime | None = Field(default_factory=datetime.now)
@@ -29,6 +24,15 @@ class OrderBase(BaseModel):
 class OrderCreate(OrderBase):
     pass
 
+class OrderUpdate(BaseModel):
+    id_address: Optional[int] = None
+    id_card: Optional[int] = None
+    estimated_date: Optional[FutureDate] = None
+
+class ConfirmOrder(BaseModel):
+    id_address: int = None
+    id_card: int = None
+
 
 class Order(OrderBase):
     model_config = ConfigDict(from_attributes=True)
@@ -44,3 +48,4 @@ class CompleteOrder(OrderBase):
     id: int
     id_buyer: int
     product_lines: list[CompleteProductLine]
+    estimated_date: Optional[FutureDate] = None

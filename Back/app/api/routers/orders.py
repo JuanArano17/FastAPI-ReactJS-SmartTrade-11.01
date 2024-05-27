@@ -1,8 +1,9 @@
 from fastapi import APIRouter
 
 from app.schemas.orders.order import (
-    ConfirmOrder,
     CompleteOrder,
+    ConfirmOrder,
+    OrderUpdate,
 )
 from app.api.deps import CurrentUserDep, OrderServiceDep
 

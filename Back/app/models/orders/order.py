@@ -1,4 +1,4 @@
-from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, Enum as EnumColumn
+from sqlalchemy import Date, DateTime, ForeignKey, Integer, Numeric, Enum as EnumColumn
 from sqlalchemy.orm import relationship, mapped_column
 
 from app.base import Base
@@ -21,10 +21,12 @@ class Order(Base):
     state = mapped_column(
         EnumColumn(OrderState), nullable=False, default=OrderState.PENDING
     )
+    estimated_date = mapped_column(Date)
 
     card = relationship("Card", back_populates="orders")
     address = relationship("Address", back_populates="orders")
     buyer = relationship("Buyer", back_populates="orders")
+   
 
     product_lines = relationship(
         "ProductLine", back_populates="order", cascade="all, delete-orphan"
