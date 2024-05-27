@@ -222,6 +222,29 @@ class OrderService:
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Order with id {order_id} not found.",
         )
+    
+    #def update(self, user: User, order_id: int, order_update: OrderUpdate) -> Order:
+    #    self._check_is_buyer(user)
+    #    order = self._get_by_id(order_id)
+    #    self._check_buyer_owns_order(user.id, order_id)
+
+    #    state_class = self._get_state_class(order.state)
+    #    state_instance = state_class(order, self)
+    #    state_instance.validate(order_update)
+
+    #    return state_instance.apply(user, order_update)
+
+    #def _get_state_class(self, state: OrderState):
+    #    if state == OrderState.PENDING:
+    #        return PendingState
+    #    elif state == OrderState.CONFIRMED:
+    #        return ConfirmedState
+    #    elif state == OrderState.SHIPPED:
+    #        return ShippedState
+    #    elif state == OrderState.DELIVERED:
+    #        return DeliveredState
+    #     else:
+    #        raise ValueError("Invalid state")
 
     def get_one_by_user(self, user: User, order_id) -> CompleteOrder:
         self._check_is_buyer(user)

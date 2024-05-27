@@ -48,10 +48,6 @@ from app.core.enums import OrderState
 faker = Faker()
 Faker.seed(42)  # Set the seed to any value you prefer
 
-def get_random_image_url():
-    response = requests.get("https://picsum.photos/200")
-    return response.url
-
 # Define the number of items to create
 num_buyers = 100
 num_sellers = 100
