@@ -168,7 +168,7 @@ def initialize_db():
 
     services["admin_service"].add(
         AdminCreate(
-            email="admin@example.com", name="Robert", surname="House", password="admin"
+            email="admin@example.com", name="Robert", surname="House", password="admin1234@"
         )
     )
     session.commit()
@@ -192,7 +192,7 @@ def create_buyer():
         "dni": dni,
         "billing_address": faker.address(),
         "payment_method": "Credit Card",
-        "password": "prueba",
+        "password": "prueba1234@",
     }
     buyer_create = BuyerCreate(**buyer_data)
     buyer = buyer_service.add(buyer_create)
@@ -218,7 +218,7 @@ def create_seller():
         "birth_date": faker.date_of_birth(minimum_age=18, maximum_age=80),
         "cif": cif,
         "bank_data": bank_data,
-        "password": "prueba",
+        "password": "prueba1234@",
     }
     seller_create = SellerCreate(**seller_data)
     seller = seller_service.add(seller_create)
