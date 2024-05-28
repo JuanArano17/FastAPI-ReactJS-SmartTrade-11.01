@@ -23,7 +23,8 @@ class ProductLine(Base):
     quantity = mapped_column(Integer, nullable=False)
     subtotal = mapped_column(Numeric(10, 2), nullable=False)
     estimated_date=mapped_column(Date)
-    
+    id_size = mapped_column(Integer, ForeignKey("Size.id", ondelete="CASCADE", name="fk_product_line_size_id"),)
+
     order = relationship("Order", back_populates="product_lines")
     seller_product = relationship("SellerProduct", back_populates="product_lines")
     refund_products = relationship(

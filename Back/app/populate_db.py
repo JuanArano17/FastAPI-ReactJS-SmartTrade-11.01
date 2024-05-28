@@ -19,7 +19,7 @@ from app.schemas.users.card import CardCreate
 from app.schemas.products.image import ImageCreate
 from app.schemas.users.in_shopping_cart import InShoppingCartCreate
 from app.schemas.users.in_wish_list import InWishListCreate
-from app.schemas.orders.order import OrderCreate
+from app.schemas.orders.order import ConfirmOrder, OrderCreate
 from app.schemas.orders.product_line import ProductLineCreate
 from app.schemas.users.types.seller import SellerCreate
 from app.schemas.products.seller_product import SellerProductCreate, SellerProductUpdate
@@ -50,7 +50,7 @@ Faker.seed(42)  # Set the seed to any value you prefer
 # Define the number of items to create
 num_buyers = 100
 num_sellers = 100
-num_cards = 100
+num_cards = 200
 num_books = 40
 num_games = 40
 num_electronics = 40
@@ -58,11 +58,11 @@ num_electrodomestics = 40
 num_foods = 40
 num_clothes = 40
 num_house_utilities = 40
-num_addresses = 100
+num_addresses = 200
 num_seller_products = 280
-num_cart_items = 100
+num_cart_items = 750
 num_list_items = 100
-num_orders = 100
+num_orders = 70
 num_product_lines_per_order = 3
 num_rejected = 40
 num_approved = 200
@@ -319,31 +319,73 @@ def create_product(category, extra_fields):
     session.close()
     return created_product_id
 
-
-def create_order(buyer_ids):
+orders_ids=[]
+buyers_with_orders=[]
+def create_order_sequential(buyer_ids):
     services = create_services()
     session = services["session"]
     buyer_service = services["buyer_service"]
     order_service = services["order_service"]
+    shopping_cart_service = services["in_shopping_cart_service"]
 
     order_date = datetime.now() - timedelta(days=random.randint(1, 30))
     buyer_id = random.choice(buyer_ids)
     buyer = buyer_service.get_by_id(buyer_id)
     cards = buyer.cards
     addresses = buyer.addresses
-    while len(cards) < 1 or len(addresses) < 1:
-        buyer_id = random.choice(buyer_ids)
-        buyer = buyer_service.get_by_id(buyer_id)
-        cards = buyer.cards
-        addresses = buyer.addresses
-    order = OrderCreate(
+    #while len(cards) < 1 or len(addresses) < 1:
+    #    buyer_id = random.choice(buyer_ids)
+    #    buyer = buyer_service.get_by_id(buyer_id)
+    #order = OrderCreate(
+    #    id_card=random.choice(cards).id,
+    #    id_address=random.choice(addresses).id,
+    #    order_date=order_date,
+    #    total=0,
+    #    state=OrderState.CONFIRMED,
+    #)
+    if(shopping_cart_service.get_by_user(buyer)!=[]):
+        created_order = order_service.create_from_shopping_cart(buyer)
+        order_id = created_order.id  # Obtener el ID antes de cerrar la sesión
+        buyer_id = buyer.id  # Obtener el ID antes de cerrar la sesión
+        orders_ids.append(order_id)
+        session.commit()
+        session.close()
+        return order_id, buyer_id
+    else:
+        session.close()
+
+def confirm_order_sequential(i,order_ids):
+    services = create_services()
+    session = services["session"]
+    buyer_service = services["buyer_service"]
+    order_service = services["order_service"]
+    seller_product_service=services["seller_product_serv"]
+    product_line_service=services["product_line_service"]
+    order=order_service.order_repo.get_by_id(order_ids[i])
+    if order==None:
+        return
+    
+    for product_line in order.product_lines:
+        seller_product=seller_product_service.get_by_id(product_line.id_seller_product)
+        if seller_product.sizes==[]:
+            if product_line.quantity>seller_product.quantity:
+                product_line_service.delete_by_id(product_line.id)
+        else:
+            size=seller_product_service.size_repo.get_by_id(product_line.id_size)
+            if product_line.quantity>size.quantity:
+                product_line_service.delete_by_id(product_line.id)
+            
+    buyer_id = order.id_buyer
+    buyer = buyer_service.get_by_id(buyer_id)
+    cards = buyer.cards
+    addresses = buyer.addresses
+    if len(cards) < 1 or len(addresses) < 1:
+        return
+    order = ConfirmOrder(
         id_card=random.choice(cards).id,
         id_address=random.choice(addresses).id,
-        order_date=order_date,
-        total=0,
-        state=OrderState.CONFIRMED,
     )
-    created_order = order_service.populate(id_buyer=buyer.id, order=order)
+    created_order = order_service.confirm_pending_order(buyer,order)
     order_id = created_order.id  # Obtener el ID antes de cerrar la sesión
     buyer_id = buyer.id  # Obtener el ID antes de cerrar la sesión
     session.commit()
@@ -380,6 +422,11 @@ def create_product_lines_sequential(orders, seller_product_ids):
                             subtotal=subtotal,
                             id_seller_product=seller_product.id,
                         )
+
+                        id_size=None
+                        if seller_product.sizes!=None or seller_product.sizes!=[]:
+                            id_size=random.choice(seller_product.sizes).size
+
                         product_line_service.add(
                             id_order=order_id,
                             id_buyer=buyer_id,
@@ -611,7 +658,7 @@ for i in range(num_approved):
     list_of_approved_ids.append(seller_product_ids[i + 1 + num_rejected])
 
 
-def create_cart_item():
+def create_cart_item_sequential():
     services = create_services()
     session = services["session"]
     in_shopping_cart_service = services["in_shopping_cart_service"]
@@ -631,11 +678,16 @@ def create_cart_item():
     seller_product = seller_product_serv.get_by_id(id_seller_product)
     id_size = None
     if seller_product.sizes:
+        quantity = random.randint(1, 4)
+        in_shopping_cart = InShoppingCartCreate(
+        id_seller_product=id_seller_product, quantity=quantity
+        )
         size_ids = [size.id for size in seller_product.sizes]
         id_size = random.choice(size_ids)
         random_size = seller_product_serv.size_repo.get_by_id(id_size)
         while random_size.quantity < quantity:
             id_size = random.choice(size_ids)
+            print("h")
             random_size = seller_product_serv.size_repo.get_by_id(id_size)
         in_shopping_cart_service.add(
             id_buyer=id_buyer, shopping_cart_product=in_shopping_cart, id_size=id_size
@@ -648,7 +700,7 @@ def create_cart_item():
     session.close()
 
 
-def create_wish_list_item():
+def create_wish_list_item_sequential():
     services = create_services()
     session = services["session"]
     in_wish_list_service = services["in_wish_list_service"]
@@ -666,13 +718,22 @@ def create_wish_list_item():
 
 
 # Populate shopping cart and wish list items in parallel
-run_in_parallel([create_cart_item] * num_cart_items)
-run_in_parallel([create_wish_list_item] * num_list_items)
+for i in range(num_cart_items):
+    create_cart_item_sequential()
+for i in range(num_list_items):
+    create_wish_list_item_sequential()
 
-created_orders = run_in_parallel([create_order] * num_orders, buyer_ids)
+#created_orders = run_in_parallel([create_order] * num_orders, buyer_ids)
+for i in range(num_orders):
+    created_orders=create_order_sequential(buyer_ids)
 
+
+for i in range(int(len(orders_ids)*0.95)):
+    confirmed_orders=confirm_order_sequential(i,orders_ids)
 # Populate product lines for each order en secuencial
-create_product_lines_sequential(created_orders, seller_product_ids)
+#create_product_lines_sequential(created_orders, seller_product_ids)
+
+
 
 services = create_services()
 product_line_ids = services["product_line_service"].product_line_repo.get_id_list()
