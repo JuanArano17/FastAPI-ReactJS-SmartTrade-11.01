@@ -393,51 +393,6 @@ def confirm_order_sequential(i,order_ids):
     return order_id, buyer_id
 
 
-def create_product_lines_sequential(orders, seller_product_ids):
-    services = create_services()
-    session = services["session"]
-    seller_product_serv = services["seller_product_serv"]
-    product_line_service = services["product_line_service"]
-
-    for order_id, buyer_id in orders:
-        used_seller_product_ids = set()
-        for _ in range(num_product_lines_per_order):
-            quantity = random.randint(1, 6)
-            attempts = 0
-            max_attempts = 10
-            while attempts < max_attempts:
-                seller_product_id = random.choice(seller_product_ids)
-                if seller_product_id not in used_seller_product_ids:
-                    seller_product = seller_product_serv.get_by_id(seller_product_id)
-                    if seller_product.quantity >= quantity:
-                        used_seller_product_ids.add(seller_product_id)
-                        price = seller_product.price
-                        subtotal = quantity * price
-                        print(f"el subtotal es {subtotal}")
-                        print(
-                            f"seller_product_price: {price}\nquantity: {quantity}\nsubtotal: {subtotal}"
-                        )
-                        product_line = ProductLineCreate(
-                            quantity=quantity,
-                            subtotal=subtotal,
-                            id_seller_product=seller_product.id,
-                        )
-
-                        id_size=None
-                        if seller_product.sizes!=None or seller_product.sizes!=[]:
-                            id_size=random.choice(seller_product.sizes).size
-
-                        product_line_service.add(
-                            id_order=order_id,
-                            id_buyer=buyer_id,
-                            product_line=product_line,
-                        )
-                        break
-                attempts += 1
-    session.commit()
-    session.close()
-
-
 def create_reviews_sequential(buyer_purchased_products):
     services = create_services()
     session = services["session"]
@@ -727,9 +682,9 @@ for i in range(num_list_items):
 for i in range(num_orders):
     created_orders=create_order_sequential(buyer_ids)
 
-
+confirmed_orders=[]
 for i in range(int(len(orders_ids)*0.95)):
-    confirmed_orders=confirm_order_sequential(i,orders_ids)
+    confirmed_orders.append(confirm_order_sequential(i,orders_ids))
 # Populate product lines for each order en secuencial
 #create_product_lines_sequential(created_orders, seller_product_ids)
 
@@ -740,17 +695,18 @@ product_line_ids = services["product_line_service"].product_line_repo.get_id_lis
 
 # Map buyer_id to purchased products
 buyer_purchased_products = {buyer_id: set() for buyer_id in buyer_ids}
+for confirmed_order in confirmed_orders:
+    if confirmed_order:
+        order_id, buyer_id = confirmed_order
+        services = create_services()
+        session = services["session"]
+        product_line_service = services["product_line_service"]
 
-for order_id, buyer_id in created_orders:
-    services = create_services()
-    session = services["session"]
-    product_line_service = services["product_line_service"]
-
-    product_lines = product_line_service.get_all_by_order_id(order_id)
-    for product_line in product_lines:
-        buyer_purchased_products[buyer_id].add(product_line.id_seller_product)
-    session.close()
-
+        product_lines = product_line_service.get_all_by_order_id(order_id)
+        for product_line in product_lines:
+            buyer_purchased_products[buyer_id].add(product_line.id_seller_product)
+        session.close()
+  
 # Crear reviews de manera secuencial
 create_reviews_sequential(buyer_purchased_products)
 
