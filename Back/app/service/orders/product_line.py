@@ -13,6 +13,7 @@ from app.crud_repository import CRUDRepository
 from app.schemas.products.seller_product import SellerProductUpdate
 from app.schemas.orders.order import OrderUpdate
 from app.core.enums import OrderState
+from app.schemas.products.categories.variations.size import SizeUpdate
 
 class ProductLineRepository(CRUDRepository):
     def __init__(self, session: Session):
@@ -174,7 +175,25 @@ class ProductLineService:
     
     # SHOULD ONLY USE THE METHOD BELOW FOR TESTING
     def delete_by_id(self, product_line_id):
-        self.get_by_id(product_line_id)
+        product_line=self.get_by_id(product_line_id)
+        order=self.order_service.get_by_id(product_line.order.id)
+        seller_product=self.seller_product_service.get_by_id(product_line.id_seller_product)
+
+        order.total -= float(product_line.subtotal)
+
+        if seller_product.sizes == []:
+            seller_product_update = SellerProductUpdate(
+                quantity=seller_product.quantity + product_line.quantity
+            )
+        else:
+            old_size=self.seller_product_service.size_repo.get_by_id(product_line.id_size)
+            old_quantity=old_size.quantity
+            size=SizeUpdate(size=old_size.size, quantity=old_quantity+product_line.quantity)
+            seller_product_update = SellerProductUpdate(
+                        sizes=[size]
+                    )
+        self.order_service.seller_product_service.update(seller_product.id, seller_product_update)
+        
         self.product_line_repo.delete_by_id(product_line_id)
 
     def delete_all(self):

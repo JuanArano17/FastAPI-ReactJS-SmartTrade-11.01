@@ -59,14 +59,29 @@ class PendingState(OrderStateBase):
                     seller_product_update = SellerProductUpdate(
                     quantity=seller_product.quantity - product_line.quantity
                     )
+                    self.order_service.seller_product_service.update(seller_product.id, seller_product_update)
                 else:
-                #    cart_item=self.order_service.shopping_cart_service.shopping_cart_repo.get_where()
-                #    size=SizeUpdate()
-                #    seller_product_update = SellerProductUpdate(
-                    
-                #    )
+                    old_size=self.order_service.seller_product_service.size_repo.get_by_id(product_line.id_size)
+                    old_quantity=old_size.quantity
+                    size=SizeUpdate(size=old_size.size, quantity=old_quantity-product_line.quantity)
+                    seller_product_update = SellerProductUpdate(
+                        sizes=[size]
+                    )
+                
+
+                #print("product line")
+                #    print(product_line.id)
+                #    print(product_line.quantity)
+                #    print("size")
+                #    print(old_size.id)
+                #    print(old_size.quantity)
+                #    print("seller_product")
+                #    print(seller_product.id)
+                #    print(seller_product.quantity)
+                #    print("buyer")
+                #    print(user)
+                #    print("----")
                 #self.order_service.seller_product_service.update(seller_product.id, seller_product_update)
-                    pass
                 
             self.order_service.shopping_cart_service.delete_all_by_user(user)
             return self.order_service.order_repo.update(self.order,order_update)
@@ -172,11 +187,16 @@ class OrderService:
 
         for item in shopping_cart:
             subtotal = item.seller_product.price * item.quantity
+            if item.size==None:
+                id_size=None
+            else:
+                id_size=item.size.id
             order.product_lines.append(
                 ProductLine(
                     id_seller_product=item.seller_product.id,
                     quantity=item.quantity,
                     subtotal=subtotal,
+                    id_size=id_size
                 )
             )
             order.total += Decimal(subtotal)
