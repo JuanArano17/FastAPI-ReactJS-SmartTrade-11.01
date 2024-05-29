@@ -19,7 +19,7 @@ class Order(Base):
     order_date = mapped_column(DateTime)
     total = mapped_column(Numeric(10, 2), nullable=False)
     state = mapped_column(
-        EnumColumn(OrderState), nullable=False, default=OrderState.PENDING
+        EnumColumn(OrderState), nullable=False, default=OrderState.CONFIRMED
     )
     estimated_date = mapped_column(Date)
 

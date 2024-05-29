@@ -20,3 +20,6 @@ class Card(Base):
 
     orders = relationship("Order", back_populates="card")
     buyer = relationship("Buyer", back_populates="cards")
+
+    def __repr__(self):
+        return f"Card(id={self.id}, card_number='{self.card_number}', card_name={self.card_name}, card_exp_date='{self.card_exp_date}', card_security_num='{self.card_security_num}', id_buyer='{self.id_buyer}')"

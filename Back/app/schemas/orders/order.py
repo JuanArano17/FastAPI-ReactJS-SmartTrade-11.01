@@ -6,9 +6,9 @@ from app.schemas.orders.product_line import ProductLine, CompleteProductLine
 from app.core.enums import OrderState
 
 class OrderBase(BaseModel):
-    order_date: datetime | None = Field(default_factory=datetime.now)
-    id_card: int | None
-    id_address: int | None
+    order_date: datetime = Field(default_factory=datetime.now)
+    id_card: int 
+    id_address: int
     state: OrderState
     total: NonNegativeFloat = Field(default=0)
 
@@ -18,11 +18,6 @@ class OrderBase(BaseModel):
         if v is not None and v.astimezone(timezone.utc) > datetime.now(tz=timezone.utc):
             raise ValueError("The order date must be in the past")
         return v
-
-
-# Only used in populate_db.py
-class OrderCreate(OrderBase):
-    pass
 
 class OrderUpdate(BaseModel):
     id_address: Optional[int] = None

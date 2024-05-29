@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Float, ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import relationship, mapped_column
 from app.base import Base
-
+from sqlalchemy.orm import Session
 
 class SellerProduct(Base):
     __tablename__ = "SellerProduct"
@@ -37,13 +37,17 @@ class SellerProduct(Base):
     def __repr__(self):
         return f"SellerProduct(id={self.id}, id_product={self.id_product}, id_seller={self.id_seller}, quantity={self.quantity}, price={self.price}, shipping_costs={self.shipping_costs}, state={self.state}, justification={self.justification}, eco_points={self.eco_points}, age_restricted={self.age_restricted})"
 
-    def notify_observers(self, new_quantity: int, id_size:int = None):
+    def notify_observers(self, new_quantity: int, id_size:int = None, session:Session=None):
         for cart_item in self.in_shopping_carts:
             if self.sizes==[]:
                 if cart_item.quantity > new_quantity:
                     cart_item.quantity = new_quantity
+                if new_quantity == 0:
+                        session.delete(cart_item)
             else:
                 if cart_item.id_size==id_size:
                     if cart_item.quantity > new_quantity:
                         cart_item.quantity = new_quantity
+                    if new_quantity == 0:
+                        session.delete(cart_item)
            

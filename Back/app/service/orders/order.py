@@ -14,7 +14,7 @@ from app.service.users.card import CardService
 from app.service.users.address import AddressService
 from app.service.users.types.buyer import BuyerService
 from app.schemas.orders.product_line import CompleteProductLine
-from app.schemas.orders.order import CompleteOrder, ConfirmOrder, OrderCreate, OrderUpdate
+from app.schemas.orders.order import CompleteOrder, ConfirmOrder, OrderUpdate
 from app.crud_repository import CRUDRepository
 from app.schemas.products.categories.variations.size import SizeUpdate
 from app.schemas.products.seller_product import SellerProductUpdate
@@ -29,48 +29,6 @@ class OrderStateBase:
 
     def apply(self, user, order_update):
         pass
-
-class PendingState(OrderStateBase):
-    def validate(self, order_update):
-        if order_update.id_address is None or order_update.id_card is None:
-            raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="id_address and id_card cannot be null when changing to state CONFIRMED."
-            )
-        if self.order.state!=OrderState.PENDING:
-            raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="order state must be pending to be in the pending state"
-            )
-
-    def apply(self, user, order_update):
-            # Checking if this user owns the card and address sent in the request
-            self.order_service.card_service.get_one_by_user(user, order_update.id_card)
-            self.order_service.address_service.get_one_by_user(user, order_update.id_address)
-            order_update.estimated_date = (datetime.now() + timedelta(weeks=1)).date()
-            self.order.state = OrderState.CONFIRMED
-            self.order.order_date = datetime.now()
-            for product_line in self.order.product_lines:
-                product = self.order_service.seller_product_service.get_by_id(
-                    product_line.id_seller_product
-                ).product
-                seller_product=self.order_service.seller_product_service.get_by_id(product_line.id_seller_product)
-                if seller_product.sizes==None or seller_product.sizes==[]:
-                    seller_product_update = SellerProductUpdate(
-                    quantity=seller_product.quantity - product_line.quantity
-                    )
-                    self.order_service.seller_product_service.update(seller_product.id, seller_product_update)
-                else:
-                    old_size=self.order_service.seller_product_service.size_repo.get_by_id(product_line.id_size)
-                    old_quantity=old_size.quantity
-                    size=SizeUpdate(size=old_size.size, quantity=old_quantity-product_line.quantity)
-                    seller_product_update = SellerProductUpdate(
-                        sizes=[size]
-                    )
-                    self.order_service.seller_product_service.update(seller_product.id, seller_product_update)
-                
-            self.order_service.shopping_cart_service.delete_all_by_user(user)
-            return self.order_service.order_repo.update(self.order,order_update)
 
 class ConfirmedState(OrderStateBase):
     def validate(self, order_update):
@@ -157,7 +115,7 @@ class OrderService:
         self.seller_product_service = seller_product_service
         self.shopping_cart_service = shopping_cart_service
 
-    def create_from_shopping_cart(self, user: User) -> Order:
+    def create_from_shopping_cart(self, user: User, order_create:ConfirmOrder) -> Order:
         self._check_is_buyer(user)
         shopping_cart = self.shopping_cart_service.get_by_user(user)
 
@@ -166,11 +124,14 @@ class OrderService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Cannot create an order from the user's shopping cart if it is empty.",
             )
+        self.card_service.get_one_by_user(user, order_create.id_card)
+        self.address_service.get_one_by_user(user, order_create.id_address)
+        order = Order(total=0, order_date=datetime.now(), id_buyer=user.id, state=OrderState.CONFIRMED, **order_create.model_dump())
+        order.id_address=order_create.id_address
+        order.id_card=order_create.id_card
+        order=self.order_repo.add(order)
+        self.shopping_cart_service.delete_all_by_user(user)
 
-        self.order_repo.delete_where(
-            Order.state == OrderState.PENDING, Order.id_buyer == user.id
-        )
-        order = self.order_repo.add(Order(id_buyer=user.id, total=0))
 
         for item in shopping_cart:
             subtotal = item.seller_product.price * item.quantity
@@ -188,35 +149,41 @@ class OrderService:
             )
             order.total += Decimal(subtotal)
 
-        self.session.commit()
+        for product_line in order.product_lines:
+            product = self.seller_product_service.get_by_id(
+                product_line.id_seller_product
+            ).product
+            seller_product=self.seller_product_service.get_by_id(product_line.id_seller_product)
+            if seller_product.sizes==None or seller_product.sizes==[]:
+                seller_product_update = SellerProductUpdate(
+                quantity=seller_product.quantity - product_line.quantity
+                )
+                self.seller_product_service.update(seller_product.id, seller_product_update)
+            else:
+                old_size=self.seller_product_service.size_repo.get_by_id(product_line.id_size)
+                old_quantity=old_size.quantity
+                size=SizeUpdate(size=old_size.size, quantity=old_quantity-product_line.quantity)
+                seller_product_update = SellerProductUpdate(
+                    sizes=[size]
+                )
+                self.seller_product_service.update(seller_product.id, seller_product_update)
+        order=self._get_by_id(order.id)
         return order
-
-    def confirm_pending_order(self, user: User, data: ConfirmOrder) -> Order:
-        self._check_is_buyer(user)
-        orders = self.order_repo.get_where(
-            Order.state == OrderState.PENDING, Order.id_buyer == user.id
-        )
-
-        if orders is None or orders==[]:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"User {user.email} does not have a pending order.",
-            )
-
-        else:
-            order=orders[0]
-
-        data=OrderUpdate(id_address=data.id_address, id_card=data.id_card)
-
-        state_instance = PendingState(order, self)
-        state_instance.validate(data)
-
-        return state_instance.apply(user, data)
     
-    def ship_confirmed_order(self, user: User, data: OrderUpdate, id_order:int) -> Order:
+    def get_state_instance(self, state, order):
+        if(state==OrderState.CONFIRMED):
+            return ConfirmedState(order, self)
+        elif(state==OrderState.SHIPPED):
+            return ShippedState(order, self)
+        elif(state==OrderState.DELIVERED):
+            return DeliveredState(order, self)
+        else:
+            raise ValueError("This state does not exist")
+        
+    def update_order(self, user: User, data: OrderUpdate, id_order:int, state) -> Order:
         self._check_is_buyer(user)
         orders = self.order_repo.get_where(
-            Order.state == OrderState.CONFIRMED, Order.id_buyer == user.id, Order.id==id_order
+            Order.state == state, Order.id_buyer == user.id, Order.id==id_order
         )
 
         if orders is None or orders==[]:
@@ -226,28 +193,9 @@ class OrderService:
             )
         else:
             order=orders[0]
-        state_instance = ConfirmedState(order, self)
+        state_instance = self.get_state_instance(state, order)
         state_instance.validate(data)
         return state_instance.apply(user, data)
-    
-    def deliver_shipped_order(self, user: User, data: OrderUpdate, id_order:int) -> Order:
-        self._check_is_buyer(user)
-        orders = self.order_repo.get_where(
-            Order.state == OrderState.SHIPPED, Order.id_buyer == user.id, Order.id==id_order
-        )
-
-        if orders is None or orders==[]:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"User {user.email} does not have a shipped order with this id.",
-            )
-        else:
-            order=orders[0]
-
-        state_instance = ShippedState(order, self)
-        state_instance.validate(data)
-
-        return state_instance.apply(user,data)
     
     def get_by_id(self, order_id) -> CompleteOrder:
         order = self.order_repo.get_by_id(order_id)
@@ -268,29 +216,6 @@ class OrderService:
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Order with id {order_id} not found.",
         )
-    
-    #def update(self, user: User, order_id: int, order_update: OrderUpdate) -> Order:
-    #    self._check_is_buyer(user)
-    #    order = self._get_by_id(order_id)
-    #    self._check_buyer_owns_order(user.id, order_id)
-
-    #    state_class = self._get_state_class(order.state)
-    #    state_instance = state_class(order, self)
-    #    state_instance.validate(order_update)
-
-    #    return state_instance.apply(user, order_update)
-
-    #def _get_state_class(self, state: OrderState):
-    #    if state == OrderState.PENDING:
-    #        return PendingState
-    #    elif state == OrderState.CONFIRMED:
-    #        return ConfirmedState
-    #    elif state == OrderState.SHIPPED:
-    #        return ShippedState
-    #    elif state == OrderState.DELIVERED:
-    #        return DeliveredState
-    #     else:
-    #        raise ValueError("Invalid state")
 
     def get_one_by_user(self, user: User, order_id) -> CompleteOrder:
         self._check_is_buyer(user)
@@ -310,11 +235,6 @@ class OrderService:
 
     def delete_all(self):
         self.order_repo.delete_all()
-
-    def populate(self, id_buyer: int, order: OrderCreate) -> Order:
-        order = Order(id_buyer=id_buyer, **order.model_dump(), estimated_date = (datetime.now() + timedelta(weeks=1)).date())
-        self.order_repo.add(order)
-        return order
 
     def _map_order_to_schema(self, order: Order) -> CompleteOrder:
         complete_product_lines = []

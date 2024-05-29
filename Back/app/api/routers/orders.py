@@ -21,28 +21,16 @@ async def get_orders(
     return order_service.get_all_by_user(current_user)
 
 
-@router.post("/", response_model=CompleteOrder, status_code=201)
+@router.post("/", response_model=CompleteOrder, status_code=200)
 async def create_order_from_shopping_cart(
     current_user: CurrentUserDep,
     order_service: OrderServiceDep,
+    confirm_order: ConfirmOrder
 ):
     """
     Create an order from the current user's shopping cart.
     """
-    order = order_service.create_from_shopping_cart(current_user)
-    return order_service._map_order_to_schema(order)
-
-
-@router.post("/confirm-order", response_model=CompleteOrder, status_code=200)
-async def confirm_pending_order(
-    current_user: CurrentUserDep,
-    order_service: OrderServiceDep,
-    confirm_order: ConfirmOrder,
-):
-    """
-    Confirm the current user's pending order.
-    """
-    order = order_service.confirm_pending_order(current_user, confirm_order)
+    order = order_service.create_from_shopping_cart(current_user, confirm_order)
     return order_service._map_order_to_schema(order)
 
 
