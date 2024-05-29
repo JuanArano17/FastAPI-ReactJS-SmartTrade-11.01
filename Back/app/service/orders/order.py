@@ -94,13 +94,7 @@ class ConfirmedState(OrderStateBase):
 
     def apply(self, user, order_update):
             self.order.state = OrderState.SHIPPED
-            print("---")
-            for product_line in self.order.product_lines:
-                print(product_line)
-            print("---")
             updated_order=self.order_service.order_repo.update(self.order, order_update)
-            for product_line in self.order.product_lines:
-                print(product_line)
             return updated_order
 
 class ShippedState(OrderStateBase):
@@ -232,22 +226,8 @@ class OrderService:
             )
         else:
             order=orders[0]
-        
-        #if not order.product_lines or order.product_lines==[]:
-        #    self.order_repo._db.refresh(order)
-        
-        print("---")
-        print(order)
-        print("---")
-        for product_line in order.product_lines:
-                print(product_line)
-        print("---")
         state_instance = ConfirmedState(order, self)
         state_instance.validate(data)
-        print("---")
-        for product_line in order.product_lines:
-                print(product_line)
-        print("---")
         return state_instance.apply(user, data)
     
     def deliver_shipped_order(self, user: User, data: OrderUpdate, id_order:int) -> Order:
