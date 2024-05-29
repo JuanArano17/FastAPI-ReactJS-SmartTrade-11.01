@@ -291,7 +291,7 @@ class SellerProductService:
                             new_data.quantity - size[0].quantity + size_data.quantity
                         )
                         self.size_repo.update(size[0], size_data)
-                        seller_product.notify_observers(new_quantity=size_data.quantity, id_size=size[0].id)
+                        seller_product.notify_observers(new_quantity=size_data.quantity, id_size=size[0].id, session=self.session)
                     else:
                         new_data.quantity += size_data.quantity
                         size_data = SizeCreate(**size_data.model_dump())
@@ -301,9 +301,9 @@ class SellerProductService:
                                 seller_product_id=seller_product.id,
                             )
                         )
-        if new_data.quantity:
+        if new_data.quantity!=None:
             product.stock = product.stock + new_data.quantity - seller_product.quantity
-            seller_product.notify_observers(new_data.quantity)
+            seller_product.notify_observers(new_data.quantity, session=self.session)
 
     def are_all_fields_none_except_sizes(self, new_data):
         return all(field_name == "sizes" or field_value is None for field_name, field_value in new_data)

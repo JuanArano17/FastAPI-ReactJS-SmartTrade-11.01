@@ -36,7 +36,7 @@ class ProductLineRepository(CRUDRepository):
             .join(SellerProduct, SellerProduct.id == ProductLine.id_seller_product)
             .join(Order, Order.id==ProductLine.id_order)
             .filter(SellerProduct.id_seller == seller_id)
-            .filter(Order.state==OrderState.CONFIRMED)
+            .filter(ProductLine.estimated_date==None)
         )
         return session.execute(stmt).scalars().all()
 
@@ -182,7 +182,7 @@ class ProductLineService:
                 max=product_line.estimated_date
         if ship:    
             data=OrderUpdate(estimated_date=max)
-            self.order_service.ship_confirmed_order(buyer,data,order.id)
+            self.order_service.update_order(buyer,data,order.id, OrderState.CONFIRMED)
         return new_product_line
 
     def _check_is_seller(self, user):
