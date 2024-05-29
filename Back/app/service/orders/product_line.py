@@ -181,13 +181,7 @@ class ProductLineService:
             if(product_line.estimated_date>max):
                 max=product_line.estimated_date
         if ship:    
-            for product_line in order.product_lines:
-                print(product_line)
             data=OrderUpdate(estimated_date=max)
-
-            print("---")
-            for product_line in order.product_lines:
-                print(product_line)
             self.order_service.ship_confirmed_order(buyer,data,order.id)
         return new_product_line
 
