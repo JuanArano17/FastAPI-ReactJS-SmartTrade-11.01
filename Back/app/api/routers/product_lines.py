@@ -14,7 +14,7 @@ async def get_product_line(
     product_line_service: ProductLineServiceDep,
 ):
     """
-    Get all product lines from the current seller (belonging to orders that are confirmed, shipped or delivered).
+    Get all product lines from the current seller (the ones that dont have an estimated date, so that the seller may give them an estimated date)
     """
     return product_line_service.get_all_by_seller_id(current_user.id)
 

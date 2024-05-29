@@ -8,7 +8,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Import your services and models here
 from app.database import SessionLocal
-from app.core.enums import OrderState
 from app.service.users.types.seller import SellerService
 from app.service.users.types.buyer import BuyerService
 from app.service.users.card import CardService
@@ -341,16 +340,6 @@ def create_order_sequential(buyer_ids):
         id_card=random.choice(cards).id,
         id_address=random.choice(addresses).id,
     )
-    #shopping_cart=shopping_cart_service.get_by_id_buyer(buyer_id)
-    #for cart_item in shopping_cart:
-    #    seller_product=seller_product_service.get_by_id(cart_item.id_seller_product)
-    #    if seller_product.sizes==[]:
-    #        if cart_item.quantity>seller_product.quantity:
-    #            shopping_cart_service.delete_by_id(cart_item.id)
-    #    else:
-    #        size=seller_product_service.size_repo.get_by_id(cart_item.id_size)
-    #        if cart_item.quantity>seller_product.quantity:
-    #            shopping_cart_service.delete_by_id(cart_item.id)
     if(shopping_cart_service.get_by_user(buyer)!=[]):
         created_order = order_service.create_from_shopping_cart(buyer, order)
         order_id = created_order.id  # Obtener el ID antes de cerrar la sesión
@@ -361,44 +350,6 @@ def create_order_sequential(buyer_ids):
         return order_id, buyer_id
     else:
         session.close()
-
-def confirm_order_sequential(i,order_ids):
-    services = create_services()
-    session = services["session"]
-    buyer_service = services["buyer_service"]
-    order_service = services["order_service"]
-    seller_product_service=services["seller_product_serv"]
-    product_line_service=services["product_line_service"]
-    order=order_service.order_repo.get_by_id(order_ids[i])
-    if order==None:
-        return
-    
-    for product_line in order.product_lines:
-        seller_product=seller_product_service.get_by_id(product_line.id_seller_product)
-        if seller_product.sizes==[]:
-            if product_line.quantity>seller_product.quantity:
-                product_line_service.delete_by_id(product_line.id)
-        else:
-            size=seller_product_service.size_repo.get_by_id(product_line.id_size)
-            if product_line.quantity>size.quantity:
-                product_line_service.delete_by_id(product_line.id)
-            
-    buyer_id = order.id_buyer
-    buyer = buyer_service.get_by_id(buyer_id)
-    cards = buyer.cards
-    addresses = buyer.addresses
-    if len(cards) < 1 or len(addresses) < 1:
-        return
-    order = ConfirmOrder(
-        id_card=random.choice(cards).id,
-        id_address=random.choice(addresses).id,
-    )
-    created_order = order_service.confirm_pending_order(buyer,order)
-    order_id = created_order.id  # Obtener el ID antes de cerrar la sesión
-    buyer_id = buyer.id  # Obtener el ID antes de cerrar la sesión
-    session.commit()
-    session.close()
-    return order_id, buyer_id
 
 
 def create_reviews_sequential(buyer_purchased_products):
@@ -695,12 +646,6 @@ for i in range(num_orders):
     result = create_order_sequential(buyer_ids)
     if result is not None:
         created_orders.append(result)
-
-#confirmed_orders=[]
-#for i in range(int(len(orders_ids)*0.95)):
-#    confirmed_orders.append(confirm_order_sequential(i,orders_ids))
-# Populate product lines for each order en secuencial
-#create_product_lines_sequential(created_orders, seller_product_ids)
 
 
 
