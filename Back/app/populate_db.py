@@ -8,7 +8,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Import your services and models here
 from app.database import SessionLocal
-from app.core.enums import OrderState
 from app.service.users.types.seller import SellerService
 from app.service.users.types.buyer import BuyerService
 from app.service.users.card import CardService
