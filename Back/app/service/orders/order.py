@@ -14,7 +14,7 @@ from app.service.users.card import CardService
 from app.service.users.address import AddressService
 from app.service.users.types.buyer import BuyerService
 from app.schemas.orders.product_line import CompleteProductLine
-from app.schemas.orders.order import CompleteOrder, ConfirmOrder, OrderCreate, OrderUpdate
+from app.schemas.orders.order import CompleteOrder, ConfirmOrder, OrderUpdate
 from app.crud_repository import CRUDRepository
 from app.schemas.products.categories.variations.size import SizeUpdate
 from app.schemas.products.seller_product import SellerProductUpdate
@@ -222,29 +222,6 @@ class OrderService:
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Order with id {order_id} not found.",
         )
-    
-    #def update(self, user: User, order_id: int, order_update: OrderUpdate) -> Order:
-    #    self._check_is_buyer(user)
-    #    order = self._get_by_id(order_id)
-    #    self._check_buyer_owns_order(user.id, order_id)
-
-    #    state_class = self._get_state_class(order.state)
-    #    state_instance = state_class(order, self)
-    #    state_instance.validate(order_update)
-
-    #    return state_instance.apply(user, order_update)
-
-    #def _get_state_class(self, state: OrderState):
-    #    if state == OrderState.PENDING:
-    #        return PendingState
-    #    elif state == OrderState.CONFIRMED:
-    #        return ConfirmedState
-    #    elif state == OrderState.SHIPPED:
-    #        return ShippedState
-    #    elif state == OrderState.DELIVERED:
-    #        return DeliveredState
-    #     else:
-    #        raise ValueError("Invalid state")
 
     def get_one_by_user(self, user: User, order_id) -> CompleteOrder:
         self._check_is_buyer(user)
