@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, ConfigDict, NonNegativeFloat, NonNegativeInt
+from pydantic import BaseModel, ConfigDict, FutureDate, NonNegativeFloat, NonNegativeInt
 from app.schemas.orders.refund_product import RefundProduct
 from app.schemas.products.categories.variations.size import Size
 
@@ -12,6 +12,8 @@ class ProductLineBase(BaseModel):
 class ProductLineCreate(ProductLineBase):
     id_seller_product: int
 
+class ProductLineUpdate(BaseModel):
+    estimated_date:Optional[FutureDate]
 
 class ProductLine(ProductLineBase):
     model_config = ConfigDict(from_attributes=True)
@@ -35,3 +37,4 @@ class CompleteProductLine(ProductLineBase):
     category: str
     refund_products: list[RefundProduct] = []
     size: Optional[Size]=None
+    estimated_date:Optional[FutureDate]
