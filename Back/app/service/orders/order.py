@@ -67,21 +67,7 @@ class PendingState(OrderStateBase):
                     seller_product_update = SellerProductUpdate(
                         sizes=[size]
                     )
-                
-
-                #print("product line")
-                #    print(product_line.id)
-                #    print(product_line.quantity)
-                #    print("size")
-                #    print(old_size.id)
-                #    print(old_size.quantity)
-                #    print("seller_product")
-                #    print(seller_product.id)
-                #    print(seller_product.quantity)
-                #    print("buyer")
-                #    print(user)
-                #    print("----")
-                #self.order_service.seller_product_service.update(seller_product.id, seller_product_update)
+                    self.order_service.seller_product_service.update(seller_product.id, seller_product_update)
                 
             self.order_service.shopping_cart_service.delete_all_by_user(user)
             return self.order_service.order_repo.update(self.order,order_update)
@@ -108,7 +94,14 @@ class ConfirmedState(OrderStateBase):
 
     def apply(self, user, order_update):
             self.order.state = OrderState.SHIPPED
-            return self.order_service.order_repo.update(self.order, order_update)
+            print("---")
+            for product_line in self.order.product_lines:
+                print(product_line)
+            print("---")
+            updated_order=self.order_service.order_repo.update(self.order, order_update)
+            for product_line in self.order.product_lines:
+                print(product_line)
+            return updated_order
 
 class ShippedState(OrderStateBase):
     def validate(self, order_update):
@@ -239,10 +232,22 @@ class OrderService:
             )
         else:
             order=orders[0]
-
+        
+        #if not order.product_lines or order.product_lines==[]:
+        #    self.order_repo._db.refresh(order)
+        
+        print("---")
+        print(order)
+        print("---")
+        for product_line in order.product_lines:
+                print(product_line)
+        print("---")
         state_instance = ConfirmedState(order, self)
         state_instance.validate(data)
-
+        print("---")
+        for product_line in order.product_lines:
+                print(product_line)
+        print("---")
         return state_instance.apply(user, data)
     
     def deliver_shipped_order(self, user: User, data: OrderUpdate, id_order:int) -> Order:
@@ -339,15 +344,31 @@ class OrderService:
                 product_line.id_seller_product
             )
             product = self.product_service.get_by_id(seller_product.id_product)
-            complete_product_lines.append(
-                CompleteProductLine(
-                    **product_line.__dict__,
-                    name=product.name,
-                    description=product.description,
-                    category=product.category,
-                    refund_products=product_line.refund_products,
+            if product_line.id_size:
+                complete_product_lines.append(
+                    CompleteProductLine(
+                        **product_line.__dict__,
+                        name=product.name,
+                        description=product.description,
+                        category=product.category,
+                        refund_products=product_line.refund_products,
+                        size=self.seller_product_service.size_repo.get_by_id(product_line.id_size)
+                        #estimated_date=product_line.estimated_date
+                    )
                 )
-            )
+            else:
+                complete_product_lines.append(
+                    CompleteProductLine(
+                        **product_line.__dict__,
+                        name=product.name,
+                        description=product.description,
+                        category=product.category,
+                        refund_products=product_line.refund_products,
+                        size=self.seller_product_service.size_repo.get_by_id(product_line.id_size)
+                        #estimated_date=product_line.estimated_date
+                    )
+                )
+
 
         del order.product_lines
 
