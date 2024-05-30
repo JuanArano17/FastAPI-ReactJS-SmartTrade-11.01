@@ -18,8 +18,6 @@ const TopBar = () => {
   const logout = useLogout();
   const isLoggedIn = Boolean(localStorage.getItem('accessToken'));
   const userType = localStorage.getItem('type');
-  console.log("isLoggedIn:", isLoggedIn);
-  console.log("userType:", userType);
   const handleLogoClick = () => {
     history.push("/");
   };

@@ -64,4 +64,28 @@ const updateCartItemQuantity = async (id_cart_item, quantity) => {
   }
 };
 
-export { updateCartItemQuantity, addCartItem, deleteCartItem, getCartItems };
+const updateSellerProductStock = async (sellerProductId, updateData) => {
+  try {
+      const response = await axiosInstance.put(`/seller_products/${sellerProductId}`, updateData);
+      return response.data;
+  } catch (error) {
+      console.error('Error al actualizar el stock del producto:', error.response ? error.response.data : error);
+      throw error;
+  }
+};
+
+
+const clearCart = async () => {
+  try {
+      const response = await axiosInstance.delete('/shopping_cart/me/');
+      return response.data;
+  } catch (error) {
+      console.error('Error al vaciar el carrito:', error.response ? error.response.data : error);
+      throw error;
+  }
+};
+
+
+
+
+export { clearCart,updateSellerProductStock, updateCartItemQuantity, addCartItem, deleteCartItem, getCartItems };

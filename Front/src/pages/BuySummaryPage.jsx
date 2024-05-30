@@ -5,8 +5,8 @@ import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
 import CartSummaryItem from '../components/products/shoppingcart/CartSummaryItem';
 import styles from '../styles/styles';
-import { getCartItems } from '../api/services/products/ShoppingCartService';
-import { createOrder } from '../api/services/orders/OrderService';  // Importa la función de creación de pedidos
+import { updateSellerProductStock, getCartItems, clearCart } from '../api/services/products/ShoppingCartService';
+import { createOrder } from '../api/services/orders/OrderService';
 
 const BuySummaryPage = () => {
     const { state } = useLocation();
@@ -33,18 +33,30 @@ const BuySummaryPage = () => {
     const handleConfirmPurchase = async () => {
         console.log(selectedAddress);
         console.log(selectedCard);
-
+    
         try {
-            // Crear el pedido
             const orderData = {
                 order_date: new Date().toISOString(),
                 id_card: selectedCard.id,
                 id_address: selectedAddress.id,
                 total: calculateTotal(),
+                product_lines: cartItems.map(item => ({
+                    id_seller_product: item.seller_product.id,
+                    quantity: item.quantity,
+                    subtotal: (item.seller_product.price + item.seller_product.shipping_costs) * item.quantity
+                }))
             };
-
+    
             const response = await createOrder(orderData);
-
+            console.log("response order:", response);
+            
+            await Promise.all(cartItems.map(async (item) => {
+                const newStock = item.seller_product.stock - item.quantity;
+                await updateSellerProductStock(item.seller_product.id, { stock: newStock });
+            }));
+    
+            await clearCart();
+    
             history.push('/review-product');
         } catch (error) {
             console.error('Error al crear el pedido:', error.response ? error.response.data : error.message);
