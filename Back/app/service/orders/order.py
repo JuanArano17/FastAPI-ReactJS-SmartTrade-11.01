@@ -14,7 +14,7 @@ from app.service.users.card import CardService
 from app.service.users.address import AddressService
 from app.service.users.types.buyer import BuyerService
 from app.schemas.orders.product_line import CompleteProductLine
-from app.schemas.orders.order import CompleteOrder, ConfirmOrder, OrderUpdate
+from app.schemas.orders.order import CompleteOrder, ConfirmOrder, OrderCreate, OrderUpdate
 from app.crud_repository import CRUDRepository
 from app.schemas.products.categories.variations.size import SizeUpdate
 from app.schemas.products.seller_product import SellerProductUpdate
@@ -114,6 +114,11 @@ class OrderService:
         self.product_service = product_service
         self.seller_product_service = seller_product_service
         self.shopping_cart_service = shopping_cart_service
+
+    def populate(self, id_buyer: int, order: OrderCreate) -> Order:
+        order = Order(id_buyer=id_buyer, **order.model_dump())
+        self.order_repo.add(order)
+        return order
 
     def create_from_shopping_cart(self, user: User, order_create:ConfirmOrder) -> Order:
         self._check_is_buyer(user)
@@ -224,6 +229,10 @@ class OrderService:
 
     def get_all_by_user(self, user: User) -> list[CompleteOrder]:
         self._check_is_buyer(user)
+        for order in self.get_all_by_buyer_id(user.id):
+            if(order.estimated_date and order.state== OrderState.SHIPPED):
+                if datetime.now().date()>=order.estimated_date:
+                    self.update_order(user, OrderUpdate(), order.id, OrderState.SHIPPED)
         return [
             self._map_order_to_schema(order)
             for order in self.get_all_by_buyer_id(user.id)

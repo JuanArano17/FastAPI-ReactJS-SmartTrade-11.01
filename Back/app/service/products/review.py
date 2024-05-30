@@ -9,6 +9,7 @@ from app.crud_repository import CRUDRepository
 from app.models.products.review import Review
 from app.schemas.products.review import CompleteReview, ReviewCreate
 from app.schemas.users.types.buyer import Buyer
+from app.core.enums import OrderState
 
 
 class ReviewRepository(CRUDRepository):
@@ -38,6 +39,7 @@ class ReviewRepository(CRUDRepository):
             .join(ProductLine, ProductLine.id_seller_product == SellerProduct.id)
             .join(Order, Order.id == ProductLine.id_order)
             .filter(Order.id_buyer == buyer_id)
+            .filter(Order.state==OrderState.DELIVERED)
         )
         return session.execute(stmt).scalars().all()
     
@@ -66,7 +68,7 @@ class ReviewService:
         if self.seller_product_service.get_by_id(review.id_seller_product) not in self.get_seller_product_by_buyer(id_buyer):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="The buyer must purchase the product to review it",
+                detail="The buyer must have purchased AND received the product to review it",
             )
         
         self.buyer_service.get_by_id(id_buyer)

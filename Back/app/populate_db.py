@@ -18,7 +18,7 @@ from app.schemas.users.card import CardCreate
 from app.schemas.products.image import ImageCreate
 from app.schemas.users.in_shopping_cart import InShoppingCartCreate
 from app.schemas.users.in_wish_list import InWishListCreate
-from app.schemas.orders.order import ConfirmOrder
+from app.schemas.orders.order import ConfirmOrder, OrderBase, OrderCreate
 from app.schemas.orders.product_line import ProductLineCreate
 from app.schemas.users.types.seller import SellerCreate
 from app.schemas.products.seller_product import SellerProductCreate, SellerProductUpdate
@@ -41,6 +41,7 @@ from app.service.users.country import CountryService
 
 from app.schemas.products.review import ReviewCreate
 from app.service.products.review import ReviewService
+from app.core.enums import OrderState
 
 # Initialize Faker with a specific seed (for consistency)
 faker = Faker()
@@ -50,7 +51,7 @@ Faker.seed(42)  # Set the seed to any value you prefer
 num_buyers = 100
 num_sellers = 100
 num_cards_per_person=3
-num_books = 40
+num_books = 70
 num_games = 40
 num_electronics = 40
 num_electrodomestics = 40
@@ -58,14 +59,16 @@ num_foods = 40
 num_clothes = 40
 num_house_utilities = 40
 num_addresses_per_person = 3
-num_seller_products = 280
-num_cart_items = 750
+num_seller_products = 400
+num_cart_items = 850
 num_list_items = 100
-num_orders = 63
+num_orders = 53
 num_product_lines_per_order = 3
 num_rejected = 40
 num_approved = 200
+num_delivered_orders = 40
 num_reviews = 100
+num_product_lines_per_order_delivered = 2
 
 
 def create_services():
@@ -690,9 +693,82 @@ for i in range(num_orders):
 services = create_services()
 product_line_ids = services["product_line_service"].product_line_repo.get_id_list()
 
+def create_order_delivered(buyer_ids):
+    services = create_services()
+    session = services["session"]
+    buyer_service = services["buyer_service"]
+    order_service = services["order_service"]
+    
+    order_date = datetime.now() - timedelta(days=random.randint(1, 30))
+    buyer_id = random.choice(buyer_ids)
+    buyer = buyer_service.get_by_id(buyer_id)
+    cards = buyer.cards
+    addresses = buyer.addresses
+    while len(cards) < 1 or len(addresses) < 1:
+        buyer_id = random.choice(buyer_ids)
+        buyer = buyer_service.get_by_id(buyer_id)
+        cards = buyer.cards
+        addresses = buyer.addresses
+    order = OrderCreate(
+        id_card=random.choice(cards).id,
+        id_address=random.choice(addresses).id,
+        order_date=datetime.now().date()-timedelta(days=30),
+        total=0,
+        estimated_date=datetime.now().date()-timedelta(days=1),
+        state=OrderState.DELIVERED
+    )
+    created_order = order_service.populate(id_buyer=buyer.id, order=order)
+    order_id = created_order.id  # Obtener el ID antes de cerrar la sesión
+    buyer_id = buyer.id  # Obtener el ID antes de cerrar la sesión
+    session.commit()
+    session.close()
+    return order_id, buyer_id
+
+def create_product_lines_sequential(orders, seller_product_ids):
+    services = create_services()
+    session = services["session"]
+    seller_product_serv = services["seller_product_serv"]
+    product_line_service = services["product_line_service"]
+    
+    for order_id, buyer_id in orders:
+        used_seller_product_ids = set()
+        for _ in range(num_product_lines_per_order):
+            quantity = random.randint(1, 6)
+            attempts = 0
+            max_attempts = 10
+            while attempts < max_attempts:
+                seller_product_id = random.choice(seller_product_ids)
+                if seller_product_id not in used_seller_product_ids:
+                    seller_product = seller_product_serv.get_by_id(seller_product_id)
+                    if seller_product.quantity >= quantity:
+                        used_seller_product_ids.add(seller_product_id)
+                        price = seller_product.price
+                        subtotal = quantity * price
+                        product_line = ProductLineCreate(
+                            quantity=quantity,
+                            subtotal=subtotal,
+                            id_seller_product=seller_product.id,
+                        )
+                        product_line_service.add(id_order=order_id, id_buyer=buyer_id, product_line=product_line)
+                        break
+                attempts += 1
+    session.commit()
+    session.close()
+
+
+# Crear una lista para almacenar las órdenes entregadas
+delivered_orders = []
+
+for i in range(num_delivered_orders):
+    order_info = create_order_delivered(buyer_ids)
+    delivered_orders.append(order_info)
+
+# Pasar la lista de órdenes entregadas a la función
+create_product_lines_sequential(delivered_orders, seller_product_ids)
+
 buyer_purchased_products = {buyer_id: set() for buyer_id in buyer_ids}
-for created_order in created_orders:
-    order_id, buyer_id = created_order
+for delivered_order in delivered_orders:
+    order_id, buyer_id = delivered_order
     services = create_services()
     session = services["session"]
     product_line_service = services["product_line_service"]
@@ -705,9 +781,7 @@ for created_order in created_orders:
 # Crear reviews de manera secuencial
 create_reviews_sequential(buyer_purchased_products)
 
-# Crear productos de devolución de manera secuencial
-create_refund_products_sequential(product_line_ids)
-
+print("THE DATABASE HAS BEEN POPULATED FULLY")
 # Close the session
 services = create_services()
 session = services["session"]

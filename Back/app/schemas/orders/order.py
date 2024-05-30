@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field, FutureDate, NonNegativeFloat, validator
 
@@ -18,6 +18,9 @@ class OrderBase(BaseModel):
         if v is not None and v.astimezone(timezone.utc) > datetime.now(tz=timezone.utc):
             raise ValueError("The order date must be in the past")
         return v
+
+class OrderCreate(OrderBase):
+    estimated_date: Optional[date] = None
 
 class OrderUpdate(BaseModel):
     id_address: Optional[int] = None
@@ -43,4 +46,4 @@ class CompleteOrder(OrderBase):
     id: int
     id_buyer: int
     product_lines: list[CompleteProductLine]
-    estimated_date: Optional[FutureDate] = None
+    estimated_date: Optional[date] = None

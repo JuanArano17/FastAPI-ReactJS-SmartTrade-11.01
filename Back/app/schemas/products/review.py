@@ -8,7 +8,7 @@ from app.schemas.users.types.buyer import Buyer
 
 class ReviewBase(BaseModel):
     stars: int = Field(ge=1, le=5)
-    comment: str = Field(max_length=140)
+    comment: Optional[str] = Field(default=None,max_length=140)
 
 class ReviewCreate(ReviewBase):
     id_seller_product: int
