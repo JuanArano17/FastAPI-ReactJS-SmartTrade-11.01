@@ -134,7 +134,7 @@ class OrderService:
 
 
         for item in shopping_cart:
-            subtotal = item.seller_product.price * item.quantity
+            subtotal = item.seller_product.price * item.quantity 
             if item.size==None:
                 id_size=None
             else:

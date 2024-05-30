@@ -427,59 +427,97 @@ for i in range(len(buyer_ids)):
     create_address_sequential(buyer_ids, i)
 
 
-# Populate products in parallel
-product_categories = [
-    ("book", {"pages": random.randint(100, 1500), "author": faker.name()}),
-    (
-        "game",
-        {
+def create_product(category, extra_fields):
+    services = create_services()
+    session = services["session"]
+    product_service = services["product_service"]
+    image_service = services["image_service"]
+
+    name = faker.word()[:39]
+    description = faker.sentence()
+    spec_sheet = faker.text(max_nb_chars=200)
+    stock = 0
+    product = {
+        "name": name,
+        "description": description,
+        "spec_sheet": spec_sheet,
+        "stock": stock,
+    }
+    product.update(extra_fields)
+    created_product = product_service.add(category=category, product_data=product)
+    used_urls = []
+    for _ in range(random.randint(1, 5)):
+        random_param = random.randint(1, 100000)
+        if category == "game":
+            url = f"https://source.unsplash.com/featured/?videogame&{random_param}"
+        elif category.lower() == "houseutilities":
+            url = f"https://source.unsplash.com/featured/?kitchen&{random_param}"
+        else:
+            url = f"https://source.unsplash.com/featured/?{category}&{random_param}"
+        while url in used_urls:
+            random_param = random.randint(1, 100000)
+            if category == "game":
+                url = f"https://source.unsplash.com/featured/?videogame&{random_param}"
+            elif category.lower() == "houseutilities":
+                url = f"https://source.unsplash.com/featured/?kitchen&{random_param}"
+            else:
+                url = f"https://source.unsplash.com/featured/?{category}&{random_param}"
+        used_urls.append(url)
+        image_create = ImageCreate(url=url)
+        image_service.add(id_product=created_product.id, image=image_create)
+    session.commit()
+    created_product_id = created_product.id
+    session.close()
+    return created_product_id
+
+def create_task(category):
+    if category == "book":
+        extra_fields = {
+            "pages": random.randint(100, 1500),
+            "author": faker.name()
+        }
+    elif category == "game":
+        extra_fields = {
             "publisher": faker.company(),
-            "platform": random.choice(["PlayStation", "Xbox", "Nintendo Switch", "PC"]),
+            "platform": random.choice(["PlayStation", "Xbox", "Nintendo Switch", "PC", "Mobile"]),
             "size": str(random.randint(1, 1000)) + "GB",
-        },
-    ),
-    (
-        "clothes",
-        {
-            "materials": random.choice(["Cotton", "Polyester", "Wool"]),
-            "type": random.choice(["T-shirt", "Jeans", "Dress"]),
-        },
-    ),
-    (
-        "electronics",
-        {
+        }
+    elif category == "clothes":
+        extra_fields = {
+            "materials": random.choice(["Cotton", "Polyester", "Wool", "Silk", "Leather"]),
+            "type": random.choice(["T-shirt", "Jeans", "Dress", "Jacket", "Sweater"]),
+        }
+    elif category == "electronics":
+        extra_fields = {
             "brand": faker.company(),
-            "type": random.choice(["Smartphone", "Laptop"]),
-            "capacity": str(random.randint(1, 1000)) + "GB",
-        },
-    ),
-    (
-        "electrodomestics",
-        {
+            "type": random.choice(["Smartphone", "Laptop", "Tablet", "Smartwatch", "Camera"]),
+            "capacity": str(random.randint(1, 2000)) + "GB",
+        }
+    elif category == "electrodomestics":
+        extra_fields = {
             "brand": faker.company(),
-            "type": random.choice(["Refrigerator", "Washing Machine"]),
+            "type": random.choice(["Refrigerator", "Washing Machine", "Microwave", "Oven", "Dishwasher"]),
             "power_source": random.choice(["Batteries", "Electrical"]),
-        },
-    ),
-    (
-        "houseutilities",
-        {"brand": faker.company(), "type": random.choice(["Knife", "Fork"])},
-    ),
-    (
-        "food",
-        {
+        }
+    elif category == "houseutilities":
+        extra_fields = {
             "brand": faker.company(),
-            "type": random.choice(["Fruit", "Vegetable"]),
-            "ingredients": random.choice(["Protein", "Carbohydrates"]),
-        },
-    ),
-]
+            "type": random.choice(["Knife", "Fork", "Spoon", "Plate", "Glass"]),
+        }
+    elif category == "food":
+        extra_fields = {
+            "brand": faker.company(),
+            "type": random.choice(["Fruit", "Vegetable", "Meat", "Dairy", "Snack"]),
+            "ingredients": random.choice(["Protein", "Carbohydrates", "Vitamins", "Minerals"]),
+        }
+    return lambda: create_product(category, extra_fields)
+
+# Populate products in parallel
+product_categories = ["book", "game", "clothes", "electronics", "electrodomestics", "houseutilities", "food"]
 
 product_ids = []
-for category, extra_fields in product_categories:
-    product_ids.extend(
-        run_in_parallel([lambda: create_product(category, extra_fields)] * num_books)
-    )
+tasks = [create_task(category) for category in product_categories for _ in range(num_books)]
+product_ids.extend(run_in_parallel(tasks))
 
 
 def create_seller_product_sequential():
