@@ -61,9 +61,7 @@ const TopBar = () => {
     logout: '#357a38',
     profile: '#357a38',
     products: '#357a38',
-    tutorial: '#ffffff' // Color blanco para el ícono de tutorial
-    orders: '#357a38' // Define color for orders button
-    products: '#357a38',
+    orders: '#357a38',
     tutorial: '#ffffff' // Color blanco para el ícono de tutorial
   };
 
@@ -81,9 +79,7 @@ const TopBar = () => {
     "/logout": "logout",
     "/profile": "profile",
     "/seller-products": "products",
-    "/tutorial": "tutorial",
-    "/orders": "orders"
-    "/seller-products": "products",
+    "/orders": "orders",
     "/tutorial": "tutorial"
   })[path] || 'home';
 
@@ -104,18 +100,6 @@ const TopBar = () => {
           <>
             <SearchBar />
             <Tooltip title="Profile">
-              <Button
-                size="large"
-                startIcon={<AccountCircleIcon />}
-                variant="text"
-                onClick={handleProfileClick}
-                sx={{
-                  color: buttonColors.profile,
-                  fontSize: '1.2em',
-                  ...indicatorStyle('/profile')
-                }}
-              />
-            </Tooltip>
               <Button
                 size="large"
                 startIcon={<AccountCircleIcon />}

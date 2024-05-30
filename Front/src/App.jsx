@@ -15,7 +15,7 @@ import BuyingProcessPage from './pages/BuyingProccessPage';
 import BuySummaryPage from './pages/BuySummaryPage';
 import ReviewProductPage from './pages/ReviewProductPage';
 import OrdersPage from './pages/OrdersPage'; // Import the OrdersPage
-import { adminPaths, buyerPaths, catalogPaths, forgotPasswordPaths, homePaths, loginPaths, orderPaths, profilePaths, registerPaths, sellerproductsPaths } from './PrivateRoutePaths';
+import { adminPaths, buyerPaths, catalogPaths, forgotPasswordPaths, homePaths, loginPaths, orderPaths, profilePaths, registerPaths, sellerproductsPaths, helpPagePaths } from './PrivateRoutePaths';
 import PrivateRouter from './components/router/PrivateRouter';
 import SellerProductsPage from './pages/SellerProductsPage';
 import TutorialPage from './pages/TutorialPage';
