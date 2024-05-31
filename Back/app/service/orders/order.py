@@ -71,7 +71,7 @@ class ShippedState(OrderStateBase):
 
     def apply(self,user,order_update):
         self.order.state = OrderState.DELIVERED
-        if(datetime.now()>self.order.estimated_date):
+        if(datetime.now().date()>self.order.estimated_date):
             return self.order_service.order_repo.update(self.order, OrderUpdate())
 
 class DeliveredState(OrderStateBase):

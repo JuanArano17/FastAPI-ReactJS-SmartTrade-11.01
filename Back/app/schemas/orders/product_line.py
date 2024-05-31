@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Optional
 from pydantic import BaseModel, ConfigDict, FutureDate, NonNegativeFloat, NonNegativeInt
 from app.schemas.orders.refund_product import RefundProduct
@@ -37,4 +38,4 @@ class CompleteProductLine(ProductLineBase):
     category: str
     refund_products: list[RefundProduct] = []
     size: Optional[Size]=None
-    estimated_date:Optional[FutureDate]
+    estimated_date:Optional[date]
