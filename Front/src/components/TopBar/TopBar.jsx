@@ -62,7 +62,7 @@ const TopBar = () => {
     profile: '#357a38',
     products: '#357a38',
     orders: '#357a38',
-    tutorial: '#ffffff' // Color blanco para el ícono de tutorial
+    tutorial: '#ffffff' 
   };
 
   const indicatorStyle = (path) => ({
