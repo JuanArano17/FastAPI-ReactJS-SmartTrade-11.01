@@ -143,5 +143,18 @@ const styles = {
         height: '56px',
         boxShadow: '0 4px 8px rgba(0,0,0,0.2)' 
       },
+      modalBox: {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 400,
+        bgcolor: 'background.paper',
+        boxShadow: 24,
+        p: 4,
+        borderRadius: '16px',
+        outline: 'none',
+      },
+          
 }
 export default styles;
