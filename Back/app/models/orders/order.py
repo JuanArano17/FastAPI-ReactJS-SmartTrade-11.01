@@ -2,7 +2,7 @@ from sqlalchemy import Date, DateTime, ForeignKey, Integer, Numeric, Enum as Enu
 from sqlalchemy.orm import relationship, mapped_column
 
 from app.base import Base
-from app.core.enums import OrderState
+from app.core.enums import OrderState, OrderType
 
 
 class Order(Base):
@@ -20,6 +20,9 @@ class Order(Base):
     total = mapped_column(Numeric(10, 2), nullable=False)
     state = mapped_column(
         EnumColumn(OrderState), nullable=False, default=OrderState.CONFIRMED
+    )
+    type = mapped_column(
+        EnumColumn(OrderType), nullable=False, default=OrderType.STANDARD
     )
     estimated_date = mapped_column(Date)
 

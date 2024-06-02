@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from decimal import Decimal
 
-from app.core.enums import OrderState
+from app.core.enums import OrderState, OrderType
 from app.models.orders.product_line import ProductLine
 from app.models.users.types.user import User
 from app.models.orders.order import Order
@@ -52,6 +52,8 @@ class ConfirmedState(OrderStateBase):
 
     def apply(self, user, order_update):
             self.order.state = OrderState.SHIPPED
+            if(self.order.type==OrderType.STANDARD):
+                order_update.estimated_date+=timedelta(days=2)
             updated_order=self.order_service.order_repo.update(self.order, order_update)
             return updated_order
 
@@ -131,7 +133,10 @@ class OrderService:
             )
         self.card_service.get_one_by_user(user, order_create.id_card)
         self.address_service.get_one_by_user(user, order_create.id_address)
-        order = Order(total=0, order_date=datetime.now(), id_buyer=user.id, state=OrderState.CONFIRMED, **order_create.model_dump())
+        estimated_date=datetime.now().date()+timedelta(weeks=1)
+        if(order_create.type==OrderType.STANDARD or order_create.type==None):
+            estimated_date+=timedelta(days=2)
+        order = Order(total=0, order_date=datetime.now(), id_buyer=user.id, state=OrderState.CONFIRMED, **order_create.model_dump(), estimated_date=estimated_date)
         order.id_address=order_create.id_address
         order.id_card=order_create.id_card
         order=self.order_repo.add(order)

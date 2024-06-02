@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field, FutureDate, NonNegativeFloat, validator
 
 from app.schemas.orders.product_line import ProductLine, CompleteProductLine
-from app.core.enums import OrderState
+from app.core.enums import OrderState, OrderType
 
 class OrderBase(BaseModel):
     order_date: datetime = Field(default_factory=datetime.now)
@@ -21,6 +21,7 @@ class OrderBase(BaseModel):
 
 class OrderCreate(OrderBase):
     estimated_date: Optional[date] = None
+    type: Optional[OrderType] = OrderType.STANDARD
 
 class OrderUpdate(BaseModel):
     id_address: Optional[int] = None
@@ -30,6 +31,7 @@ class OrderUpdate(BaseModel):
 class ConfirmOrder(BaseModel):
     id_address: int = None
     id_card: int = None
+    type: Optional[OrderType] = OrderType.STANDARD
 
 
 class Order(OrderBase):
@@ -47,3 +49,4 @@ class CompleteOrder(OrderBase):
     id_buyer: int
     product_lines: list[CompleteProductLine]
     estimated_date: Optional[date] = None
+    type: OrderType

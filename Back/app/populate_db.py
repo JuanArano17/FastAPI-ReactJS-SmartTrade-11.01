@@ -342,6 +342,7 @@ def create_order_sequential(buyer_ids):
     order = ConfirmOrder(
         id_card=random.choice(cards).id,
         id_address=random.choice(addresses).id,
+        type= random.choice(["STANDARD","PREMIUM"])
     )
     if(shopping_cart_service.get_by_user(buyer)!=[]):
         created_order = order_service.create_from_shopping_cart(buyer, order)
@@ -715,7 +716,8 @@ def create_order_delivered(buyer_ids):
         order_date=datetime.now().date()-timedelta(days=30),
         total=0,
         estimated_date=datetime.now().date()-timedelta(days=1),
-        state=OrderState.DELIVERED
+        state=OrderState.DELIVERED,
+        type= random.choice(["STANDARD","PREMIUM"])
     )
     created_order = order_service.populate(id_buyer=buyer.id, order=order)
     order_id = created_order.id  # Obtener el ID antes de cerrar la sesión
