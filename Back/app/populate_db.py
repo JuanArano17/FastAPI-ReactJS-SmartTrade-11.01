@@ -742,8 +742,8 @@ def create_product_lines_sequential(orders, seller_product_ids):
                     seller_product = seller_product_serv.get_by_id(seller_product_id)
                     if seller_product.quantity >= quantity:
                         used_seller_product_ids.add(seller_product_id)
-                        price = seller_product.price
-                        subtotal = quantity * price
+                        price = float(seller_product.price)
+                        subtotal = quantity * price + float(seller_product.shipping_costs)
                         product_line = ProductLineCreate(
                             quantity=quantity,
                             subtotal=subtotal,

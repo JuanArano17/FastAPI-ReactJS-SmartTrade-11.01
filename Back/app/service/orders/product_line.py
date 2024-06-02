@@ -85,7 +85,7 @@ class ProductLineService:
         seller_product_price = Decimal(seller_product.price).quantize(Decimal("0.01"))
         calculated_subtotal = (
             seller_product_price * Decimal(product_line.quantity)
-        ).quantize(Decimal("0.01"))
+        ).quantize(Decimal("0.01")) + Decimal(seller_product.shipping_costs).quantize(Decimal("0.01"))
 
         if product_line_subtotal != calculated_subtotal:
             raise HTTPException(
