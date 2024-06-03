@@ -137,6 +137,8 @@ class OrderService:
         if(order_create.type==OrderType.STANDARD or order_create.type==None):
             estimated_date+=timedelta(days=2)
         order = Order(total=0, order_date=datetime.now(), id_buyer=user.id, state=OrderState.CONFIRMED, **order_create.model_dump(), estimated_date=estimated_date)
+        if order.type==OrderType.PREMIUM:
+            order.total=5
         order.id_address=order_create.id_address
         order.id_card=order_create.id_card
         order=self.order_repo.add(order)

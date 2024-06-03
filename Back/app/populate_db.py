@@ -710,14 +710,19 @@ def create_order_delivered(buyer_ids):
         buyer = buyer_service.get_by_id(buyer_id)
         cards = buyer.cards
         addresses = buyer.addresses
+    type=random.choice(["STANDARD","PREMIUM"])
+    if type=="STANDARD":
+        total=0
+    else:
+        total=5
     order = OrderCreate(
         id_card=random.choice(cards).id,
         id_address=random.choice(addresses).id,
         order_date=datetime.now().date()-timedelta(days=30),
-        total=0,
+        total=total,
         estimated_date=datetime.now().date()-timedelta(days=1),
         state=OrderState.DELIVERED,
-        type= random.choice(["STANDARD","PREMIUM"])
+        type= type
     )
     created_order = order_service.populate(id_buyer=buyer.id, order=order)
     order_id = created_order.id  # Obtener el ID antes de cerrar la sesión
