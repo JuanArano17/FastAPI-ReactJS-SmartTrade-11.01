@@ -249,7 +249,7 @@ class SellerProductService:
 
     def get_all_by_state(self, state) -> list[SellerProductRead]:
         seller_products = self.seller_product_repo.get_all()
-        return [self.map_seller_product_to_read_schema(sp) for sp in seller_products if sp.state == state]
+        return [self.map_seller_product_to_read_schema(sp) for sp in seller_products if sp.state == state and sp.quantity != 0]
     
     def update(self, seller_product_id, new_data: SellerProductUpdate) -> SellerProduct:
         seller_product = self.get_by_id(seller_product_id)
