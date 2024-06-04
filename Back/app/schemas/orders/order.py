@@ -24,8 +24,6 @@ class OrderCreate(OrderBase):
     type: Optional[OrderType] = OrderType.STANDARD
 
 class OrderUpdate(BaseModel):
-    id_address: Optional[int] = None
-    id_card: Optional[int] = None
     estimated_date: Optional[FutureDate] = None
 
 class ConfirmOrder(BaseModel):

@@ -43,12 +43,6 @@ class ConfirmedState(OrderStateBase):
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="order state must be confirmed to be in the confirmed state"
             )
-        
-        if order_update.id_address is not None or order_update.id_card is not None:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="id_address and id_card cannot be changed after confirmation."
-            )
 
     def apply(self, user, order_update):
             self.order.state = OrderState.SHIPPED
@@ -65,10 +59,10 @@ class ShippedState(OrderStateBase):
                     detail="shipped state must be shipped to be in the shipped state"
             )
 
-        if order_update.id_address is not None or order_update.id_card is not None or order_update.estimated_date is not None:
+        if order_update.estimated_date is not None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="id_address and id_card and estimated date cannot be changed after shipping."
+                detail="estimated date cannot be changed after shipping."
             )
 
     def apply(self,user,order_update):
