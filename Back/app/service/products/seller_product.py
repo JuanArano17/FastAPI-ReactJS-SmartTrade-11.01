@@ -62,6 +62,97 @@ class RejectedState(SellerProductState):
             )
 
 
+class ProductValidationStrategy(ABC):
+    @abstractmethod
+    def validate(self, seller_product: SellerProductCreate, product):
+        pass
+
+    @abstractmethod
+    def update_quantities(self, seller_product, new_data, product, size_repo):
+        pass
+
+class ClothingProductValidationStrategy(ProductValidationStrategy):
+    def validate(self, seller_product: SellerProductCreate, product):
+        if not seller_product.sizes:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Clothing products must have at least one size specified.",
+            )
+        seller_product.quantity = sum(size.quantity for size in seller_product.sizes)
+        self._check_duplicate_sizes(seller_product.sizes)
+        product.stock += seller_product.quantity
+
+    def update_quantities(self, seller_product, new_data, product, size_repo):
+        new_data.quantity = seller_product.quantity
+        if new_data.sizes:
+            for size_data in new_data.sizes:
+                size = size_repo.get_where(
+                    Size.size == size_data.size,
+                    Size.seller_product_id == seller_product.id,
+                )
+                if size:
+                    new_data.quantity = (
+                        new_data.quantity - size[0].quantity + size_data.quantity
+                    )
+                    size_repo.update(size[0], size_data)
+                    seller_product.notify_observers(new_quantity=size_data.quantity, id_size=size[0].id, session=size_repo._db)
+                else:
+                    new_data.quantity += size_data.quantity
+                    size_data = SizeCreate(**size_data.model_dump())
+                    size_repo.add(
+                        Size(
+                            **size_data.model_dump(),
+                            seller_product_id=seller_product.id,
+                        )
+                    )
+        product.stock = product.stock + new_data.quantity - seller_product.quantity
+    
+    def validate_sizes_on_update(self, new_data):
+        if new_data.quantity:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Only update size quantities for clothing objects",
+            )
+        self._check_duplicate_sizes(new_data.sizes)
+
+    def _check_duplicate_sizes(self, sizes):
+        used_sizes = set()
+        for size_data in sizes:
+            if size_data.size in used_sizes:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="There can't be repeat sizes for the same clothing item",
+                )
+            used_sizes.add(size_data.size)
+
+class NonClothingProductValidationStrategy(ProductValidationStrategy):
+    def validate(self, seller_product: SellerProductCreate, product):
+        if seller_product.sizes:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="This category of product cannot have sizes",
+            )
+        if not seller_product.quantity:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="This category of product must have a quantity",
+            )
+        product.stock += seller_product.quantity
+
+    def validate_sizes_on_update(self, new_data):
+        if new_data.sizes:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail="Seller products of this category cannot have sizes",
+            )
+
+    def update_quantities(self, seller_product, new_data, product, size_repo):
+        if new_data.quantity!=None:
+            product.stock = product.stock + new_data.quantity - seller_product.quantity
+            seller_product.notify_observers(new_data.quantity, session=size_repo._db)
+
+
+
 class SellerProductRepository(CRUDRepository):
     def __init__(self, session: Session):
         super().__init__(session=session, model=SellerProduct)
@@ -103,13 +194,18 @@ class SellerProductService:
         self.seller_service.get_by_id(id_seller)
         product = self.product_service.get_by_id(seller_product.id_product)
         self._validate_existing_product(id_seller, seller_product)
-        if product.__class__.__name__ == "Clothes":
-            self._validate_clothing_product(seller_product, product)
-        else:
-            self._validate_non_clothing_product(seller_product, product)
+        
+        validation_strategy = self.get_validation_strategy(product)
+        validation_strategy.validate(seller_product, product)
 
         seller_product_obj = self._create_seller_product(id_seller, seller_product)
         return seller_product_obj
+    
+    def get_validation_strategy(self, product) -> ProductValidationStrategy:
+        if product.__class__.__name__ == "Clothes":
+            return ClothingProductValidationStrategy()
+        else:
+            return NonClothingProductValidationStrategy()
 
     def _validate_existing_product(self, id_seller, seller_product: SellerProductCreate):
         if self.seller_product_repo.get_where(
@@ -120,39 +216,6 @@ class SellerProductService:
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"Seller already has a product with id {seller_product.id_product}",
             )
-
-    def _validate_clothing_product(self, seller_product: SellerProductCreate, product):
-        if not seller_product.sizes:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="Clothing products must have at least one size specified.",
-            )
-        seller_product.quantity = sum(size.quantity for size in seller_product.sizes)
-        self._check_duplicate_sizes(seller_product.sizes)
-        product.stock += seller_product.quantity
-
-    def _validate_non_clothing_product(self, seller_product: SellerProductCreate, product):
-        if seller_product.sizes:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="This category of product cannot have sizes",
-            )
-        if not seller_product.quantity:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="This category of product must have a quantity",
-            )
-        product.stock += seller_product.quantity
-
-    def _check_duplicate_sizes(self, sizes):
-        used_sizes = set()
-        for size_data in sizes:
-            if size_data.size in used_sizes:
-                raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail="There can't be repeat sizes for the same clothing item",
-                )
-            used_sizes.add(size_data.size)
 
     def _create_seller_product(self, id_seller, seller_product: SellerProductCreate) -> SellerProduct:
         seller_product_obj = SellerProduct(
@@ -256,54 +319,15 @@ class SellerProductService:
         current_state = self.get_current_state(seller_product.state)
         product = self.product_service.get_by_id(seller_product.id_product)
         current_state.handle(new_data)
-        self._validate_sizes_on_update(new_data, product)
-        self._update_quantities(seller_product, new_data, product)
+
+        validation_strategy = self.get_validation_strategy(product)
+        validation_strategy.validate_sizes_on_update(new_data)
+        validation_strategy.update_quantities(seller_product, new_data, product, self.size_repo)
+
         modified_data = SellerProductUpdate(**new_data.model_dump(exclude="sizes"))
         if self.are_all_fields_none_except_sizes(modified_data):
             return seller_product
         return self.seller_product_repo.update(seller_product, modified_data)
-
-    def _validate_sizes_on_update(self, new_data, product):
-        if new_data.sizes and product.__class__.__name__ != "Clothes":
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="Seller products of this category cannot have sizes",
-            )
-        if new_data.quantity and product.__class__.__name__ == "Clothes":
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="Only update size quantities for clothing objects",
-            )
-        if product.__class__.__name__ == "Clothes":
-            self._check_duplicate_sizes(new_data.sizes)
-
-    def _update_quantities(self, seller_product, new_data, product):
-        if product.__class__.__name__ == "Clothes":
-            new_data.quantity = seller_product.quantity
-            if new_data.sizes:
-                for size_data in new_data.sizes:
-                    size = self.size_repo.get_where(
-                        Size.size == size_data.size,
-                        Size.seller_product_id == seller_product.id,
-                    )
-                    if size:
-                        new_data.quantity = (
-                            new_data.quantity - size[0].quantity + size_data.quantity
-                        )
-                        self.size_repo.update(size[0], size_data)
-                        seller_product.notify_observers(new_quantity=size_data.quantity, id_size=size[0].id, session=self.session)
-                    else:
-                        new_data.quantity += size_data.quantity
-                        size_data = SizeCreate(**size_data.model_dump())
-                        self.size_repo.add(
-                            Size(
-                                **size_data.model_dump(),
-                                seller_product_id=seller_product.id,
-                            )
-                        )
-        if new_data.quantity!=None:
-            product.stock = product.stock + new_data.quantity - seller_product.quantity
-            seller_product.notify_observers(new_data.quantity, session=self.session)
 
     def are_all_fields_none_except_sizes(self, new_data):
         return all(field_name == "sizes" or field_value is None for field_name, field_value in new_data)
