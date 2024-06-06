@@ -10,6 +10,7 @@ import { addCartItem } from '../api/services/products/ShoppingCartService';
 import FavoriteButton from '../components/favorite-button/FavoriteButton';
 import ImageSelector from '../components/products/ImageSelector/ImageSelector';
 import SimilarProduct from '../components/products/similarProduct/SimilarProduct';
+import ProductReviews from '../components/reviews/ProductReviews'; 
 
 const ProductDetailPage = () => {
     const { id } = useParams();
@@ -189,6 +190,8 @@ const ProductDetailPage = () => {
                                 ))}
                             </Grid>
                         </Box>
+                        <Divider sx={styles.ThickDivider}></Divider>
+                        <ProductReviews productId={id} />  {/* Añade el nuevo componente de reseñas */}
                     </Paper>
                 )}
             </Container>
