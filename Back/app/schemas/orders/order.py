@@ -31,21 +31,6 @@ class ConfirmOrder(BaseModel):
     id_card: int = None
     type: Optional[OrderType] = OrderType.STANDARD
 
-
-# Only used in populate_db.py
-class OrderCreate(OrderBase):
-    pass
-
-class OrderUpdate(BaseModel):
-    id_address: Optional[int] = None
-    id_card: Optional[int] = None
-    estimated_date: Optional[FutureDate] = None
-
-class ConfirmOrder(BaseModel):
-    id_address: int = None
-    id_card: int = None
-
-
 class Order(OrderBase):
     model_config = ConfigDict(from_attributes=True)
 

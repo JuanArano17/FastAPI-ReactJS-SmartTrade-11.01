@@ -337,8 +337,6 @@ def create_order_sequential(buyer_ids):
     buyer = buyer_service.get_by_id(buyer_id)
     cards = buyer.cards
     addresses = buyer.addresses
-    print(cards)
-    print(addresses)
     order = ConfirmOrder(
         id_card=random.choice(cards).id,
         id_address=random.choice(addresses).id,
