@@ -14,7 +14,7 @@ from app.service.users.card import CardService
 from app.service.users.address import AddressService
 from app.service.users.types.buyer import BuyerService
 from app.schemas.orders.product_line import CompleteProductLine
-from app.schemas.orders.order import CompleteOrder, ConfirmOrder, OrderUpdate
+from app.schemas.orders.order import CompleteOrder, ConfirmOrder, OrderCreate, OrderUpdate
 from app.crud_repository import CRUDRepository
 from app.schemas.products.categories.variations.size import SizeUpdate
 from app.schemas.products.seller_product import SellerProductUpdate
