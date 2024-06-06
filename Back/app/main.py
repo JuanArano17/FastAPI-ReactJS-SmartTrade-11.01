@@ -7,12 +7,12 @@ from app.api.main import api_router
 app = FastAPI(title="SmartTrade API", swagger_ui_parameters={"docExpansion": "none"})
 
 origins = [
-    "http://54.226.149.183:3000",
-    "http://54.226.149.183:3001",
-    "http://54.226.149.183:3002",
-    "http://54.226.149.183:3003",
-    "http://54.226.149.183:3004",
-    "http://54.226.149.183:8000",
+    "http://34.229.236.209:3000",
+    "http://34.229.236.209:3001",
+    "http://34.229.236.209:3002",
+    "http://34.229.236.209:3003",
+    "http://34.229.236.209:3004",
+    "http://34.229.236.209:8000",
 ]
 
 app.add_middleware(
