@@ -218,7 +218,7 @@ const ProductDetailPage = () => {
                             </Slider>
                         </Box>
                         <Divider sx={styles.ThickDivider}></Divider>
-                        <ProductReviews productId={id} />  {/* Añade el nuevo componente de reseñas */}
+                        <ProductReviews productId={id} />  
                     </Paper>
                 )}
             </Container>

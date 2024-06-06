@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, Divider, CircularProgress, Rating } from '@mui/material';
-import { getProductReviews } from '../../api/services/products/ReviewsService'; // Ajusta esta ruta según tu estructura de proyecto
+import { getProductReviews } from '../../api/services/products/ReviewsService'; 
 
 const ProductReviews = ({ productId }) => {
     const [reviews, setReviews] = useState([]);
@@ -10,7 +10,9 @@ const ProductReviews = ({ productId }) => {
     useEffect(() => {
         const fetchReviews = async () => {
             try {
+                console.log(productId);
                 const response = await getProductReviews(productId); 
+                console.log(response);
                 setReviews(response);
                 setLoading(false);
             } catch (err) {
