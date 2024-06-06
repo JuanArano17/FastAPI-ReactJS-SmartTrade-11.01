@@ -12,8 +12,6 @@ import ImageSelector from '../components/products/ImageSelector/ImageSelector';
 import SimilarProduct from '../components/products/similarProduct/SimilarProduct';
 import ProductReviews from '../components/reviews/ProductReviews'; 
 import Slider from 'react-slick';
-import "slick-carousel/slick/slick.css"; 
-import "slick-carousel/slick/slick-theme.css";
 
 const ProductDetailPage = () => {
     const { id } = useParams();
