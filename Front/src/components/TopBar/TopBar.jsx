@@ -9,7 +9,6 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import { Link, useHistory, useLocation } from "react-router-dom";
 import SearchBar from "./searchbar/SearchBar";
 import { useLogout } from "../../utils/hooks/useLogout";
@@ -48,9 +47,6 @@ const TopBar = () => {
     history.push("/orders");
   };
 
-  const handleTutorialClick = () => {
-    history.push("/tutorial");
-  };
 
   const buttonColors = {
     home: '#357a38',
