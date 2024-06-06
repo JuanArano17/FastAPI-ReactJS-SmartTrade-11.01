@@ -5,27 +5,28 @@ import Footer from "../components/footer/Footer";
 import styles from "../styles/styles";
 import OrdersTable from "../components/products/ordersProducts/OrdersTable";
 import { getOrders } from "../api/services/orders/OrderService";
+import { getProductLines } from "../api/services/product_lines/ProductLinesService";
 
 const OrdersPage = () => {
   const userType = localStorage.getItem('type');
-  const [ordersData, setOrdersData] = useState([]);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const orders = await getOrders();
-        setOrdersData(orders);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchData = async () => {
+    try {
+      const responseData = userType === 'Buyer' ? await getOrders() : await getProductLines();
+      setData(responseData);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchOrders();
-  }, []);
+  useEffect(() => {
+    fetchData();
+  }, [userType]);
 
   if (loading) {
     return <Typography variant="h6">Loading...</Typography>;
@@ -41,9 +42,9 @@ const OrdersPage = () => {
       <Container sx={styles.mainContainer}>
         <Paper sx={styles.paperContainer}>
           <Typography variant="h4" gutterBottom sx={{ mb: 2, color: '#629c44' }}>
-            {userType === 'Buyer' ? "Ordered Products" : "Sold Products"}
+            {userType === 'Buyer' ? "Ordered Products" : "Product Lines"}
           </Typography>
-          <OrdersTable data={ordersData} isSeller={userType === 'Seller'} />
+          <OrdersTable data={data} isSeller={userType === 'Seller'} reloadData={fetchData} />
         </Paper>
       </Container>
       <Footer />
