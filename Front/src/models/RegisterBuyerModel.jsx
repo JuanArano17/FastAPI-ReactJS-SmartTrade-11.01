@@ -4,5 +4,5 @@ export const getDefaultRegisterBuyerModel = () => ({
     email: "",
     dni: "",
     password: "",
-    birth_date: new Date(),
+    birth_date: "",
 });

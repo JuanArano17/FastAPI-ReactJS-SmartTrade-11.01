@@ -20,7 +20,7 @@ const RegisterPage = () => {
                 {selectedOption === null ? (
                     <>
                         <Typography variant="h4" align="center" color="#629c44" marginTop={"20px"} marginBottom={"20px"}>
-                            ¿Qué harás en SmartTrade?
+                            What are you looking for?
                         </Typography>
                         <Box display="flex" justifyContent="center" alignItems="center" mb={32}>
                             <Box textAlign="center" mr={4} style={{ width: "275px", marginBottom: "10px" }}>
@@ -28,7 +28,7 @@ const RegisterPage = () => {
                                     sx={styles.greenRoundedButton}
                                     onClick={() => handleOptionSelect("buyer")}
                                 >
-                                    VER LA TIENDA
+                                    Buy Products
                                 </Button>
                                 <img src={img_Buyer} style={styles.imageStyle} alt="Buyer" />
                             </Box>
@@ -37,7 +37,7 @@ const RegisterPage = () => {
                                     sx={styles.greenRoundedButton}
                                     onClick={() => handleOptionSelect("seller")}
                                 >
-                                    VENDER PRODUCTOS
+                                    Sell Products
                                 </Button>
                                 <img src={img_Seller} style={styles.imageStyle} alt="Seller" />
                             </Box>

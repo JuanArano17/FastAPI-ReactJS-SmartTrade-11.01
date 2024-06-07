@@ -5,6 +5,7 @@ from sqlalchemy_utils import database_exists, create_database
 from dotenv import load_dotenv
 
 # Base = declarative_base()
+from app.models.users.country import Country
 from app.models.users.types.user import User
 from app.models.users.types.admin import Admin
 from app.models.users.types.buyer import Buyer
@@ -27,6 +28,7 @@ from app.models.products.seller_product import SellerProduct
 from app.models.users.in_shopping_cart import InShoppingCart
 from app.models.users.in_wish_list import InWishList
 from app.models.orders.refund_product import RefundProduct
+from app.models.products.review import Review
 
 load_dotenv()
 
@@ -34,6 +36,7 @@ load_dotenv()
 def get_db_url() -> str:
     return os.getenv(
         "DB_URL",
+        #"postgresql+psycopg://postgres:password@database-1.caonuyb119ll.us-east-1.rds.amazonaws.com:5432/remote_db", 
         "postgresql+psycopg://postgres:password@localhost:5432/database",
     )
 

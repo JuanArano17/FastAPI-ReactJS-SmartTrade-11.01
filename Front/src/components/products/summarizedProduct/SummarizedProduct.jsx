@@ -1,10 +1,24 @@
-import React from 'react';
-import { Card, CardMedia, CardContent, Typography, CardActions } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Card, CardMedia, CardContent, Typography, CardActions, ButtonBase } from '@mui/material';
 import FavoriteButton from '../../favorite-button/FavoriteButton';
+import { getLoggedInfo } from '../../../api/services/user/profile/ProfileService';
 
 const SummarizedProduct = ({ product }) => {
     const { idProduct, name, images, price, description, ecoPoints } = product;
     const image = images.length > 0 ? images[0] : 'default-product-image.jpg';
+
+    const [isSeller, setIsSeller] = useState(false);
+
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            const userInfo = await getLoggedInfo();
+            if (userInfo.type === 'seller') {
+                setIsSeller(true);
+            }
+        };
+
+        fetchUserInfo();
+    }, []);
 
     const calculateColor = (points) => {
         const red = 255 * (1 - points / 100);
@@ -13,48 +27,63 @@ const SummarizedProduct = ({ product }) => {
         return `rgb(${Math.round(red)}, ${Math.round(green)}, ${blue})`;
     };
 
-    const boxShadowColor = calculateColor(ecoPoints);
+    const ecoPointsColor = calculateColor(ecoPoints);
 
     return (
-        <Card
+        <ButtonBase
             sx={{
-                maxWidth: 350,
                 width: '100%',
-                m: 2, display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                borderRadius: '40px',
-                boxShadow: '0px 4px 20px rgba(128, 128, 128, 0.4)',  // Gris por defecto para simular profundidad
-                height: '100%',
-                '&:hover': {
-                    boxShadow: `0px 4px 20px ${boxShadowColor}`,  // Cambia al color eco_points al hacer hover
+                textAlign: 'left',
+                '&:hover .MuiCard-root': {
+                    boxShadow: `0px 4px 20px ${ecoPointsColor}`,
+                    transform: 'scale(1.05)',
+                },
+                '&:hover .ecoPointsText': {
+                    color: ecoPointsColor,
                 }
             }}
         >
-            <CardMedia
-                component="img"
-                image={image}
-                alt={name}
-                sx={{ height: 140, backgroundSize: 'contain' }}
-            />
-            <CardContent>
-                <FavoriteButton productId={product.id}></FavoriteButton>
-                <Typography gutterBottom variant="h6" component="div" sx={{ textAlign: 'left' }}>
-                    {name}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'left' }}>
-                    {description}
-                </Typography>
-            </CardContent>
-            <CardActions sx={{ justifyContent: 'space-between', p: 2 }}>
-                <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'left' }}>
-                    EPoints: {ecoPoints}
-                </Typography>
-                <Typography variant="body1" color="green" sx={{ textAlign: 'right' }}>
-                    € {price.toFixed(2)}
-                </Typography>
-            </CardActions>
-        </Card>
+            <Card
+                className="MuiCard-root"
+                sx={{
+                    maxWidth: 345,
+                    width: '100%',
+                    minHeight: 360,
+                    m: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    borderRadius: '40px',
+                    boxShadow: '0px 4px 20px rgba(128, 128, 128, 0.4)',
+                    transition: 'transform 0.3s, box-shadow 0.3s',
+                }}
+            >
+                <CardMedia
+                    component="img"
+                    image={image}
+                    alt={name}
+                    sx={{ height: 140, backgroundSize: 'contain' }}
+                />
+                <CardContent sx={{ flexGrow: 1, overflow: 'hidden' }}>
+                    {!isSeller && <FavoriteButton productId={product.id}></FavoriteButton>}
+                    <Typography gutterBottom variant="h6" component="div" sx={{ textAlign: 'left' }}>
+                        {name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'left' }}>
+                        {description}
+                    </Typography>
+                </CardContent>
+                <CardActions sx={{ justifyContent: 'space-between', p: 2 }}>
+                    <Typography className="ecoPointsText" variant="body1" sx={{ textAlign: 'left', color: 'black', transition: 'color 0.3s' }}>
+                        EcoPoints: {ecoPoints}
+                    </Typography>
+                    <Typography variant="body1" color="green" sx={{ textAlign: 'right' }}>
+                        € {price.toFixed(2)}
+                    </Typography>
+                </CardActions>
+            </Card>
+        </ButtonBase>
     );
 };
+
 export default SummarizedProduct;

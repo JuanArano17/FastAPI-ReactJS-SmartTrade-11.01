@@ -5,6 +5,10 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import StarIcon from '@mui/icons-material/Star';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import StorefrontIcon from '@mui/icons-material/Storefront';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import { Link, useHistory, useLocation } from "react-router-dom";
 import SearchBar from "./searchbar/SearchBar";
 import { useLogout } from "../../utils/hooks/useLogout";
@@ -14,7 +18,7 @@ const TopBar = () => {
   const location = useLocation();
   const logout = useLogout();
   const isLoggedIn = Boolean(localStorage.getItem('accessToken'));
-
+  const userType = localStorage.getItem('type');
   const handleLogoClick = () => {
     history.push("/");
   };
@@ -27,6 +31,23 @@ const TopBar = () => {
     history.push("/wish-list");
   };
 
+  const handleProfileClick = () => {
+    history.push("/profile");
+  };
+
+  const handleProductsClick = () => {
+    history.push("/seller-products");
+  };
+
+  const handleTutorialClick = () => {
+    history.push("/tutorial");
+  };
+
+  const handleOrdersClick = () => {
+    history.push("/orders");
+  };
+
+
   const buttonColors = {
     home: '#357a38',
     shoppingCart: '#357a38',
@@ -34,11 +55,15 @@ const TopBar = () => {
     login: '#357a38',
     register: '#357a38',
     logout: '#357a38',
+    profile: '#357a38',
+    products: '#357a38',
+    orders: '#357a38',
+    tutorial: '#ffffff' 
   };
 
   const indicatorStyle = (path) => ({
     borderBottom: location.pathname === path ? `4px solid ${buttonColors[pathToButtonColorKey(path)]}` : 'none',
-    paddingBottom: '10px',  // Adjust padding to accommodate the border without shifting the button
+    paddingBottom: '10px',
   });
 
   const pathToButtonColorKey = (path) => ({
@@ -47,7 +72,11 @@ const TopBar = () => {
     "/wish-list": "wishList",
     "/login": "login",
     "/register": "register",
-    "/logout": "logout"
+    "/logout": "logout",
+    "/profile": "profile",
+    "/seller-products": "products",
+    "/orders": "orders",
+    "/tutorial": "tutorial"
   })[path] || 'home';
 
   return (
@@ -63,32 +92,79 @@ const TopBar = () => {
             </IconButton>
           </Tooltip>
         </Box>
-        {isLoggedIn ? (
+        {isLoggedIn && (
           <>
             <SearchBar />
-            <Tooltip title="View Cart">
+            <Tooltip title="Profile">
               <Button
                 size="large"
-                startIcon={<AddShoppingCartIcon />}
+                startIcon={<AccountCircleIcon />}
                 variant="text"
-                onClick={handleShoppingCart}
+                onClick={handleProfileClick}
                 sx={{
-                  color: buttonColors.shoppingCart,
+                  color: buttonColors.profile,
                   fontSize: '1.2em',
-                  ...indicatorStyle('/shopping-cart')
+                  ...indicatorStyle('/profile')
                 }}
               />
             </Tooltip>
-            <Tooltip title="View Wish List">
+            {userType === 'Buyer' && (
+              <>
+                <Tooltip title="View Wish List">
+                  <Button
+                    size="large"
+                    startIcon={location.pathname === '/wish-list' ? <StarIcon sx={{ color: buttonColors.wishList }} /> : <StarBorderIcon sx={{ color: buttonColors.wishList }} />}
+                    variant="text"
+                    onClick={handleWishList}
+                    sx={{
+                      color: buttonColors.wishList,
+                      fontSize: '1.2em',
+                      ...indicatorStyle('/wish-list')
+                    }}
+                  />
+                </Tooltip>
+                <Tooltip title="View Cart">
+                  <Button
+                    size="large"
+                    startIcon={<AddShoppingCartIcon />}
+                    variant="text"
+                    onClick={handleShoppingCart}
+                    sx={{
+                      color: buttonColors.shoppingCart,
+                      fontSize: '1.2em',
+                      ...indicatorStyle('/shopping-cart')
+                    }}
+                  />
+                </Tooltip>
+              </>
+            )}
+            {userType === 'Seller' && (
+              <>
+                <Tooltip title="Your Products">
+                  <Button
+                    size="large"
+                    startIcon={<StorefrontIcon />}
+                    variant="text"
+                    onClick={handleProductsClick}
+                    sx={{
+                      color: buttonColors.products,
+                      fontSize: '1.2em',
+                      ...indicatorStyle('/seller-products')
+                    }}
+                  />
+                </Tooltip>
+              </>
+            )}
+            <Tooltip title="Track Orders">
               <Button
                 size="large"
-                startIcon={location.pathname === '/wish-list' ? <StarIcon sx={{ color: buttonColors.wishList }} /> : <StarBorderIcon sx={{ color: buttonColors.wishList }} />}
+                startIcon={<LocalShippingIcon />}
                 variant="text"
-                onClick={handleWishList}
+                onClick={handleOrdersClick}
                 sx={{
-                  color: buttonColors.wishList,
+                  color: buttonColors.orders,
                   fontSize: '1.2em',
-                  ...indicatorStyle('/wish-list')
+                  ...indicatorStyle('/orders')
                 }}
               />
             </Tooltip>
@@ -106,7 +182,8 @@ const TopBar = () => {
               />
             </Tooltip>
           </>
-        ) : (
+        )}
+        {!isLoggedIn && (
           <>
             <Link to="/login" style={{ textDecoration: 'none' }}>
               <Tooltip title="Login">
@@ -141,6 +218,21 @@ const TopBar = () => {
             </Link>
           </>
         )}
+        <Tooltip title="Tutorial">
+          <IconButton 
+            size="large" 
+            color="inherit" 
+            onClick={handleTutorialClick} 
+            sx={{ 
+              backgroundColor: '#357a38', 
+              color: '#ffffff', 
+              '&:hover': { backgroundColor: '#ffffff', color: '#357a38' }, 
+              marginRight: '40px', 
+              ...indicatorStyle('/tutorial') 
+            }}>
+            <HelpOutlineIcon />
+          </IconButton>
+        </Tooltip>
       </Toolbar>
     </AppBar>
   );

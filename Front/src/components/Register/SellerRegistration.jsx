@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useHistory } from 'react-router-dom';
-import { Box, Typography, TextField, Button, Container, Grid, Paper, IconButton, InputAdornment, Snackbar} from "@mui/material";
+import { Box, Typography, TextField, Button, Container, Grid, Paper, IconButton, InputAdornment, Snackbar } from "@mui/material";
 import { getDefaultRegisterSellerModel } from "../../models/RegisterSellerModel";
 import { validateEmail, validatePassword, validateAge, validateCIF, validateBankData } from "../../utils/registerFormValidations";
 import { registerUserSellerService } from "../../api/services/user/AuthService";
@@ -18,7 +18,7 @@ const formFields = [
 
 const formBankFields = [
     { id: "cif", name: "CIF", label: "CIF", autoComplete: "cif" },
-    { id: "bankData", name: "Bank data", label: "Your bank data", autoComplete: "cif" }
+    { id: "bankData", name: "Bank data", label: "Your bank data", autoComplete: "bankData" }
 ];
 
 const SellerRegistration = () => {
@@ -41,21 +41,26 @@ const SellerRegistration = () => {
     const handleChange = (e) => {
         const { id, value } = e.target;
         let errors = { ...formErrors };
-        
         if (id === 'email') {
-            errors.email = validateEmail(value) ? '' : 'Email is not valid!';
+            errors.email = validateEmail(value) ? '' : 'Please enter a valid email address. Example: "jhondoe214@gmail.com".';
         }
         if (id === 'password') {
-            errors.password = validatePassword(value) ? '' : 'Password does not meet criteria!';
+            errors.password = validatePassword(value) ? '' : 'Password must be at least 8 characters long and include at least one letter, one number, and one special character.';
         }
         if (id === 'birth_date') {
-            errors.birth_date = validateAge(value) ? '' : 'Age is not valid!';
+            errors.birth_date = validateAge(value) ? '' : 'Please enter a valid birth date. Age must be between 0 and 100 years.';
         }
         if (id === 'cif') {
-            errors.cif = validateCIF(value) ? '' : 'CIF is not valid!';
+            const upperCaseValue = value.toUpperCase();
+            errors.cif = validateCIF(upperCaseValue) ? '' : 'CIF must start with a letter (A-H, J, L, M, N, P, Q, R, S, U, V, W) followed by exactly 8 digits.';
+            setFormData((prevData) => ({ ...prevData, [id]: upperCaseValue }));
+        } else {
+            setFormData((prevData) => ({ ...prevData, [id]: value }));
+        }
+        if (id === 'bankData') { 
+            errors.bankData = validateBankData(value) ? '' : 'Bank data must be at least 10 characters long.';
         }
         setFormErrors(errors);
-        setFormData((prevData) => ({ ...prevData, [id]: value }));
     };
 
     const handleSubmit = async (e) => {
@@ -94,7 +99,7 @@ const SellerRegistration = () => {
                                             {...field}
                                             error={!!formErrors[field.id]}
                                             helperText={formErrors[field.id]}
-                                            value={formData[field.name]}
+                                            value={formData[field.id]}
                                             onChange={handleChange}
                                             type={showPassword ? 'text' : 'password'}
                                             InputProps={{
@@ -118,7 +123,7 @@ const SellerRegistration = () => {
                                             {...field}
                                             error={!!formErrors[field.id]}
                                             helperText={formErrors[field.id]}
-                                            value={formData[field.name]}
+                                            value={formData[field.id]}
                                             onChange={handleChange}
                                             sx={styles.textField}
                                         />
@@ -140,7 +145,7 @@ const SellerRegistration = () => {
                                             {...field}
                                             required
                                             fullWidth
-                                            value={formData[field.name]}
+                                            value={formData[field.id]}
                                             onChange={handleChange}
                                             error={!!formErrors[field.id]}
                                             helperText={formErrors[field.id]}
@@ -169,7 +174,7 @@ const SellerRegistration = () => {
                 open={openSnackbar}
                 autoHideDuration={6000}
                 onClose={() => setOpenSnackbar(false)}
-                message="Te has registrado con éxito."
+                message="You have successfully registered."
             />
         </Container>
     );

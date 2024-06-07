@@ -1,18 +1,26 @@
-import React, { useState, useEffect} from 'react';
-import { Box, Grid, TextField, Typography, Button } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Grid, TextField, Typography, Alert } from '@mui/material';
 import styles from "../../../styles/styles";
 
-const CardInformationForm = ({ cardData, handleChange }) => {
+const CardInformationForm = ({ cardData, handleChange, setCardFormValidity }) => {
     const [formValidity, setFormValidity] = useState({
+        CardName: false,
         CardNumber: false,
         ExpiryDate: false,
         Cvv: false
     });
 
     const handleFieldValidation = (fieldId, value) => {
+        if (typeof value !== 'string') {
+            console.error(`Invalid value for ${fieldId}. Expected a string but got ${typeof value}`);
+            return false;
+        }
+    
         switch (fieldId) {
+            case "CardName":
+                return value.trim().length > 0;
             case "CardNumber":
-                return /^\d{16}$/.test(value.replace(/\s+/g, '')); 
+                return /^\d{16}$/.test(value.replace(/\s+/g, ''));
             case "ExpiryDate":
                 const matches = value.match(/^(0[1-9]|1[0-2])\/(\d{4})$/);
                 if (matches) {
@@ -30,13 +38,19 @@ const CardInformationForm = ({ cardData, handleChange }) => {
                 return false;
         }
     };
+    
+
     useEffect(() => {
-        setFormValidity({
+        const validity = {
+            CardName: handleFieldValidation("CardName",cardData.CardName),
             CardNumber: handleFieldValidation("CardNumber", cardData.CardNumber),
             ExpiryDate: handleFieldValidation("ExpiryDate", cardData.ExpiryDate),
             Cvv: handleFieldValidation("Cvv", cardData.Cvv)
-        });
-    }, []); 
+        };
+        setFormValidity(validity);
+        setCardFormValidity(Object.values(validity).every(valid => valid));
+    }, [cardData, setCardFormValidity]);
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         handleChange(e);
@@ -46,8 +60,6 @@ const CardInformationForm = ({ cardData, handleChange }) => {
         }));
     };
 
-    const isFormValid = Object.values(formValidity).every(valid => valid);
-    
     const getHelperText = (field) => {
         switch (field) {
             case "CardNumber":
@@ -60,7 +72,7 @@ const CardInformationForm = ({ cardData, handleChange }) => {
                 return '';
         }
     };
-    
+
     return (
         <Box component="form" sx={styles.formContainer}>
             <Grid container spacing={3}>
@@ -134,14 +146,15 @@ const CardInformationForm = ({ cardData, handleChange }) => {
                     />
                 </Grid>
             </Grid>
-            <Button
-                fullWidth
-                sx={{ ...styles.registerButton, pointerEvents: isFormValid ? "auto" : "none", opacity: isFormValid ? 1 : 0.5 }}
-                disabled={!isFormValid}
-                onClick={() => console.log("Listo para guardar después del registro del usuario")}
-            >
-                Save
-            </Button>
+            {Object.values(formValidity).every(valid => valid) ? (
+                <Alert severity="success" sx={{ mt: 2 }}>
+                    The card information is correct.
+                </Alert>
+            ) : (
+                <Alert severity="error" sx={{ mt: 2 }}>
+                    Please fill in the card information correctly.
+                </Alert>
+            )}
         </Box>
     );
 };

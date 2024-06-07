@@ -10,7 +10,7 @@ class AddressBase(BaseModel):
     adit_info: Optional[str] = Field(max_length=70)
     city: str = Field(min_length=1, max_length=28)
     postal_code: str = Field(min_length=5, max_length=8)
-    country: CountryAlpha3
+    country: str = Field(min_length=1)
     default: bool
 
 
@@ -25,7 +25,7 @@ class AddressUpdate(AddressBase):
     adit_info: Optional[str] = Field(default=None, max_length=70)
     city: Optional[str] = Field(default=None, min_length=1, max_length=28)
     postal_code: Optional[str] = Field(default=None, min_length=5, max_length=8)
-    country: Optional[CountryAlpha3] = None
+    country: Optional[str] = None
     default: Optional[bool] = None
 
 

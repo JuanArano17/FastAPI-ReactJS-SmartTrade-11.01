@@ -18,6 +18,7 @@ def fake_buyer():
         "email": "mytestemail@gmail.com",
         "name": "Jonathan",
         "surname": "Wick Doe",
+        "birth_date": "1992-03-08",
         "dni": "58263711F",
         "eco_points": 0,
         "billing_address": "Street Whatever 123",
@@ -31,6 +32,7 @@ def fake_seller():
         "email": "donaldtrump@gmail.com",
         "name": "Donald",
         "surname": "Trump",
+        "birth_date": "1999-03-03",
         "bank_data": "Random bank data",
         "cif": "S31002655",
         "password": "randompassword",
@@ -68,6 +70,14 @@ def test_create_wish_list(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
     data = fake_seller()
     seller = seller_service.add(SellerCreate(**data))
 
@@ -80,19 +90,36 @@ def test_create_wish_list(
 
     wish_list_item = {"id_seller_product": seller_product.id}
 
-    response = client.post(f"/buyers/{buyer.id}/wish_list", json=wish_list_item)
+    response = client.post(f"/wish_list/me", json=wish_list_item, headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
-    assert "id_seller_product" in content
+    assert "seller_product" in content
     assert content["id_buyer"] == buyer.id
-    assert content["id_seller_product"] == seller_product.id
+    assert content["seller_product"]["id"] == seller_product.id
+    assert content["seller_product"]["id_product"] == product.id
+    assert content["seller_product"]["id_seller"] == seller.id
+    assert content["seller_product"]["state"] == "Pending"
+    assert "description" not in content["seller_product"]
+    assert "justification" not in content["seller_product"]
+    assert content["seller_product"]["age_restricted"] == seller_product.age_restricted
+    assert content["seller_product"]["name"] == product.name
+    assert content["seller_product"]["spec_sheet"] == product.spec_sheet
+    assert content["seller_product"]["eco_points"] == seller_product.eco_points
+    assert content["seller_product"]["stock"] == product.stock
+    assert content["seller_product"]["author"] == product.author
+    assert content["seller_product"]["pages"] == product.pages
+    assert content["seller_product"]["category"] == product.category
+    assert content["seller_product"]["images"] == product.images
+    assert content["seller_product"]["price"] == seller_product.price
+    assert content["seller_product"]["shipping_costs"] == seller_product.shipping_costs
+    assert content["seller_product"]["quantity"] == seller_product.quantity
 
     wish_list_item = wish_list_service.get_by_id(
-        content["id_seller_product"], content["id_buyer"]
+        content["seller_product"]["id"], content["id_buyer"]
     )
     assert wish_list_item is not None
     assert content["id_buyer"] == wish_list_item.id_buyer
-    assert content["id_seller_product"] == seller_product.id
+    #assert content["id_seller_product"] == seller_product.id
 
 
 def test_create_wish_list_invalid_seller_product(
@@ -101,9 +128,17 @@ def test_create_wish_list_invalid_seller_product(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
     data = {"id_seller_product": 999}
 
-    response = client.post(f"/buyers/{buyer.id}/wish_list", json=data)
+    response = client.post(f"/wish_list/me", json=data, headers=headers)
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert "detail" in response.json()
 
@@ -118,6 +153,14 @@ def test_create_duplicate_wish_list(
 ):
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
+
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
 
     data = fake_seller()
     seller = seller_service.add(SellerCreate(**data))
@@ -134,7 +177,7 @@ def test_create_duplicate_wish_list(
 
     data = {"id_seller_product": wish_list_item.id_seller_product}
 
-    response = client.post(f"/buyers/{buyer.id}/wish_list", json=data)
+    response = client.post(f"/wish_list/me", json=data, headers=headers)
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     assert "detail" in response.json()
 
@@ -158,6 +201,14 @@ def test_get_wish_list(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
     data = fake_seller()
     seller1 = seller_service.add(SellerCreate(**data))
 
@@ -194,20 +245,20 @@ def test_get_wish_list(
     wish_list_item3 = InWishListCreate(id_seller_product=seller_product3.id)
     wish_list_item3 = wish_list_service.add(buyer.id, wish_list_item=wish_list_item3)
 
-    response = client.get(f"/buyers/{buyer.id}/wish_list/")
+    response = client.get(f"/wish_list/me", headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert len(content) == 3
     assert wish_list_item.id_seller_product in [
-        wish_list["id_seller_product"] for wish_list in content
+        wish_list["seller_product"]["id"] for wish_list in content
     ]
     assert wish_list_item.id_buyer in [wish_list["id_buyer"] for wish_list in content]
     assert wish_list_item2.id_seller_product in [
-        wish_list["id_seller_product"] for wish_list in content
+        wish_list["seller_product"]["id"] for wish_list in content
     ]
     assert wish_list_item2.id_buyer in [wish_list["id_buyer"] for wish_list in content]
     assert wish_list_item3.id_seller_product in [
-        wish_list["id_seller_product"] for wish_list in content
+        wish_list["seller_product"]["id"] for wish_list in content
     ]
     assert wish_list_item3.id_buyer in [wish_list["id_buyer"] for wish_list in content]
 
@@ -224,6 +275,14 @@ def test_delete_wish_list_item(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}    
+
     data = fake_seller()
     seller = seller_service.add(SellerCreate(**data))
 
@@ -237,7 +296,7 @@ def test_delete_wish_list_item(
     wish_list_item = InWishListCreate(id_seller_product=seller_product.id)
     wish_list_item = wish_list_service.add(buyer.id, wish_list_item=wish_list_item)
 
-    response = client.delete(f"/buyers/{buyer.id}/wish_list/{seller_product.id}")
+    response = client.delete(f"/wish_list/me/{seller_product.id}", headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content is None or content == {}
@@ -259,6 +318,14 @@ def test_delete_wish_list_item_not_found(
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
 
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
     data = fake_seller()
     seller = seller_service.add(SellerCreate(**data))
 
@@ -269,10 +336,10 @@ def test_delete_wish_list_item_not_found(
     data["id_product"] = product.id
     seller_product = seller_product_service.add(seller.id, SellerProductCreate(**data))
 
-    response = client.delete(f"/buyers/{buyer.id}/wish_list/{seller_product.id}")
+    response = client.delete(f"/wish_list/me/999", headers=headers)
     assert response.status_code == status.HTTP_404_NOT_FOUND
     content = response.json()
-    assert content["detail"] == "Seller product with id 999 not found."
+    assert content["detail"] == "Wishlist item not found"
 
 
 def test_delete_wish_list(
@@ -293,6 +360,14 @@ def test_delete_wish_list(
 
     data = fake_buyer()
     buyer = buyer_service.add(BuyerCreate(**data))
+
+    login_data = {"username": data["email"], "password": data["password"]}
+
+    login_response = client.post("/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    access_token = login_response.json()["access_token"]
+
+    headers = {"Authorization": f"Bearer {access_token}"}
 
     data = fake_seller()
     seller1 = seller_service.add(SellerCreate(**data))
@@ -330,7 +405,7 @@ def test_delete_wish_list(
     wish_list_item3 = InWishListCreate(id_seller_product=seller_product3.id)
     wish_list_item3 = wish_list_service.add(buyer.id, wish_list_item=wish_list_item3)
 
-    response = client.delete(f"/buyers/{buyer.id}/wish_list")
+    response = client.delete(f"/wish_list/me", headers=headers)
     assert response.status_code == status.HTTP_200_OK
     content = response.json()
     assert content is None or content == {}

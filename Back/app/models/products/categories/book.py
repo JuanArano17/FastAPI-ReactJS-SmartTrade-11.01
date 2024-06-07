@@ -21,4 +21,4 @@ class Book(Product):
     }
 
     def __repr__(self):
-        return f"Book(id={self.id}, name='{self.name}', description='{self.description}', eco_points={self.eco_points}, spec_sheet='{self.spec_sheet}', stock={self.stock}, pages='{self.pages}', author='{self.author}')"
+        return f"Book(id={self.id}, name='{self.name}', description='{self.description}', spec_sheet='{self.spec_sheet}', stock={self.stock}, pages='{self.pages}', author='{self.author}')"

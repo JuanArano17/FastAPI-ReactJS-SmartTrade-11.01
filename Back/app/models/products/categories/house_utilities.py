@@ -21,4 +21,4 @@ class HouseUtilities(Product):
     }
 
     def __repr__(self):
-        return f"HouseUtilities(id={self.id}, name='{self.name}', description='{self.description}', eco_points={self.eco_points}, spec_sheet='{self.spec_sheet}', stock={self.stock}, brand={self.brand}, type={self.type})"
+        return f"HouseUtilities(id={self.id}, name='{self.name}', description='{self.description}', spec_sheet='{self.spec_sheet}', stock={self.stock}, brand={self.brand}, type={self.type})"

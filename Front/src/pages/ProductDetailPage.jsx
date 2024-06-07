@@ -1,22 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { Box, Container, Typography, Grid, Button, Paper, Divider, CircularProgress, Rating, ButtonBase, IconButton, Snackbar } from '@mui/material';
+import { Box, Container, Typography, Grid, Button, Paper, Divider, CircularProgress, Rating, IconButton, Snackbar } from '@mui/material';
 import TopBar from '../components/topbar/TopBar';
 import Footer from '../components/footer/Footer';
 import styles from '../styles/styles';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { getProductSellerById } from '../api/services/products/ProductsService';
+import { getProductSellerById, getAllProductsSeller } from '../api/services/products/ProductsService';
 import { addCartItem } from '../api/services/products/ShoppingCartService';
 import FavoriteButton from '../components/favorite-button/FavoriteButton';
+import ImageSelector from '../components/products/ImageSelector/ImageSelector';
+import SimilarProduct from '../components/products/similarProduct/SimilarProduct';
+import ProductReviews from '../components/reviews/ProductReviews'; 
+import Slider from 'react-slick';
 
 const ProductDetailPage = () => {
     const { id } = useParams();
     const [snackbar, setSnackbar] = useState({ open: false, message: '', backgroundColor:'' });
     const [productData, setProductData] = useState(null);
+    const [similarProducts, setSimilarProducts] = useState([]);
     const [selectedSize, setSelectedSize] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [imageIndex, setImageIndex] = useState(0);
     const history = useHistory();
 
     useEffect(() => {
@@ -24,12 +28,19 @@ const ProductDetailPage = () => {
             try {
                 setLoading(true);
                 const response = await getProductSellerById(id);
-                console.log("Product by id: ", response);
                 if (response) {
                     setProductData(response);
                     if (response.sizes && response.sizes.length > 0) {
-                        setSelectedSize(response.sizes[0].size); // Default to first size
+                        setSelectedSize(response.sizes[0].size); 
                     }
+                    const allProducts = await getAllProductsSeller();
+                    const similar = allProducts.filter(product => 
+                        product.id !== response.id &&
+                        product.category === response.category &&
+                        Math.abs(product.price - response.price) <= 25 &&
+                        Math.abs(product.ecoPoints - response.eco_points) <= 25
+                    );
+                    setSimilarProducts(similar);
                     setLoading(false);
                     setError(null);
                 }
@@ -42,7 +53,7 @@ const ProductDetailPage = () => {
     }, [id]);
 
     const handleBackToCatalog = () => {
-        history.push('/catalog'); // Asegúrate de usar la ruta correcta para el catálogo
+        history.push('/catalog'); 
     };
 
     const handleAddToCart = async () => {
@@ -63,7 +74,6 @@ const ProductDetailPage = () => {
     const handleCloseSnackbar = () => {
         setSnackbar({ open: false, message: '', backgroundColor: '' });
     };
-    
 
     const handleSizeChange = (sizeId) => {
         setSelectedSize(sizeId);
@@ -122,8 +132,30 @@ const ProductDetailPage = () => {
         return <Typography color="error">{error}</Typography>;
     }
 
-    const handleImageChange = (newIndex) => {
-        setImageIndex(newIndex);
+    const sliderSettings = {
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 3,
+        slidesToScroll: 3,
+        responsive: [
+            {
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 2,
+                    infinite: true,
+                    dots: true
+                }
+            },
+            {
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1
+                }
+            }
+        ]
     };
 
     return (
@@ -137,31 +169,8 @@ const ProductDetailPage = () => {
                         </IconButton>
                         <FavoriteButton productId={productData.id} />
                         <Grid container spacing={2}>
-                            <Grid item xs={12} md={5} sx={{ display: 'flex', justifyContent: 'center' }}>
-                                <Box sx={{
-                                    width: 600,
-                                    height: 600,
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    overflow: 'hidden',
-                                    borderRadius: '40px',
-                                }}>
-                                    <ButtonBase onClick={() => handleImageChange((imageIndex + 1) % productData.images.length)} disabled={productData.images.length <= 1}>
-                                        <img
-                                            src={productData.images[imageIndex]}
-                                            alt={`Image ${imageIndex + 1} of ${productData.name}`}
-                                            style={{
-                                                height: '100%',
-                                                width: '100%',
-                                                objectFit: 'cover',  // Cubre el contenedor sin distorsionar
-                                                objectPosition: 'center center',  // Centra la imagen en el contenedor
-                                                borderRadius: '40px',  // borderRadius a la imagen
-                                                boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.7)'  // Sombra a la imagen
-                                            }}
-                                        />
-                                    </ButtonBase>
-                                </Box>
+                            <Grid item xs={12} md={5} mt={2}>
+                                <ImageSelector images={productData.images} />  {/* Utilizamos el nuevo componente */}
                             </Grid>
                             <Grid item xs={12} md={7}>
                                 <Typography variant="h6" color="text.secondary">
@@ -200,7 +209,14 @@ const ProductDetailPage = () => {
                             <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
                                 Similar Products
                             </Typography>
+                            <Slider {...sliderSettings}>
+                                {similarProducts.map((product) => (
+                                    <SimilarProduct key={product.id} product={product} />
+                                ))}
+                            </Slider>
                         </Box>
+                        <Divider sx={styles.ThickDivider}></Divider>
+                        <ProductReviews productId={id} />  
                     </Paper>
                 )}
             </Container>
